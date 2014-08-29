@@ -1,0 +1,17 @@
+[
+{
+	"modid": "framez",
+	"name": "Framez",
+	"version": "0.1.2 beta",
+	"url": "http://framez.amadornes.com/",
+    "updateUrl": "http://framez.amadornes.com/downloads",
+	"authorList": [
+	   "amadornes"
+	],
+	"credits": "amadornes",
+	"logoFile": "assets/framez/textures/logo.png",
+	"screenshots": [],
+	"parent": "",
+	"dependencies": [ForgeMultipart]
+}
+]

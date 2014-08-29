@@ -1,0 +1,78 @@
+package com.amadornes.framez.frame;
+
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+
+import com.amadornes.framez.api.IFrame;
+import com.amadornes.framez.api.IFrameModifier;
+import com.amadornes.framez.api.IFrameModifierProvider;
+import com.amadornes.framez.ref.ModInfo;
+import com.amadornes.framez.ref.References.Modifiers;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+public class ModifierProviderIron implements IFrameModifierProvider {
+
+    @SideOnly(Side.CLIENT)
+    protected static IIcon border;
+    @SideOnly(Side.CLIENT)
+    protected static IIcon cross;
+
+    @Override
+    public String getIdentifier() {
+
+        return Modifiers.IRON;
+    }
+
+    @Override
+    public String getUnlocalizedName(ItemStack item) {
+
+        return "Iron";
+    }
+
+    @Override
+    public IFrameModifier instantiate(IFrame frame) {
+
+        return new ModifierIron(frame, this);
+    }
+
+    @Override
+    public boolean isCompatibleWith(String[] otherModifiers) {
+
+        return true;
+    }
+
+    @Override
+    public void registerIcons(IIconRegister reg) {
+
+        border = reg.registerIcon(ModInfo.MODID + ":frameBorderIron");
+        cross = reg.registerIcon(ModInfo.MODID + ":frameCrossIron");
+    }
+
+    @Override
+    public boolean overridesBorderTexture() {
+
+        return true;
+    }
+
+    @Override
+    public boolean overridesCrossTexture() {
+
+        return true;
+    }
+
+    @Override
+    public int overridePriorityBorder() {
+
+        return 50;
+    }
+
+    @Override
+    public int overridePriorityCross() {
+
+        return 50;
+    }
+
+}
