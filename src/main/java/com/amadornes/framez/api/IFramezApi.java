@@ -4,4 +4,6 @@ public interface IFramezApi {
 
     public IModifierRegistry getModifierRegistry();
 
+    public IMotorRegistry getMotorRegistry();
+
 }

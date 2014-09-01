@@ -2,8 +2,10 @@ package com.amadornes.framez.ref;
 
 public class References {
 
-    public static final String FRAME_PART_NAME = ModInfo.MODID + ".frame";
-    public static final String FRAME_PART_ITEM_NAME = ModInfo.MODID + ":frame";
+    public static final String FRAME_NAME = ModInfo.MODID + ".frame";
+    public static final String FRAME_ITEM_NAME = ModInfo.MODID + ":frame";
+
+    public static final String MOTOR_NAME = ModInfo.MODID + ".motor";
 
     public static class Modifiers {
 

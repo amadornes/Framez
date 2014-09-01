@@ -22,7 +22,7 @@ public class ItemFramePart extends JItemMultiPart {
 
     public ItemFramePart() {
 
-        setUnlocalizedName("item." + References.FRAME_PART_NAME);
+        setUnlocalizedName("item." + References.FRAME_NAME);
     }
 
     @Override

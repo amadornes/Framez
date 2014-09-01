@@ -13,7 +13,7 @@ public class FramezApi {
 
     public static void init(IFramezApi inst) {
 
-        if (!Loader.instance().activeModContainer().getModId().equals("Framez"))
+        if (!Loader.instance().activeModContainer().getModId().equals("framez"))
             return;
 
         FramezApi.inst = inst;

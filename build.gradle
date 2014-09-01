@@ -1,0 +1,154 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+repositories {
+    maven { // the repo from which to get CCL and FMP
+        name 'CB Repo'
+        url "http://chickenbones.net/maven/"
+    }
+    maven {
+        name = "ic2"
+        url = "http://maven.ic2.player.to/"
+    }
+    maven {
+        name = "K4 maven"
+        url = "http://maven.k-4u.nl/"
+    }
+}
+
+apply plugin: 'forge'
+
+project.ext {
+    major = "0"
+    minor = "1"
+    mcVersion = "1.7.10"
+}
+
+
+version = "${project.ext.major}.${project.minor}"
+group = "com.amadornes.framez"
+archivesBaseName = "Framez"
+
+
+if (System.getenv().BUILD_NUMBER != null) {
+    version += ".${System.getenv().BUILD_NUMBER}"
+} else {
+    version += " - err"
+}
+
+def grabDep(url) {
+    ant.get(src: url, dest: 'dep')
+	compile files("dep/" + url.substring(url.lastIndexOf("/")));
+}
+
+dependencies {
+    def f = new File('dep/')
+    if (f.exists()) {
+        f.delete()
+    }
+    f.mkdirs()
+    if (!f.exists()) {
+        f.mkdir()
+    }
+    println("  Adding dependencies!")
+    compile "codechicken:CodeChickenLib:1.7.10-1.1.1.95:dev"
+    compile "codechicken:ForgeMultipart:1.7.10-1.1.0.297:dev"
+    compile 'net.industrial-craft:industrialcraft-2:2.2.558-experimental:api'
+    println("  Finished adding dependencies!")
+}
+
+minecraft {
+    version = "${project.ext.mcVersion}-10.13.0.1208"
+    runDir = "eclipse/assets"
+
+    // replacing stuff in the source
+    replace '@MAJOR@', project.major
+    replace '@MINOR@', project.minor
+    replace '@MC_VERSION@', version
+    if (System.getenv("BUILD_NUMBER") != null) {
+        replace '@BUILD_NUMBER@', System.getenv("BUILD_NUMBER")
+    } else {
+        replace '@BUILD_NUMBER@', 0
+    }
+
+}
+
+processResources
+        {
+            // this will ensure that this task is redone when the versions change.
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
+
+            // replace stuff in mcmod.info, nothing else
+            from(sourceSets.main.resources.srcDirs) {
+                include '*.info'
+
+                // replace version and mcversion
+                expand 'version': project.version, 'mcversion': project.minecraft.version
+            }
+
+            // copy everything else, thats not the mcmod.info
+            from(sourceSets.main.resources.srcDirs) {
+                exclude 'mcmod.info'
+            }
+        }
+
+
+jar {
+    appendix = "${project.ext.mcVersion}"
+    classifier = "universal"
+}
+
+task deobfJar(type: Jar) {
+    from(sourceSets.main.output) {
+        appendix = "${project.ext.mcVersion}"
+        classifier = "deobf"
+    }
+}
+
+// add a source jar
+task sourceJar(type: Jar) {
+    from (sourceSets.main.allSource) {
+        appendix = "${project.ext.mcVersion}"
+        classifier = "src"
+    }
+}
+
+// add a javadoc jar
+task javadocZip(type: Zip, dependsOn: javadoc) {
+    appendix = "${project.ext.mcVersion}"
+    classifier = "javadoc"
+    from 'build/docs/javadoc'
+}
+
+// Create API library jar
+task apiJar(type: Jar) {
+    from(sourceSets.main.java) {
+        include 'com/framez/api/**'
+        appendix = "${project.ext.mcVersion}"
+        classifier = "api"
+    }
+}
+
+apiZip.mustRunAfter deobfJar
+
+artifacts {
+    archives sourceJar
+    archives deobfJar
+    archives javadocZip
+    archives apiJar
+}

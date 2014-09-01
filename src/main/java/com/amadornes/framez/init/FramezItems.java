@@ -27,7 +27,7 @@ public final class FramezItems {
 
     private static final void register() {
 
-        GameRegistry.registerItem(item_frame_part, References.FRAME_PART_ITEM_NAME);
+        GameRegistry.registerItem(item_frame_part, References.FRAME_ITEM_NAME);
     }
 
 }

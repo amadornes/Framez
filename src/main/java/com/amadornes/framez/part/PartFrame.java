@@ -145,7 +145,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
     @Override
     public String getType() {
 
-        return References.FRAME_PART_NAME;
+        return References.FRAME_NAME;
     }
 
     @Override

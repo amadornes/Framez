@@ -1,10 +1,12 @@
 package com.amadornes.framez;
 
 import com.amadornes.framez.api.FramezApi;
+import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.frame.ModifierProviderConnected;
 import com.amadornes.framez.frame.ModifierProviderGlass;
 import com.amadornes.framez.frame.ModifierProviderGlassClear;
 import com.amadornes.framez.frame.ModifierProviderIron;
+import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.part.RegisterParts;
 import com.amadornes.framez.proxy.CommonProxy;
@@ -36,6 +38,8 @@ public class Framez {
         ModifierRegistry.INST.registerModifierProvider(new ModifierProviderIron());
         ModifierRegistry.INST.registerModifierProvider(new ModifierProviderGlass());
         ModifierRegistry.INST.registerModifierProvider(new ModifierProviderGlassClear());
+
+        CompatibilityUtils.preInit(ev);
     }
 
     @EventHandler
@@ -45,11 +49,17 @@ public class Framez {
 
         RegisterParts.init();
         FramezItems.init();
+        FramezBlocks.init();
+
+        CompatibilityUtils.init(ev);
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent ev) {
 
+        CompatibilityUtils.postInit(ev);
+
+        proxy.registerRenders();
     }
 
 }

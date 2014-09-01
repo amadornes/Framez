@@ -10,13 +10,13 @@ public class RegisterParts implements IPartFactory {
 
     public static void init() {
 
-        MultiPartRegistry.registerParts(new RegisterParts(), new String[] { References.FRAME_PART_NAME });
+        MultiPartRegistry.registerParts(new RegisterParts(), new String[] { References.FRAME_NAME });
     }
 
     @Override
     public TMultiPart createPart(String type, boolean client) {
 
-        if (type == References.FRAME_PART_NAME)
+        if (type == References.FRAME_NAME)
             return new PartFrame();
 
         return null;
