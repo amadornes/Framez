@@ -1,11 +1,21 @@
 package com.amadornes.framez.tile;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import codechicken.lib.vec.BlockCoord;
+
+import com.amadornes.framez.movement.MovingStructure;
+import com.amadornes.framez.movement.StructureTickHandler;
+import com.amadornes.framez.part.PartFrame;
+import com.amadornes.framez.util.Utils;
 
 public abstract class TileMotor extends TileEntity {
 
@@ -21,6 +31,8 @@ public abstract class TileMotor extends TileEntity {
     private ForgeDirection face = ForgeDirection.DOWN;
 
     private ForgeDirection direction = ForgeDirection.SOUTH;
+
+    private MovingStructure structure = null;
 
     public ForgeDirection getFace() {
 
@@ -91,6 +103,31 @@ public abstract class TileMotor extends TileEntity {
     public void sendUpdatePacket() {
 
         worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+    }
+
+    @Override
+    public void updateEntity() {
+
+        super.updateEntity();
+
+        if (canMove() && worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air && structure == null) {
+            structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 64D);
+
+            PartFrame frame = Utils.getFrame(worldObj, xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
+            if (frame != null) {
+                List<BlockCoord> blocks = new ArrayList<BlockCoord>();
+                Utils.addConnected(blocks, frame);
+                blocks.remove(new BlockCoord(xCoord, yCoord, zCoord));
+                structure.addBlocks(blocks);
+                blocks.clear();
+            } else {
+                structure.addBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
+            }
+
+            StructureTickHandler.inst.addStructure(structure);
+        }
+        if (structure != null && !structure.isValid())
+            structure = null;
     }
 
 }

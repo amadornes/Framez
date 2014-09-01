@@ -1,8 +1,11 @@
 package com.amadornes.framez.util;
 
+import java.util.List;
+
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import codechicken.lib.vec.BlockCoord;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Rotation;
 import codechicken.lib.vec.Vector3;
@@ -63,6 +66,55 @@ public class Utils {
         }
 
         return false;
+    }
+
+    public static int getMicroblockSize(TileMultipart tile, ForgeDirection face) {
+
+        if (tile != null) {
+            TileMultipart te = tile;
+            for (TMultiPart p : te.jPartList()) {
+                if (p instanceof PartFrame)
+                    continue;
+                if (p instanceof FaceMicroblock)
+                    if (((FaceMicroblock) p).getSlot() == face.ordinal())
+                        return ((FaceMicroblock) p).getSize();
+            }
+
+            return 0;
+        }
+
+        return 0;
+    }
+
+    public static void addConnected(List<BlockCoord> blocks, PartFrame frame) {
+
+        int i = 0;
+        for (Object o : frame.getConnections()) {
+            ForgeDirection d = ForgeDirection.getOrientation(i);
+            if (o != null) {
+                if (o instanceof PartFrame) {
+                    PartFrame f = (PartFrame) o;
+                    BlockCoord c = new BlockCoord(f.x(), f.y(), f.z());
+                    if (!blocks.contains(c)) {
+                        blocks.add(c);
+                        addConnected(blocks, f);
+                    }
+                } else if (o instanceof Boolean) {
+                    BlockCoord c = new BlockCoord(frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ);
+                    if (!blocks.contains(c))
+                        blocks.add(c);
+                } else if (o instanceof Integer) {
+                    if (((Integer) o).intValue() > 1) {
+                        if (getFrame(frame.world(), frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ) == null) {
+                            BlockCoord c = new BlockCoord(frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ);
+                            if (!blocks.contains(c))
+                                blocks.add(c);
+                        }
+                    }
+                }
+            }
+            i++;
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package com.amadornes.framez;
 
+import net.minecraftforge.common.MinecraftForge;
+
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.frame.ModifierProviderConnected;
@@ -8,10 +10,12 @@ import com.amadornes.framez.frame.ModifierProviderGlassClear;
 import com.amadornes.framez.frame.ModifierProviderIron;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
+import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.part.RegisterParts;
 import com.amadornes.framez.proxy.CommonProxy;
 import com.amadornes.framez.ref.ModInfo;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -52,6 +56,10 @@ public class Framez {
         FramezBlocks.init();
 
         CompatibilityUtils.init(ev);
+
+        StructureTickHandler eventHandler = StructureTickHandler.inst;
+        MinecraftForge.EVENT_BUS.register(eventHandler);
+        FMLCommonHandler.instance().bus().register(eventHandler);
     }
 
     @EventHandler

@@ -649,7 +649,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
             return true;
 
         if (!Utils.occlusionTest(frame.tile(), face))
-            return true;
+            return Utils.getMicroblockSize(frame.tile(), face);
 
         TileEntity te = frame.world().getTileEntity(frame.x() + face.offsetX, frame.y() + face.offsetY, frame.z() + face.offsetZ);
         if (te != null && te instanceof TileMultipart) {
@@ -681,10 +681,10 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
             }
 
             if (!Utils.occlusionTest((TileMultipart) te, face.getOpposite()))
-                return true;
+                return Utils.getMicroblockSize((TileMultipart) te, face.getOpposite());
         }
 
-        return null;
+        return frame.world().getBlock(frame.x() + face.offsetX, frame.y() + face.offsetY, frame.z() + face.offsetZ) != Blocks.air ? true : null;
     }
 
     @Override
