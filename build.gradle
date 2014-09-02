@@ -144,7 +144,7 @@ task apiJar(type: Jar) {
     }
 }
 
-apiZip.mustRunAfter deobfJar
+apiJar.mustRunAfter deobfJar
 
 artifacts {
     archives sourceJar
