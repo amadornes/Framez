@@ -1,6 +1,7 @@
 package com.amadornes.framez.part;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +24,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
-import scala.actors.threadpool.Arrays;
 import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.raytracer.ExtendedMOP;
@@ -171,7 +171,6 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterable<Cuboid6> getCollisionBoxes() {
 
@@ -471,7 +470,6 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
         return getItem();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterable<ItemStack> getDrops() {
 
@@ -741,7 +739,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
     public void readModifiersFromNBT(NBTTagCompound tag) {
 
         List<IFrameModifier> unedited = new ArrayList<IFrameModifier>();
-        unedited.addAll(Arrays.asList(getConnections()));
+        unedited.addAll((List<? extends IFrameModifier>) Arrays.asList(getConnections()));
 
         NBTTagList list = tag.getTagList("modifiers", 10);// List of tag compounds
 
