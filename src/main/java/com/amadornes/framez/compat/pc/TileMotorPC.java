@@ -13,9 +13,6 @@ import com.amadornes.framez.tile.TileMotor;
 
 public class TileMotorPC extends TileMotor implements IPneumaticMachine {
 
-    private double stored = 0;
-    private double maxStored = 10000;
-
     @Override
     public boolean canMove() {
 
@@ -40,8 +37,6 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
 
         super.writeUpdatePacket(tag);
 
-        tag.setDouble("energy", stored);
-
         handler.writeToNBTI(tag);
     }
 
@@ -49,7 +44,6 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
     public void readUpdatePacket(NBTTagCompound tag) {
 
         super.readUpdatePacket(tag);
-        stored = tag.getDouble("energy");
 
         handler.readFromNBTI(tag);
     }

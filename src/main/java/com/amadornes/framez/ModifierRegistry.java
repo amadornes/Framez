@@ -1,6 +1,7 @@
 package com.amadornes.framez;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,7 +11,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
-import scala.actors.threadpool.Arrays;
 
 import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
@@ -109,7 +109,6 @@ public class ModifierRegistry implements IModifierRegistry {
 
     private List<ItemStack> combinations = null;
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<ItemStack> getAllPossibleCombinations() {
 
