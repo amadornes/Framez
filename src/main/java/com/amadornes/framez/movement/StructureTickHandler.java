@@ -9,7 +9,7 @@ import cpw.mods.fml.common.gameevent.TickEvent.WorldTickEvent;
 
 public class StructureTickHandler {
 
-    public static StructureTickHandler inst = new StructureTickHandler();
+    public static StructureTickHandler INST = new StructureTickHandler();
 
     private List<MovingStructure> structures = new ArrayList<MovingStructure>();
 
@@ -30,7 +30,7 @@ public class StructureTickHandler {
 
             for (MovingStructure s : new ArrayList<MovingStructure>(structures)) {
                 s.tick();
-                if (!s.isValid())
+                if (s.getMoved() >= 1)
                     invalid.add(s);
             }
 

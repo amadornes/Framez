@@ -14,6 +14,7 @@ import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
 
+import com.amadornes.framez.api.movement.IFrameMove;
 import com.amadornes.framez.part.PartFrame;
 
 public class Utils {
@@ -88,27 +89,35 @@ public class Utils {
 
     public static void addConnected(List<BlockCoord> blocks, PartFrame frame) {
 
+        BlockCoord coords = new BlockCoord(frame.x(), frame.y(), frame.z());
+        if (blocks.contains(coords))
+            return;
+        blocks.add(coords);
+
         int i = 0;
         for (Object o : frame.getConnections()) {
             ForgeDirection d = ForgeDirection.getOrientation(i);
             if (o != null) {
                 if (o instanceof PartFrame) {
-                    PartFrame f = (PartFrame) o;
-                    BlockCoord c = new BlockCoord(f.x(), f.y(), f.z());
-                    if (!blocks.contains(c)) {
-                        blocks.add(c);
-                        addConnected(blocks, f);
-                    }
+                    addConnected(blocks, (PartFrame) o);
                 } else if (o instanceof Boolean) {
                     BlockCoord c = new BlockCoord(frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ);
-                    if (!blocks.contains(c))
-                        blocks.add(c);
+                    TileEntity te = frame.world().getTileEntity(c.x, c.y, c.z);
+                    if (te == null || (te != null && (!(te instanceof IFrameMove) || (te instanceof IFrameMove && ((IFrameMove) te).canBeMoved()))))
+                        if (!blocks.contains(c))
+                            blocks.add(c);
                 } else if (o instanceof Integer) {
                     if (((Integer) o).intValue() > 1) {
-                        if (getFrame(frame.world(), frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ) == null) {
+                        PartFrame f = getFrame(frame.world(), frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ);
+                        if (f == null) {
                             BlockCoord c = new BlockCoord(frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ);
-                            if (!blocks.contains(c))
-                                blocks.add(c);
+                            TileEntity te = frame.world().getTileEntity(c.x, c.y, c.z);
+                            if (te == null
+                                    || (te != null && (!(te instanceof IFrameMove) || (te instanceof IFrameMove && ((IFrameMove) te).canBeMoved()))))
+                                if (!blocks.contains(c))
+                                    blocks.add(c);
+                        } else {
+                            addConnected(blocks, f);
                         }
                     }
                 }

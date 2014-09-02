@@ -1,0 +1,205 @@
+package com.amadornes.framez.tile;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
+import com.amadornes.framez.movement.MovingBlock;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+public class TileMoving extends TileEntity {
+
+    private MovingBlock blockA;
+    private MovingBlock blockB;
+
+    @Override
+    public void updateEntity() {
+
+        if (blockA == null && blockB == null) {
+            getWorldObj().removeTileEntity(xCoord, yCoord, zCoord);
+            getWorldObj().setBlockToAir(xCoord, yCoord, zCoord);
+        }
+    }
+
+    public void setBlockA(MovingBlock blockA) {
+
+        this.blockA = blockA;
+    }
+
+    public void setBlockB(MovingBlock blockB) {
+
+        this.blockB = blockB;
+    }
+
+    public MovingBlock getBlockA() {
+
+        return blockA;
+    }
+
+    public MovingBlock getBlockB() {
+
+        return blockB;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void addCollisionBoxesToList(AxisAlignedBB aabb, List l, Entity e) {
+
+        if (blockA != null) {
+            List lA = new ArrayList();
+            blockA.getBlock().addCollisionBoxesToList(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
+                    blockA.getLocation().z, aabb, lA, e);
+            for (Object o : lA) {
+                AxisAlignedBB b = ((AxisAlignedBB) o).copy();
+                b.minX += blockA.getDirection().offsetX * blockA.getMoved();
+                b.minY += blockA.getDirection().offsetY * blockA.getMoved();
+                b.minZ += blockA.getDirection().offsetZ * blockA.getMoved();
+                b.maxX += blockA.getDirection().offsetX * blockA.getMoved();
+                b.maxY += blockA.getDirection().offsetY * blockA.getMoved();
+                b.maxZ += blockA.getDirection().offsetZ * blockA.getMoved();
+
+                if (aabb.intersectsWith(b))
+                    l.add(b);
+            }
+        }
+
+        if (blockB != null) {
+            AxisAlignedBB aabb2 = aabb.copy();
+            aabb2.minX += blockB.getDirection().offsetX;
+            aabb2.minY += blockB.getDirection().offsetY;
+            aabb2.minZ += blockB.getDirection().offsetZ;
+            aabb2.maxX += blockB.getDirection().offsetX;
+            aabb2.maxY += blockB.getDirection().offsetY;
+            aabb2.maxZ += blockB.getDirection().offsetZ;
+
+            List lB = new ArrayList();
+            blockB.getBlock().addCollisionBoxesToList(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
+                    blockB.getLocation().z, aabb2, lB, e);
+            for (Object o : lB) {
+                AxisAlignedBB b = ((AxisAlignedBB) o).copy();
+                b.minX += 1 - blockB.getDirection().offsetX * blockB.getMoved();
+                b.minY += 1 - blockB.getDirection().offsetY * blockB.getMoved();
+                b.minZ += 1 - blockB.getDirection().offsetZ * blockB.getMoved();
+                b.maxX += 1 - blockB.getDirection().offsetX * blockB.getMoved();
+                b.maxY += 1 - blockB.getDirection().offsetY * blockB.getMoved();
+                b.maxZ += 1 - blockB.getDirection().offsetZ * blockB.getMoved();
+
+                if (aabb.intersectsWith(b))
+                    l.add(b);
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBox() {
+
+        if (blockA != null) {
+
+            if (blockA.getTileEntity() != null)
+                blockA.getTileEntity().setWorldObj(worldObj);
+
+            World w = Minecraft.getMinecraft().thePlayer.worldObj;
+            Minecraft.getMinecraft().thePlayer.worldObj = blockA.getWorldWrapper();
+            AxisAlignedBB b = blockA.getBlock().getSelectedBoundingBoxFromPool(blockA.getWorldWrapper(), blockA.getLocation().x,
+                    blockA.getLocation().y, blockA.getLocation().z);
+            Minecraft.getMinecraft().thePlayer.worldObj = w;
+
+            if (b != null) {
+                b = b.copy();
+
+                b.minX += blockA.getDirection().offsetX * blockA.getMoved();
+                b.minY += blockA.getDirection().offsetY * blockA.getMoved();
+                b.minZ += blockA.getDirection().offsetZ * blockA.getMoved();
+                b.maxX += blockA.getDirection().offsetX * blockA.getMoved();
+                b.maxY += blockA.getDirection().offsetY * blockA.getMoved();
+                b.maxZ += blockA.getDirection().offsetZ * blockA.getMoved();
+
+                if (blockA.getTileEntity() != null)
+                    blockA.getTileEntity().setWorldObj(blockA.getWorldWrapper());
+
+                return b;
+            }
+
+            if (blockA.getTileEntity() != null)
+                blockA.getTileEntity().setWorldObj(blockA.getWorldWrapper());
+        }
+
+        if (blockB != null) {
+
+            if (blockB.getTileEntity() != null)
+                blockB.getTileEntity().setWorldObj(worldObj);
+
+            World w = Minecraft.getMinecraft().thePlayer.worldObj;
+            Minecraft.getMinecraft().thePlayer.worldObj = blockB.getWorldWrapper();
+            AxisAlignedBB b = blockB.getBlock().getSelectedBoundingBoxFromPool(blockB.getWorldWrapper(), blockB.getLocation().x,
+                    blockB.getLocation().y, blockB.getLocation().z);
+            Minecraft.getMinecraft().thePlayer.worldObj = w;
+
+            if (b != null) {
+                b = b.copy();
+
+                b.minX += blockB.getDirection().offsetX * blockB.getMoved();
+                b.minY += blockB.getDirection().offsetY * blockB.getMoved();
+                b.minZ += blockB.getDirection().offsetZ * blockB.getMoved();
+                b.maxX += blockB.getDirection().offsetX * blockB.getMoved();
+                b.maxY += blockB.getDirection().offsetY * blockB.getMoved();
+                b.maxZ += blockB.getDirection().offsetZ * blockB.getMoved();
+
+                if (blockB.getTileEntity() != null)
+                    blockB.getTileEntity().setWorldObj(blockB.getWorldWrapper());
+
+                return b;
+            }
+
+            if (blockB.getTileEntity() != null)
+                blockB.getTileEntity().setWorldObj(blockB.getWorldWrapper());
+        }
+
+        return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1, zCoord + 1);
+    }
+
+    public MovingObjectPosition rayTrace(Vec3 start, Vec3 end) {
+
+        MovingObjectPosition mopA = null;
+        MovingObjectPosition mopB = null;
+
+        if (blockA != null) {
+            Vec3 start2 = start.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()), blockA.getDirection().offsetY * (-blockA.getMoved()),
+                    blockA.getDirection().offsetZ * (-blockA.getMoved()));
+            Vec3 end2 = end.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()), blockA.getDirection().offsetY * (-blockA.getMoved()),
+                    blockA.getDirection().offsetZ * (-blockA.getMoved()));
+
+            mopA = blockA.getBlock().collisionRayTrace(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
+                    blockA.getLocation().z, start2, end2);
+        }
+
+        if (blockB != null) {
+            Vec3 start2 = start.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()), blockB.getDirection().offsetY * (-blockB.getMoved()),
+                    blockB.getDirection().offsetZ * (-blockB.getMoved()));
+            Vec3 end2 = end.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()), blockB.getDirection().offsetY * (-blockB.getMoved()),
+                    blockB.getDirection().offsetZ * (-blockB.getMoved()));
+
+            mopB = blockB.getBlock().collisionRayTrace(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
+                    blockB.getLocation().z, start2, end2);
+        }
+
+        if (mopA == null && mopB == null)
+            return null;
+        if (mopA != null && mopB == null)
+            return mopA;
+        if (mopB != null && mopA == null)
+            return mopB;
+
+        if (mopA.hitVec.distanceTo(start) < mopB.hitVec.distanceTo(start))
+            return mopA;
+        return mopB;
+    }
+}

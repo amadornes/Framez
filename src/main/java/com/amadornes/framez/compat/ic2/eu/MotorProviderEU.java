@@ -1,4 +1,4 @@
-package com.amadornes.framez.compat.eu;
+package com.amadornes.framez.compat.ic2.eu;
 
 import com.amadornes.framez.api.IMotorProvider;
 import com.amadornes.framez.tile.TileMotor;

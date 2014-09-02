@@ -3,18 +3,18 @@ package com.amadornes.framez.movement;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
 
-import com.amadornes.framez.api.IDisposable;
-import com.amadornes.framez.api.movement.IMovementListener;
+import com.amadornes.framez.api.movement.IMovementListenerSelf;
+import com.amadornes.framez.init.FramezBlocks;
+import com.amadornes.framez.tile.TileMoving;
+import com.amadornes.framez.world.WorldWrapper;
 
-public class MovingBlock implements IDisposable {
+public class MovingBlock {
 
     private World world;
     private BlockCoord loc;
@@ -22,23 +22,21 @@ public class MovingBlock implements IDisposable {
     private Block block;
     private int meta;
     private TileEntity te;
-    private ForgeDirection direction;
-    private double moved = 0;
 
-    private boolean valid = true;
+    private MovingStructure structure;
 
-    public MovingBlock(BlockCoord location, World world, ForgeDirection direction) {
+    public MovingBlock(BlockCoord location, World world, MovingStructure structure) {
 
         loc = location;
         this.world = world;
-        this.direction = direction;
+        this.structure = structure;
     }
 
-    public MovingBlock(int x, int y, int z, World world, ForgeDirection direction) {
+    public MovingBlock(int x, int y, int z, World world, MovingStructure structure) {
 
         loc = new BlockCoord(x, y, z);
         this.world = world;
-        this.direction = direction;
+        this.structure = structure;
     }
 
     public World getWorld() {
@@ -68,17 +66,22 @@ public class MovingBlock implements IDisposable {
 
     public ForgeDirection getDirection() {
 
-        return direction;
+        return structure.getDirection();
     }
 
     public double getMoved() {
 
-        return moved;
+        return structure.getMoved();
     }
 
-    public void move(double distance) {
+    public WorldWrapper getWorldWrapper() {
 
-        moved += distance;
+        return structure.getWorldWrapper();
+    }
+
+    public MovingStructure getStructure() {
+
+        return structure;
     }
 
     public void storeData() {
@@ -88,29 +91,24 @@ public class MovingBlock implements IDisposable {
         meta = world.getBlockMetadata(loc.x, loc.y, loc.z);
     }
 
-    @SuppressWarnings("unchecked")
-    public void placeTmp() {
-
-        world.setBlock(loc.x, loc.y, loc.z, block, meta, 0);
-        if (te != null)
-            world.loadedTileEntityList.add(te);
-    }
-
     public void place() {
 
-        world.setBlock(loc.x + direction.offsetX, loc.y + direction.offsetY, loc.z + direction.offsetZ, block, meta, 2);
+        if (te != null) {
+            te.xCoord += getDirection().offsetX;
+            te.yCoord += getDirection().offsetY;
+            te.zCoord += getDirection().offsetZ;
+            te.setWorldObj(world);
+        }
+
+        world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, block, meta, 2);
 
         if (te != null) {
-            te.xCoord += direction.offsetX;
-            te.yCoord += direction.offsetY;
-            te.zCoord += direction.offsetZ;
-
-            if (te instanceof IMovementListener) {
-                ((IMovementListener) te).onFinishMoving(direction);
+            if (te instanceof IMovementListenerSelf) {
+                ((IMovementListenerSelf) te).onFinishMoving(getDirection());
             } else if (te instanceof TileMultipart) {
                 for (TMultiPart p : ((TileMultipart) te).jPartList()) {
-                    if (p instanceof IMovementListener) {
-                        ((IMovementListener) p).onFinishMoving(direction);
+                    if (p instanceof IMovementListenerSelf) {
+                        ((IMovementListenerSelf) p).onFinishMoving(getDirection());
                     }
                 }
             }
@@ -118,33 +116,61 @@ public class MovingBlock implements IDisposable {
             world.setTileEntity(te.xCoord, te.yCoord, te.zCoord, te);
         }
 
-        world.setBlockMetadataWithNotify(loc.x + direction.offsetX, loc.y + direction.offsetY, loc.z + direction.offsetZ, meta, 2);
-    }
+        world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 2);
 
-    public void removeTmp() {
-
-        world.removeTileEntity(loc.x, loc.y, loc.z);
-        world.setBlock(loc.x, loc.y, loc.z, Blocks.air);
+        MovementApi.INST.onPlace(te != null ? te : block, getDirection());
     }
 
     public void remove() {
 
-        removeTmp();
+        world.removeTileEntity(loc.x, loc.y, loc.z);
+        world.setBlock(loc.x, loc.y, loc.z, Blocks.air, 0, 2);
 
         // Notify the TE that it has started moving
         if (te != null) {
             if (te.isInvalid())
                 te.validate();
-            if (te instanceof IMovementListener) {
-                ((IMovementListener) te).onStartMoving(direction);
+            if (te instanceof IMovementListenerSelf) {
+                ((IMovementListenerSelf) te).onStartMoving(getDirection());
             } else if (te instanceof TileMultipart) {
                 for (TMultiPart p : ((TileMultipart) te).jPartList()) {
-                    if (p instanceof IMovementListener) {
-                        ((IMovementListener) p).onStartMoving(direction);
+                    if (p instanceof IMovementListenerSelf) {
+                        ((IMovementListenerSelf) p).onStartMoving(getDirection());
                     }
                 }
             }
         }
+
+        MovementApi.INST.onRemove(te != null ? te : block, getDirection());
+
+        if (te != null) {
+            te.setWorldObj(getWorldWrapper());
+        }
+    }
+
+    public void placePlaceholder() {
+
+        world.setBlock(loc.x, loc.y, loc.z, FramezBlocks.block_moving, 0, 2);
+        TileMoving te = new TileMoving();
+        te.setBlockA(this);
+        world.setTileEntity(loc.x, loc.y, loc.z, te);
+
+        TileMoving te2 = null;
+        if (world.getBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ) == FramezBlocks.block_moving) {
+            te2 = (TileMoving) world.getTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
+        } else {
+            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, FramezBlocks.block_moving,
+                    0, 2);
+            world.setTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ,
+                    te2 = new TileMoving());
+        }
+        te2.setBlockB(this);
+    }
+
+    public void removePlaceholder() {
+
+        world.setBlockToAir(loc.x, loc.y, loc.z);
+        world.setBlockToAir(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
     }
 
     public void tick() {
@@ -152,30 +178,6 @@ public class MovingBlock implements IDisposable {
         if (te != null)
             te.updateEntity();
         block.updateTick(world, loc.x, loc.y, loc.z, world.rand);
-    }
-
-    public MovingObjectPosition rayTrace(Vec3 start, Vec3 end) {
-
-        Vec3 end2 = end.addVector(-(direction.offsetX * moved), -(direction.offsetY * moved), -(direction.offsetZ * moved));
-
-        return block.collisionRayTrace(world, loc.x, loc.y, loc.z, start, end2);
-    }
-
-    @Override
-    public void dispose() {
-
-        world = null;
-        block = null;
-        te = null;
-        loc = null;
-
-        valid = false;
-    }
-
-    @Override
-    public boolean isValid() {
-
-        return valid;
     }
 
 }

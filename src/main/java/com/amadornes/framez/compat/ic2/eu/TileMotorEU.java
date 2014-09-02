@@ -1,4 +1,4 @@
-package com.amadornes.framez.compat.eu;
+package com.amadornes.framez.compat.ic2.eu;
 
 import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;

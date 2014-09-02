@@ -7,6 +7,8 @@ public class References {
 
     public static final String MOTOR_NAME = ModInfo.MODID + ".motor";
 
+    public static final String BLOCK_MOVING_NAME = ModInfo.MODID + ".moving";
+
     public static class Modifiers {
 
         public static final String CONNECTED = "connected";

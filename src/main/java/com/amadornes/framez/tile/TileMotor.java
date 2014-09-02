@@ -2,6 +2,7 @@ package com.amadornes.framez.tile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,12 +13,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 
+import com.amadornes.framez.api.movement.IFrameMove;
+import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.util.Utils;
 
-public abstract class TileMotor extends TileEntity {
+public abstract class TileMotor extends TileEntity implements IFrameMove {
 
     public abstract boolean canMove();
 
@@ -56,6 +59,11 @@ public abstract class TileMotor extends TileEntity {
         this.direction = direction;
 
         sendUpdatePacket();
+    }
+
+    public double getMoved() {
+
+        return structure == null ? 0 : structure.getMoved();
     }
 
     @Override
@@ -111,7 +119,7 @@ public abstract class TileMotor extends TileEntity {
         super.updateEntity();
 
         if (canMove() && worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air && structure == null) {
-            structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 64D);
+            structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 250D);// 100D);//
 
             PartFrame frame = Utils.getFrame(worldObj, xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
             if (frame != null) {
@@ -124,10 +132,30 @@ public abstract class TileMotor extends TileEntity {
                 structure.addBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
             }
 
-            StructureTickHandler.inst.addStructure(structure);
+            StructureTickHandler.INST.addStructure(structure);
         }
-        if (structure != null && !structure.isValid())
+        if (structure != null && structure.getMoved() >= 1)
             structure = null;
+    }
+
+    public MovingStructure getStructure() {
+
+        return structure;
+    }
+
+    public void randomDisplayTick(Random rnd) {
+
+        if (structure != null)
+            for (MovingBlock b : structure.getBlocks())
+                if (b != null && b.getBlock() != null)
+                    if (b.getBlock().getTickRandomly())
+                        b.getBlock().randomDisplayTick(structure.getWorldWrapper(), b.getLocation().x, b.getLocation().y, b.getLocation().z, rnd);
+    }
+
+    @Override
+    public boolean canBeMoved() {
+
+        return structure == null;
     }
 
 }

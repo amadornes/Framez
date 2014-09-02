@@ -1,5 +1,7 @@
 package com.amadornes.framez.block;
 
+import java.util.Random;
+
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -101,6 +103,12 @@ public class BlockMotor extends BlockContainer {
     public String getUnlocalizedName() {
 
         return provider.getUnlocalizedName();
+    }
+
+    @Override
+    public void randomDisplayTick(World w, int x, int y, int z, Random rnd) {
+
+        ((TileMotor) w.getTileEntity(x, y, z)).randomDisplayTick(rnd);
     }
 
 }

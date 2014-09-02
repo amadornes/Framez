@@ -1,8 +1,15 @@
 package com.amadornes.framez.client.render;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -14,6 +21,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.client.RenderHelper;
+import com.amadornes.framez.movement.MovingBlock;
+import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.tile.TileMotor;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -109,6 +118,13 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
         GL11.glPushMatrix();
         {
             GL11.glTranslated(x, y, z);
+
+            GL11.glPushMatrix();
+            {
+                if (te.getStructure() != null)
+                    renderStructure(te, frame);
+            }
+            GL11.glPopMatrix();
 
             ForgeDirection face = te.getFace();
             ForgeDirection direction = te.getDirection();
@@ -230,7 +246,7 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
 
             GL11.glPushMatrix();
             {
-                double progress = 0.5;
+                double progress = te.getMoved();
                 renderArrow(false, progress);
                 renderArrow(true, progress);
                 renderArrow(false, -progress);
@@ -417,4 +433,71 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
         GL11.glPopMatrix();
     }
 
+    private static RenderBlocks rb = new RenderBlocks();
+
+    public void renderStructure(TileMotor motor, float frame) {
+
+        MovingStructure structure = motor.getStructure();
+
+        if (structure.getBlocks() == null)
+            return;
+        List<MovingBlock> blocks = new ArrayList<MovingBlock>(structure.getBlocks());
+
+        GL11.glTranslated(structure.getDirection().offsetX * structure.getMoved(), structure.getDirection().offsetY * structure.getMoved(),
+                structure.getDirection().offsetZ * structure.getMoved());
+        GL11.glTranslated(structure.getDirection().offsetX * (structure.getSpeed() * frame), structure.getDirection().offsetY
+                * (structure.getSpeed() * frame), structure.getDirection().offsetZ * (structure.getSpeed() * frame));
+        GL11.glTranslated(-motor.xCoord, -motor.yCoord, -motor.zCoord);
+
+        // ISBRH
+        {
+            GL11.glPushMatrix();
+
+            net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+
+            Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+            rb.blockAccess = structure.getWorldWrapper();
+
+            for (MovingBlock b : blocks) {
+                if (b == null)
+                    continue;
+                Tessellator.instance.startDrawingQuads();
+                if (b.getBlock() != null && b.getLocation() != null) {
+                    for (int pass = 0; pass < 2; pass++) {
+                        if (b.getBlock().canRenderInPass(pass)) {
+                            rb.renderBlockByRenderType(b.getBlock(), b.getLocation().x, b.getLocation().y, b.getLocation().z);
+                        }
+                    }
+                }
+                Tessellator.instance.draw();
+            }
+
+            net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
+
+            GL11.glPopMatrix();
+        }
+
+        // TESR
+        {
+            GL11.glPushMatrix();
+            for (MovingBlock b : blocks) {
+                if (b == null)
+                    continue;
+
+                TileEntity te = b.getTileEntity();
+                if (te == null)
+                    continue;
+
+                GL11.glTranslated(b.getLocation().x, b.getLocation().y, b.getLocation().z);
+
+                TileEntitySpecialRenderer tesr = TileEntityRendererDispatcher.instance.getSpecialRenderer(te);
+                if (tesr != null) {
+                    GL11.glPushMatrix();
+                    tesr.renderTileEntityAt(te, 0, 0, 0, frame);
+                    GL11.glPopMatrix();
+                }
+            }
+            GL11.glPopMatrix();
+        }
+    }
 }

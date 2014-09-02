@@ -1,4 +1,4 @@
-package com.amadornes.framez.compat.eu;
+package com.amadornes.framez.compat.ic2.eu;
 
 import java.util.Map.Entry;
 

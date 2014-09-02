@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.amadornes.framez.compat.eu.CompatModuleEU;
+import com.amadornes.framez.compat.ic2.CompatModuleIC2;
 import com.amadornes.framez.compat.pc.CompatModulePC;
 import com.amadornes.framez.compat.vanilla.CompatModuleVanilla;
 
@@ -114,7 +114,7 @@ public class CompatibilityUtils {
      */
     static {
         registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleVanilla.class);
-        registerModule("IC2", CompatModuleEU.class, null);
+        registerModule("IC2", CompatModuleIC2.class, null);
         registerModule("PneumaticCraft", CompatModulePC.class, null);
     }
 
