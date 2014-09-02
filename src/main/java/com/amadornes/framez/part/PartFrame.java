@@ -734,12 +734,11 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void readModifiersFromNBT(NBTTagCompound tag) {
 
         List<IFrameModifier> unedited = new ArrayList<IFrameModifier>();
-        unedited.addAll((List<? extends IFrameModifier>) Arrays.asList(getConnections()));
+        unedited.addAll(Arrays.asList(getModifiers()));
 
         NBTTagList list = tag.getTagList("modifiers", 10);// List of tag compounds
 
