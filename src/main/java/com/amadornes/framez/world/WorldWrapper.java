@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.EnumSkyBlock;
@@ -141,36 +142,57 @@ public class WorldWrapper extends World {
     }
 
     @Override
-    public boolean setBlock(int p_147449_1_, int p_147449_2_, int p_147449_3_, Block p_147449_4_) {
+    public boolean setBlock(int x, int y, int z, Block block) {
 
-        return false;
+        MovingBlock b = get(x, y, z);
+        if (b == null)
+            return false;
+
+        b.setBlock(block);
+        return true;
     }
 
     @Override
-    public boolean setBlock(int p_147465_1_, int p_147465_2_, int p_147465_3_, Block p_147465_4_, int p_147465_5_, int p_147465_6_) {
+    public boolean setBlock(int x, int y, int z, Block block, int meta, int notify) {
 
-        return false;
+        MovingBlock b = get(x, y, z);
+        if (b == null)
+            return false;
+
+        b.setBlock(block);
+        b.setMeta(meta);
+        return true;
     }
 
     @Override
-    public boolean setBlockMetadataWithNotify(int p_72921_1_, int p_72921_2_, int p_72921_3_, int p_72921_4_, int p_72921_5_) {
+    public boolean setBlockMetadataWithNotify(int x, int y, int z, int meta, int notify) {
 
-        return false;
+        MovingBlock b = get(x, y, z);
+        if (b == null)
+            return false;
+
+        b.setMeta(meta);
+        return true;
     }
 
     @Override
-    public boolean setBlockToAir(int p_147468_1_, int p_147468_2_, int p_147468_3_) {
+    public boolean setBlockToAir(int x, int y, int z) {
 
-        return false;
+        MovingBlock b = get(x, y, z);
+        if (b == null)
+            return false;
+
+        b.setBlock(Blocks.air);
+        return true;
     }
 
     @Override
-    public void setTileEntity(int p_147455_1_, int p_147455_2_, int p_147455_3_, TileEntity p_147455_4_) {
+    public void setTileEntity(int x, int y, int z, TileEntity te) {
 
     }
 
     @Override
-    public void removeTileEntity(int p_147475_1_, int p_147475_2_, int p_147475_3_) {
+    public void removeTileEntity(int x, int y, int z) {
 
     }
 
@@ -200,6 +222,24 @@ public class WorldWrapper extends World {
     public void playSoundEffect(double x, double y, double z, String sound, float volume, float pitch) {
 
         structure.getWorld().playSoundEffect(x, y, z, sound, volume, pitch);
+    }
+
+    @Override
+    public void playAuxSFX(int x, int y, int z, int a, int b) {
+
+        structure.getWorld().playAuxSFX(x, y, z, a, b);
+    }
+
+    @Override
+    public void playAuxSFXAtEntity(EntityPlayer player, int x, int y, int z, int a, int b) {
+
+        structure.getWorld().playAuxSFXAtEntity(player, x, y, z, a, b);
+    }
+
+    @Override
+    public void playSoundToNearExcept(EntityPlayer player, String sound, float volume, float pitch) {
+
+        structure.getWorld().playSoundToNearExcept(player, sound, volume, pitch);
     }
 
     @Override

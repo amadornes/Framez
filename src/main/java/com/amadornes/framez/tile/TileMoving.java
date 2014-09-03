@@ -75,24 +75,24 @@ public class TileMoving extends TileEntity {
 
         if (blockB != null) {
             AxisAlignedBB aabb2 = aabb.copy();
-            aabb2.minX += blockB.getDirection().offsetX;
-            aabb2.minY += blockB.getDirection().offsetY;
-            aabb2.minZ += blockB.getDirection().offsetZ;
-            aabb2.maxX += blockB.getDirection().offsetX;
-            aabb2.maxY += blockB.getDirection().offsetY;
-            aabb2.maxZ += blockB.getDirection().offsetZ;
+            aabb2.minX -= blockB.getDirection().offsetX;
+            aabb2.minY -= blockB.getDirection().offsetY;
+            aabb2.minZ -= blockB.getDirection().offsetZ;
+            aabb2.maxX -= blockB.getDirection().offsetX;
+            aabb2.maxY -= blockB.getDirection().offsetY;
+            aabb2.maxZ -= blockB.getDirection().offsetZ;
 
             List lB = new ArrayList();
             blockB.getBlock().addCollisionBoxesToList(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
                     blockB.getLocation().z, aabb2, lB, e);
             for (Object o : lB) {
                 AxisAlignedBB b = ((AxisAlignedBB) o).copy();
-                b.minX += 1 - blockB.getDirection().offsetX * blockB.getMoved();
-                b.minY += 1 - blockB.getDirection().offsetY * blockB.getMoved();
-                b.minZ += 1 - blockB.getDirection().offsetZ * blockB.getMoved();
-                b.maxX += 1 - blockB.getDirection().offsetX * blockB.getMoved();
-                b.maxY += 1 - blockB.getDirection().offsetY * blockB.getMoved();
-                b.maxZ += 1 - blockB.getDirection().offsetZ * blockB.getMoved();
+                b.minX -= (-blockB.getMoved() * blockB.getDirection().offsetX);
+                b.minY -= (-blockB.getMoved() * blockB.getDirection().offsetY);
+                b.minZ -= (-blockB.getMoved() * blockB.getDirection().offsetZ);
+                b.maxX -= (-blockB.getMoved() * blockB.getDirection().offsetX);
+                b.maxY -= (-blockB.getMoved() * blockB.getDirection().offsetY);
+                b.maxZ -= (-blockB.getMoved() * blockB.getDirection().offsetZ);
 
                 if (aabb.intersectsWith(b))
                     l.add(b);
@@ -228,5 +228,17 @@ public class TileMoving extends TileEntity {
     public MovingBlock getSelected(EntityPlayer player) {
 
         return getSelected(rayTrace(player));
+    }
+
+    public boolean onBlockActivated(EntityPlayer player) {
+
+        MovingObjectPosition mop = rayTrace(player);
+        MovingBlock b = getSelected(mop);
+
+        if (b == null)
+            return false;
+
+        return b.getBlock().onBlockActivated(b.getWorldWrapper(), b.getLocation().x, b.getLocation().y, b.getLocation().z, player, mop.sideHit,
+                (float) mop.hitVec.xCoord - mop.blockX, (float) mop.hitVec.yCoord - mop.blockY, (float) mop.hitVec.zCoord - mop.blockZ);
     }
 }

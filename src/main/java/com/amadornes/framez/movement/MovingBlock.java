@@ -84,6 +84,21 @@ public class MovingBlock {
         return structure;
     }
 
+    public void setBlock(Block block) {
+
+        this.block = block;
+    }
+
+    public void setMeta(int meta) {
+
+        this.meta = meta;
+    }
+
+    public void setTileEntity(TileEntity te) {
+
+        this.te = te;
+    }
+
     public void storeData() {
 
         te = world.getTileEntity(loc.x, loc.y, loc.z);

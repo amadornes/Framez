@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.EnumSkyBlock;
@@ -202,6 +203,24 @@ public class WorldWrapperClient extends WorldClient {
     public void playSoundEffect(double x, double y, double z, String sound, float volume, float pitch) {
 
         structure.getWorld().playSoundEffect(x, y, z, sound, volume, pitch);
+    }
+
+    @Override
+    public void playAuxSFX(int x, int y, int z, int a, int b) {
+
+        structure.getWorld().playAuxSFX(x, y, z, a, b);
+    }
+
+    @Override
+    public void playAuxSFXAtEntity(EntityPlayer player, int x, int y, int z, int a, int b) {
+
+        structure.getWorld().playAuxSFXAtEntity(player, x, y, z, a, b);
+    }
+
+    @Override
+    public void playSoundToNearExcept(EntityPlayer player, String sound, float volume, float pitch) {
+
+        structure.getWorld().playSoundToNearExcept(player, sound, volume, pitch);
     }
 
     @Override

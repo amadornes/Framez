@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
@@ -91,6 +92,16 @@ public class BlockMoving extends BlockContainer {
     public boolean renderAsNormalBlock() {
 
         return false;
+    }
+
+    @Override
+    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer p, int side, float subX, float subY, float subZ) {
+
+        TileMoving te = get(w, x, y, z);
+        if (te == null)
+            return false;
+
+        return te.onBlockActivated(p);
     }
 
 }

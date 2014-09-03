@@ -119,7 +119,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         super.updateEntity();
 
         if (canMove() && worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air && structure == null) {
-            structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 250D);// 100D);//
+            structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 125D);
 
             PartFrame frame = Utils.getFrame(worldObj, xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
             if (frame != null) {
