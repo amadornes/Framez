@@ -16,7 +16,11 @@ buildscript {
 }
 
 repositories {
-    maven { // the repo from which to get CCL and FMP
+    maven {
+        name "Mobius Repo"
+        url "http://mobiusstrip.eu/maven"
+    }
+    maven {
         name 'CB Repo'
         url "http://chickenbones.net/maven/"
     }
@@ -66,7 +70,10 @@ dependencies {
     }
     println("  Adding dependencies!")
     compile "codechicken:CodeChickenLib:1.7.10-1.1.1.95:dev"
+    compile "codechicken:CodeChickenCore:1.7.10-1.0.2.11:dev"
+    compile "codechicken:NotEnoughItems:1.7.10-1.0.2.26:dev"
     compile "codechicken:ForgeMultipart:1.7.10-1.1.0.297:dev"
+    compile "mcp.mobius.waila:Waila:1.5.3a_1.7.10"
     compile 'net.industrial-craft:industrialcraft-2:2.2.558-experimental:api'
     println("  Finished adding dependencies!")
 }
