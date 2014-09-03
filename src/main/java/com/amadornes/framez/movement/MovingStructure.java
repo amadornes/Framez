@@ -3,6 +3,8 @@ package com.amadornes.framez.movement;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
@@ -79,7 +81,7 @@ public class MovingStructure {
 
     public double getMoved(float partialTick) {
 
-        return totalMoved + (getSpeed() * partialTick);
+        return totalMoved - (getSpeed() * partialTick);
     }
 
     public double getSpeed() {
@@ -103,6 +105,7 @@ public class MovingStructure {
         return wrapperClient;
     }
 
+    @SuppressWarnings("rawtypes")
     public void tick() {
 
         if (!moved) {
@@ -117,6 +120,49 @@ public class MovingStructure {
                     world.markBlockRangeForRenderUpdate(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x,
                             b.getLocation().y, b.getLocation().z);
                     world.markBlockForUpdate(b.getLocation().x, b.getLocation().y, b.getLocation().z);
+                }
+            }
+
+            // Move entities
+            {
+                List<Entity> entities = new ArrayList<Entity>();
+                double s = 2;
+                for (MovingBlock b : blocks) {
+                    List aabbs = new ArrayList();
+
+                    b.getBlock().addCollisionBoxesToList(
+                            b.getWorldWrapper(),
+                            b.getLocation().x,
+                            b.getLocation().y,
+                            b.getLocation().z,
+                            AxisAlignedBB.getBoundingBox(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x + 1,
+                                    b.getLocation().y + 1, b.getLocation().z + 1), aabbs, null);
+                    for (Object o : aabbs) {
+                        AxisAlignedBB aabb = ((AxisAlignedBB) o);
+
+                        if (aabb == null)
+                            continue;
+                        aabb = aabb.copy();
+                        aabb.maxY += 0.25;
+
+                        aabb.minX -= direction.offsetX < 0 ? 0.25 : 0;
+                        aabb.minZ -= direction.offsetZ < 0 ? 0.25 : 0;
+                        aabb.maxX += direction.offsetX > 0 ? 0.25 : 0;
+                        aabb.maxZ += direction.offsetZ > 0 ? 0.25 : 0;
+
+                        for (Object o2 : world.getEntitiesWithinAABB(Entity.class, aabb)) {
+                            if (!entities.contains(o2))
+                                entities.add((Entity) o2);
+                        }
+                    }
+                }
+
+                for (Entity e : entities) {
+                    e.motionX += direction.offsetX * (distanceMoved / s);
+                    e.motionZ += direction.offsetZ * (distanceMoved / s);
+                    if (direction.offsetY > 0)
+                        e.motionY += (distanceMoved * (1 + distanceMoved - 0.02) * (totalMoved == 0 ? 1 : 2))
+                                + (e.onGround && totalMoved == 0 ? 0.05 : 0);
                 }
             }
 

@@ -82,10 +82,13 @@ public class WorldWrapperClient extends WorldClient {
     @Override
     public int getLightBrightnessForSkyBlocks(int x, int y, int z, int unknown) {
 
-        double a = structure.getWorld().getLightBrightnessForSkyBlocks(x, y, z, unknown) * structure.getMoved();
-        double b = structure.getWorld().getLightBrightnessForSkyBlocks(x, y, z, unknown) * (1 - structure.getMoved());
-
-        return (int) (a + b);
+        // double a = structure.getWorld().getLightBrightnessForSkyBlocks(x, y, z, unknown) * structure.getMoved();
+        // double b = structure.getWorld().getLightBrightnessForSkyBlocks(x + structure.getDirection().offsetX, y + structure.getDirection().offsetZ,
+        // z + structure.getDirection().offsetX, unknown)
+        // * (1 - structure.getMoved());
+        //
+        // return (int) (a + b);
+        return structure.getWorld().getLightBrightnessForSkyBlocks(x, y, z, unknown);
     }
 
     @Override

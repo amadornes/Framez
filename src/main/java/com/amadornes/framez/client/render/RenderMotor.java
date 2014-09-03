@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -14,6 +15,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -439,15 +441,24 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
 
         MovingStructure structure = motor.getStructure();
 
+        Minecraft mc = Minecraft.getMinecraft();
+
+        World playerWorld = mc.thePlayer.worldObj;
+        WorldClient gameWorld = mc.theWorld;
+
+        mc.thePlayer.worldObj = structure.getWorldWrapper();
+        mc.theWorld = structure.getWorldWrapperClient();
+
         if (structure.getBlocks() == null)
             return;
         List<MovingBlock> blocks = new ArrayList<MovingBlock>(structure.getBlocks());
 
-        GL11.glTranslated(structure.getDirection().offsetX * structure.getMoved(), structure.getDirection().offsetY * structure.getMoved(),
-                structure.getDirection().offsetZ * structure.getMoved());
-        GL11.glTranslated(structure.getDirection().offsetX * (structure.getSpeed() * frame), structure.getDirection().offsetY
-                * (structure.getSpeed() * frame), structure.getDirection().offsetZ * (structure.getSpeed() * frame));
         GL11.glTranslated(-motor.xCoord, -motor.yCoord, -motor.zCoord);
+
+        double x = structure.getDirection().offsetX * structure.getMoved(frame);
+        double y = structure.getDirection().offsetY * structure.getMoved(frame);
+        double z = structure.getDirection().offsetZ * structure.getMoved(frame);
+        GL11.glTranslated(x, y, z);
 
         // ISBRH
         {
@@ -456,20 +467,31 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
             net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
             Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-            rb.blockAccess = structure.getWorldWrapper();
+            rb.blockAccess = structure.getWorldWrapperClient();
 
             for (MovingBlock b : blocks) {
                 if (b == null)
                     continue;
+
+                World w = null;
+                if (b.getTileEntity() != null) {
+                    w = b.getTileEntity().getWorldObj();
+                    b.getTileEntity().setWorldObj(structure.getWorldWrapper());
+                }
+
                 Tessellator.instance.startDrawingQuads();
                 if (b.getBlock() != null && b.getLocation() != null) {
                     for (int pass = 0; pass < 2; pass++) {
                         if (b.getBlock().canRenderInPass(pass)) {
+                            System.out.println(b.getBlock() + " " + b.getMetadata() + " " + b.getLocation() + " " + pass);
                             rb.renderBlockByRenderType(b.getBlock(), b.getLocation().x, b.getLocation().y, b.getLocation().z);
                         }
                     }
                 }
                 Tessellator.instance.draw();
+
+                if (b.getTileEntity() != null)
+                    b.getTileEntity().setWorldObj(w);
             }
 
             net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
@@ -488,6 +510,9 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
                 if (te == null)
                     continue;
 
+                World w = te.getWorldObj();
+                te.setWorldObj(structure.getWorldWrapper());
+
                 GL11.glTranslated(b.getLocation().x, b.getLocation().y, b.getLocation().z);
 
                 TileEntitySpecialRenderer tesr = TileEntityRendererDispatcher.instance.getSpecialRenderer(te);
@@ -496,8 +521,13 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
                     tesr.renderTileEntityAt(te, 0, 0, 0, frame);
                     GL11.glPopMatrix();
                 }
+
+                te.setWorldObj(w);
             }
             GL11.glPopMatrix();
         }
+
+        mc.thePlayer.worldObj = playerWorld;
+        mc.theWorld = gameWorld;
     }
 }

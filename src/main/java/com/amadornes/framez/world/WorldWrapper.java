@@ -71,10 +71,7 @@ public class WorldWrapper extends World {
     @Override
     public int getLightBrightnessForSkyBlocks(int x, int y, int z, int unknown) {
 
-        double a = structure.getWorld().getLightBrightnessForSkyBlocks(x, y, z, unknown) * structure.getMoved();
-        double b = structure.getWorld().getLightBrightnessForSkyBlocks(x, y, z, unknown) * (1 - structure.getMoved());
-
-        return (int) (a + b);
+        return structure.getWorld().getLightBrightnessForSkyBlocks(x, y, z, unknown);
     }
 
     @Override

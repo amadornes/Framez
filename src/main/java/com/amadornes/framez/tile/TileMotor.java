@@ -10,6 +10,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 
@@ -119,7 +120,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         super.updateEntity();
 
         if (canMove() && worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air && structure == null) {
-            structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 125D);
+            structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 100D);
 
             PartFrame frame = Utils.getFrame(worldObj, xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
             if (frame != null) {
@@ -156,6 +157,32 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     public boolean canBeMoved() {
 
         return structure == null;
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+
+        if (structure != null) {
+            int x1 = xCoord, y1 = yCoord, z1 = zCoord, x2 = xCoord, y2 = yCoord, z2 = zCoord;
+            for (MovingBlock b : new ArrayList<MovingBlock>(structure.getBlocks())) {
+                x1 = Math.min(x1, b.getLocation().x);
+                y1 = Math.min(y1, b.getLocation().y);
+                z1 = Math.min(z1, b.getLocation().z);
+                x2 = Math.max(x2, b.getLocation().x);
+                y2 = Math.max(y2, b.getLocation().y);
+                z2 = Math.max(z2, b.getLocation().z);
+            }
+            x1 -= getDirection().offsetX < 0 ? 1 : 0;
+            y1 -= getDirection().offsetY < 0 ? 1 : 0;
+            z1 -= getDirection().offsetZ < 0 ? 1 : 0;
+            x2 += getDirection().offsetX > 0 ? 1 : 0;
+            y2 += getDirection().offsetY > 0 ? 1 : 0;
+            z2 += getDirection().offsetZ > 0 ? 1 : 0;
+
+            return AxisAlignedBB.getBoundingBox(x1, y1, z1, x2, y2, z2);
+        }
+
+        return super.getRenderBoundingBox();
     }
 
 }

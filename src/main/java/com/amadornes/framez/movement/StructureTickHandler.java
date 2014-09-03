@@ -22,6 +22,11 @@ public class StructureTickHandler {
         structures.add(structure);
     }
 
+    public List<MovingStructure> getStructures() {
+
+        return structures;
+    }
+
     @SubscribeEvent
     public void onWorldTick(WorldTickEvent event) {
 
