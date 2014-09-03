@@ -104,6 +104,7 @@ public class TileMoving extends TileEntity {
     public AxisAlignedBB getSelectedBoundingBox() {
 
         if (blockA != null) {
+            MovingBlock blockA = this.blockA;
 
             if (blockA.getTileEntity() != null)
                 blockA.getTileEntity().setWorldObj(worldObj);
@@ -135,6 +136,7 @@ public class TileMoving extends TileEntity {
         }
 
         if (blockB != null) {
+            MovingBlock blockB = this.blockB;
 
             if (blockB.getTileEntity() != null)
                 blockB.getTileEntity().setWorldObj(worldObj);
@@ -174,6 +176,7 @@ public class TileMoving extends TileEntity {
         MovingObjectPosition mopB = null;
 
         if (blockA != null) {
+            MovingBlock blockA = this.blockA;
             Vec3 start2 = start.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()), blockA.getDirection().offsetY * (-blockA.getMoved()),
                     blockA.getDirection().offsetZ * (-blockA.getMoved()));
             Vec3 end2 = end.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()), blockA.getDirection().offsetY * (-blockA.getMoved()),
@@ -186,6 +189,7 @@ public class TileMoving extends TileEntity {
         }
 
         if (blockB != null) {
+            MovingBlock blockB = this.blockB;
             Vec3 start2 = start.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()), blockB.getDirection().offsetY * (-blockB.getMoved()),
                     blockB.getDirection().offsetZ * (-blockB.getMoved()));
             Vec3 end2 = end.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()), blockB.getDirection().offsetY * (-blockB.getMoved()),

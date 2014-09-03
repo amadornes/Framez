@@ -9,6 +9,7 @@ import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
@@ -19,7 +20,6 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
-import com.amadornes.framez.util.ReflectUtils;
 
 public class WorldWrapperClient extends WorldClient {
 
@@ -27,7 +27,7 @@ public class WorldWrapperClient extends WorldClient {
 
     public WorldWrapperClient(MovingStructure structure) {
 
-        super((NetHandlerPlayClient) ReflectUtils.get((WorldClient) structure.getWorld(), "sendQueue"), new WorldSettings(structure.getWorld()
+        super(new NetHandlerPlayClient(Minecraft.getMinecraft(), null, new NetworkManager(true)), new WorldSettings(structure.getWorld()
                 .getWorldInfo()), structure.getWorld().provider.dimensionId, structure.getWorld().difficultySetting, structure.getWorld().theProfiler);
 
         this.structure = structure;

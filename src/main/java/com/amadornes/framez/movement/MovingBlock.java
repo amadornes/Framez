@@ -25,6 +25,8 @@ public class MovingBlock {
 
     private MovingStructure structure;
 
+    private TileMoving placeholder = null;
+
     public MovingBlock(BlockCoord location, World world, MovingStructure structure) {
 
         loc = location;
@@ -166,13 +168,21 @@ public class MovingBlock {
     public void placePlaceholder() {
 
         world.setBlock(loc.x, loc.y, loc.z, FramezBlocks.block_moving, 0, 2);
-        TileMoving te = new TileMoving();
+        TileMoving te = null;
+        if (placeholder != null)
+            te = placeholder;
+        else
+            te = placeholder = new TileMoving();
         te.setBlockA(this);
         world.setTileEntity(loc.x, loc.y, loc.z, te);
 
         TileMoving te2 = null;
-        if (world.getBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ) == FramezBlocks.block_moving) {
-            te2 = (TileMoving) world.getTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
+        MovingBlock b = structure.getBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
+        if (b != null) {
+            if (b.placeholder == null)
+                te2 = b.placeholder = new TileMoving();
+            else
+                te2 = b.placeholder;
         } else {
             world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, FramezBlocks.block_moving,
                     0, 2);
@@ -184,8 +194,14 @@ public class MovingBlock {
 
     public void removePlaceholder() {
 
-        world.setBlockToAir(loc.x, loc.y, loc.z);
-        world.setBlockToAir(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
+        placeholder.setBlockA(null);
+        MovingBlock b = structure.getBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
+        if (b == null) {
+            world.setBlockToAir(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
+            world.removeTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
+        } else {
+            b.placeholder.setBlockB(null);
+        }
     }
 
     public void tick() {

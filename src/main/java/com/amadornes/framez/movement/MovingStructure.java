@@ -142,4 +142,15 @@ public class MovingStructure {
         }
     }
 
+    public MovingBlock getBlock(int x, int y, int z) {
+
+        BlockCoord coords = new BlockCoord(x, y, z);
+
+        for (MovingBlock b : new ArrayList<MovingBlock>(getBlocks()))
+            if (b.getLocation() != null && b.getLocation().equals(coords))
+                return b;
+
+        return null;
+    }
+
 }
