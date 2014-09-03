@@ -10,6 +10,7 @@ import java.util.UUID;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
 import com.amadornes.framez.compat.pc.CompatModulePC;
 import com.amadornes.framez.compat.vanilla.CompatModuleVanilla;
+import com.amadornes.framez.compat.waila.CompatModuleWaila;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -116,6 +117,7 @@ public class CompatibilityUtils {
         registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleVanilla.class);
         registerModule("IC2", CompatModuleIC2.class, null);
         registerModule("PneumaticCraft", CompatModulePC.class, null);
+        registerModule("Waila", CompatModuleWaila.class, null);
     }
 
 }

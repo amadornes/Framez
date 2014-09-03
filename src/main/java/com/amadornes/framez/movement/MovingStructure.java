@@ -8,6 +8,10 @@ import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.world.WorldWrapper;
+import com.amadornes.framez.world.WorldWrapperClient;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class MovingStructure {
 
@@ -21,6 +25,8 @@ public class MovingStructure {
     private double totalMoved = 0;
 
     private WorldWrapper wrapper;
+    @SideOnly(Side.CLIENT)
+    private WorldWrapperClient wrapperClient;
 
     public MovingStructure(World world, ForgeDirection direction, double distanceMoved) {
 
@@ -29,6 +35,15 @@ public class MovingStructure {
         this.distanceMoved = distanceMoved;
 
         wrapper = new WorldWrapper(this);
+
+        if (world.isRemote)
+            initClient();
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void initClient() {
+
+        wrapperClient = new WorldWrapperClient(this);
     }
 
     public void addBlocks(List<BlockCoord> blocks) {
@@ -80,6 +95,12 @@ public class MovingStructure {
     public WorldWrapper getWorldWrapper() {
 
         return wrapper;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public WorldWrapperClient getWorldWrapperClient() {
+
+        return wrapperClient;
     }
 
     public void tick() {

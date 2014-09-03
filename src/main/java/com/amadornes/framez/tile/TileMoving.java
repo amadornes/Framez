@@ -5,11 +5,13 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import codechicken.lib.raytracer.RayTracer;
 
 import com.amadornes.framez.movement.MovingBlock;
 
@@ -179,6 +181,8 @@ public class TileMoving extends TileEntity {
 
             mopA = blockA.getBlock().collisionRayTrace(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
                     blockA.getLocation().z, start2, end2);
+            if (mopA != null)
+                mopA.hitInfo = blockA;
         }
 
         if (blockB != null) {
@@ -189,6 +193,8 @@ public class TileMoving extends TileEntity {
 
             mopB = blockB.getBlock().collisionRayTrace(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
                     blockB.getLocation().z, start2, end2);
+            if (mopB != null)
+                mopB.hitInfo = blockB;
         }
 
         if (mopA == null && mopB == null)
@@ -201,5 +207,26 @@ public class TileMoving extends TileEntity {
         if (mopA.hitVec.distanceTo(start) < mopB.hitVec.distanceTo(start))
             return mopA;
         return mopB;
+    }
+
+    public MovingObjectPosition rayTrace(EntityPlayer player) {
+
+        return rayTrace(RayTracer.getStartVec(player), RayTracer.getEndVec(player));
+    }
+
+    public MovingBlock getSelected(MovingObjectPosition mop) {
+
+        if (mop == null)
+            return null;
+
+        if (mop.hitInfo != null && mop.hitInfo instanceof MovingBlock)
+            return (MovingBlock) mop.hitInfo;
+
+        return null;
+    }
+
+    public MovingBlock getSelected(EntityPlayer player) {
+
+        return getSelected(rayTrace(player));
     }
 }
