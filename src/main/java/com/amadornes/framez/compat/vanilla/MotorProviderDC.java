@@ -1,6 +1,7 @@
 package com.amadornes.framez.compat.vanilla;
 
 import com.amadornes.framez.api.IMotorProvider;
+import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMotor;
 
 public class MotorProviderDC implements IMotorProvider {
@@ -14,7 +15,7 @@ public class MotorProviderDC implements IMotorProvider {
     @Override
     public String getUnlocalizedName() {
 
-        return "DC Motor";
+        return References.MOTOR_NAME + ".dc";
     }
 
     @Override

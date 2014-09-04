@@ -30,7 +30,7 @@ public class ModifierGlassClear implements IFrameModifier {
     @Override
     public String getUnlocalizedName() {
 
-        return "Clear Glass";
+        return "framez.modifier.glass.clear";
     }
 
     @Override

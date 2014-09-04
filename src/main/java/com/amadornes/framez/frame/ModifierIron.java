@@ -30,7 +30,7 @@ public class ModifierIron implements IFrameModifier {
     @Override
     public String getUnlocalizedName() {
 
-        return "Iron";
+        return "framez.modifier.iron";
     }
 
     @Override

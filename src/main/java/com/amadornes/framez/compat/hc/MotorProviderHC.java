@@ -1,6 +1,7 @@
 package com.amadornes.framez.compat.hc;
 
 import com.amadornes.framez.api.IMotorProvider;
+import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMotor;
 
 public class MotorProviderHC implements IMotorProvider {
@@ -14,7 +15,7 @@ public class MotorProviderHC implements IMotorProvider {
     @Override
     public String getUnlocalizedName() {
 
-        return "Hydraulic Motor";
+        return References.MOTOR_NAME + ".hydraulic";
     }
 
     @Override

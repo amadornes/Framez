@@ -19,7 +19,7 @@ public class ModifierProviderConnected implements IFrameModifierProvider {
     @Override
     public String getUnlocalizedName(ItemStack item) {
 
-        return "Connected";
+        return "framez.modifier.connected";
     }
 
     @Override

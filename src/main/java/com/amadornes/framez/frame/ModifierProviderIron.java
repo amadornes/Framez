@@ -29,7 +29,7 @@ public class ModifierProviderIron implements IFrameModifierProvider {
     @Override
     public String getUnlocalizedName(ItemStack item) {
 
-        return "Iron";
+        return "framez.modifier.iron";
     }
 
     @Override

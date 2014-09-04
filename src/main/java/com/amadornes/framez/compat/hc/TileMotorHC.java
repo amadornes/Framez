@@ -3,10 +3,10 @@ package com.amadornes.framez.compat.hc;
 import java.util.AbstractMap;
 import java.util.Map.Entry;
 
+import k4unl.minecraft.Hydraulicraft.api.HydraulicBaseClassSupplier;
 import k4unl.minecraft.Hydraulicraft.api.IBaseClass;
 import k4unl.minecraft.Hydraulicraft.api.IHydraulicConsumer;
 import k4unl.minecraft.Hydraulicraft.api.PressureTier;
-import k4unl.minecraft.Hydraulicraft.tileEntities.TileHydraulicBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -39,7 +39,7 @@ public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
         return true;
     }
 
-    private IBaseClass c = new TileHydraulicBase(PressureTier.HIGHPRESSURE, 10);
+    private IBaseClass c = HydraulicBaseClassSupplier.getBaseClass(this, PressureTier.HIGHPRESSURE, 10);
 
     @Override
     public IBaseClass getHandler() {
@@ -77,24 +77,32 @@ public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
     public void writeToNBT(NBTTagCompound tag) {
 
         super.writeToNBT(tag);
+
+        c.writeToNBTI(tag);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
 
         super.readFromNBT(tag);
+
+        c.readFromNBTI(tag);
     }
 
     @Override
     public void writeUpdatePacket(NBTTagCompound tag) {
 
         super.writeUpdatePacket(tag);
+
+        c.writeToNBTI(tag);
     }
 
     @Override
     public void readUpdatePacket(NBTTagCompound tag) {
 
         super.readUpdatePacket(tag);
+
+        c.readFromNBTI(tag);
     }
 
 }

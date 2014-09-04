@@ -3,6 +3,7 @@ package com.amadornes.framez.item;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -22,7 +23,7 @@ public class ItemFramePart extends JItemMultiPart {
 
     public ItemFramePart() {
 
-        setUnlocalizedName("item." + References.FRAME_NAME);
+        setUnlocalizedName(References.FRAME_NAME);
     }
 
     @Override
@@ -74,13 +75,13 @@ public class ItemFramePart extends JItemMultiPart {
     @Override
     public void addInformation(ItemStack item, EntityPlayer player, List list, boolean shift) {
 
-        list.add("Modifiers:");
+        list.add(I18n.format("framez.hud.modifiers") + ":");
         IFrameModifierProvider[] modifiers = FramezApi.inst().getModifierRegistry().getModifiers(item);
         if (modifiers.length == 0) {
-            list.add(" None");
+            list.add(" " + I18n.format("framez.hud.modifiers.none"));
         } else {
             for (IFrameModifierProvider m : modifiers)
-                list.add(" - " + m.getUnlocalizedName(item));
+                list.add(" - " + I18n.format(m.getUnlocalizedName(item)));
         }
     }
 

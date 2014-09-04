@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.amadornes.framez.compat.ae2.CompatModuleAE2;
 import com.amadornes.framez.compat.hc.CompatModuleHC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
 import com.amadornes.framez.compat.pc.CompatModulePC;
@@ -120,6 +121,7 @@ public class CompatibilityUtils {
         registerModule("PneumaticCraft", CompatModulePC.class, null);
         registerModule("Waila", CompatModuleWaila.class, null);
         registerModule("HydCraft", CompatModuleHC.class, null);
+        registerModule("appliedenergistics2", CompatModuleAE2.class, null);
     }
 
 }

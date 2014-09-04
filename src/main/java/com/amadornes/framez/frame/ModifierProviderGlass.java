@@ -29,7 +29,7 @@ public class ModifierProviderGlass implements IFrameModifierProvider {
     @Override
     public String getUnlocalizedName(ItemStack item) {
 
-        return "Glass";
+        return "framez.modifier.glass";
     }
 
     @Override

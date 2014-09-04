@@ -30,7 +30,7 @@ public class ModifierConnected implements IFrameModifier {
     @Override
     public String getUnlocalizedName() {
 
-        return "Connected";
+        return "framez.modifier.connected";
     }
 
     @Override

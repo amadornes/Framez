@@ -18,7 +18,7 @@ public class ModifierProviderGlassClear extends ModifierProviderGlass {
     @Override
     public String getUnlocalizedName(ItemStack item) {
 
-        return "Clear Glass";
+        return "framez.modifier.glass.clear";
     }
 
     @Override

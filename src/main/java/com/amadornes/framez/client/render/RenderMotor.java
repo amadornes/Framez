@@ -479,16 +479,23 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
                     b.getTileEntity().setWorldObj(structure.getWorldWrapper());
                 }
 
-                Tessellator.instance.startDrawingQuads();
                 if (b.getBlock() != null && b.getLocation() != null) {
                     for (int pass = 0; pass < 2; pass++) {
                         if (b.getBlock().canRenderInPass(pass)) {
-                            System.out.println(b.getBlock() + " " + b.getMetadata() + " " + b.getLocation() + " " + pass);
-                            rb.renderBlockByRenderType(b.getBlock(), b.getLocation().x, b.getLocation().y, b.getLocation().z);
+                            try {
+                                Tessellator.instance.startDrawingQuads();
+                                rb.renderBlockByRenderType(b.getBlock(), b.getLocation().x, b.getLocation().y, b.getLocation().z);
+                                Tessellator.instance.draw();
+                            } catch (Exception e) {
+                                try {
+                                    Tessellator.instance.draw();
+                                } catch (Exception ex) {
+                                }
+                                // FIXME e.printStackTrace();
+                            }
                         }
                     }
                 }
-                Tessellator.instance.draw();
 
                 if (b.getTileEntity() != null)
                     b.getTileEntity().setWorldObj(w);

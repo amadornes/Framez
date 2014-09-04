@@ -30,7 +30,7 @@ public class ModifierGlass implements IFrameModifier {
     @Override
     public String getUnlocalizedName() {
 
-        return "Glass";
+        return "framez.modifier.glass";
     }
 
     @Override
