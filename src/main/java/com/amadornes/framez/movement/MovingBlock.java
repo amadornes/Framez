@@ -27,6 +27,8 @@ public class MovingBlock {
 
     private TileMoving placeholder = null;
 
+    private boolean isStored = false;
+
     public MovingBlock(BlockCoord location, World world, MovingStructure structure) {
 
         loc = location;
@@ -136,6 +138,8 @@ public class MovingBlock {
         world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 2);
 
         MovementApi.INST.onPlace(te != null ? te : block, getDirection());
+
+        isStored = false;
     }
 
     public void remove() {
@@ -163,6 +167,8 @@ public class MovingBlock {
         if (te != null) {
             te.setWorldObj(getWorldWrapper());
         }
+
+        isStored = true;
     }
 
     public void placePlaceholder() {
@@ -209,6 +215,11 @@ public class MovingBlock {
         if (te != null)
             te.updateEntity();
         block.updateTick(world, loc.x, loc.y, loc.z, world.rand);
+    }
+
+    public boolean isStored() {
+
+        return isStored;
     }
 
 }

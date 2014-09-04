@@ -1,7 +1,5 @@
 package com.amadornes.framez.world;
 
-import java.util.ArrayList;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -16,7 +14,6 @@ import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.common.util.ForgeDirection;
-import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
@@ -50,13 +47,10 @@ public class WorldWrapperClient extends WorldClient {
         if (structure.getMoved() >= 1)
             return null;
 
-        BlockCoord coords = new BlockCoord(x, y, z);
-
-        for (MovingBlock b : new ArrayList<MovingBlock>(structure.getBlocks()))
-            if (b.getLocation() != null && b.getLocation().equals(coords))
-                return b;
-
-        return null;
+        MovingBlock b = structure.getBlock(x, y, z);
+        if (!b.isStored())
+            return null;
+        return b;
     }
 
     @Override

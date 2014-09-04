@@ -11,6 +11,7 @@ import com.amadornes.framez.frame.ModifierProviderIron;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.movement.StructureTickHandler;
+import com.amadornes.framez.network.NetworkHandler;
 import com.amadornes.framez.part.RegisterParts;
 import com.amadornes.framez.proxy.CommonProxy;
 import com.amadornes.framez.ref.ModInfo;
@@ -60,6 +61,8 @@ public class Framez {
         StructureTickHandler eventHandler = StructureTickHandler.INST;
         MinecraftForge.EVENT_BUS.register(eventHandler);
         FMLCommonHandler.instance().bus().register(eventHandler);
+
+        NetworkHandler.init();
     }
 
     @EventHandler

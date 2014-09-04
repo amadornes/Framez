@@ -30,7 +30,7 @@ public class StructureTickHandler {
     @SubscribeEvent
     public void onWorldTick(WorldTickEvent event) {
 
-        if (event.phase == Phase.START) {
+        if (event.phase == Phase.END) {
             List<MovingStructure> invalid = new ArrayList<MovingStructure>();
 
             for (MovingStructure s : new ArrayList<MovingStructure>(structures)) {

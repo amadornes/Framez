@@ -45,7 +45,10 @@ public class WorldWrapper extends World {
         if (structure.getMoved() >= 1)
             return null;
 
-        return structure.getBlock(x, y, z);
+        MovingBlock b = structure.getBlock(x, y, z);
+        if (b != null && !b.isStored())
+            return null;
+        return b;
     }
 
     @Override

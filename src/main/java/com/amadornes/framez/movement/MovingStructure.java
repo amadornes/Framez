@@ -21,7 +21,7 @@ public class MovingStructure {
     private ForgeDirection direction;
     private List<MovingBlock> blocks = new ArrayList<MovingBlock>();
 
-    private double distanceMoved;
+    private double speed;
 
     private boolean moved = false;
     private double totalMoved = 0;
@@ -30,11 +30,11 @@ public class MovingStructure {
     @SideOnly(Side.CLIENT)
     private WorldWrapperClient wrapperClient;
 
-    public MovingStructure(World world, ForgeDirection direction, double distanceMoved) {
+    public MovingStructure(World world, ForgeDirection direction, double speed) {
 
         this.world = world;
         this.direction = direction;
-        this.distanceMoved = distanceMoved;
+        this.speed = speed;
 
         wrapper = new WorldWrapper(this);
 
@@ -86,7 +86,7 @@ public class MovingStructure {
 
     public double getSpeed() {
 
-        return distanceMoved;
+        return speed;
     }
 
     public World getWorld() {
@@ -158,15 +158,15 @@ public class MovingStructure {
                 }
 
                 for (Entity e : entities) {
-                    e.motionX += direction.offsetX * (distanceMoved / s);
-                    e.motionZ += direction.offsetZ * (distanceMoved / s);
+                    e.motionX += direction.offsetX * (speed / s);
+                    e.motionZ += direction.offsetZ * (speed / s);
                     if (direction.offsetY > 0)
-                        e.motionY += (distanceMoved * (1 + distanceMoved - 0.02) * (totalMoved == 0 ? 1 : 2))
+                        e.motionY += (speed * (1 + speed - 0.02) * (totalMoved == 0 ? 1 : 2))
                                 + (e.onGround && totalMoved == 0 ? 0.05 : 0);
                 }
             }
 
-            totalMoved += distanceMoved;
+            totalMoved += speed;
 
             if (totalMoved >= 1) {
                 moved = true;

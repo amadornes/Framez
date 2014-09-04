@@ -18,6 +18,8 @@ import com.amadornes.framez.api.movement.IFrameMove;
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.movement.StructureTickHandler;
+import com.amadornes.framez.network.NetworkHandler;
+import com.amadornes.framez.network.packet.PacketStartMoving;
 import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.util.Utils;
 
@@ -119,21 +121,26 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
         super.updateEntity();
 
-        if (canMove() && worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air && structure == null) {
-            structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 100D);
+        if (!worldObj.isRemote) {
+            if (canMove() && worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air
+                    && structure == null) {
+                structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 100D);
 
-            PartFrame frame = Utils.getFrame(worldObj, xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
-            if (frame != null) {
-                List<BlockCoord> blocks = new ArrayList<BlockCoord>();
-                Utils.addConnected(blocks, frame);
-                blocks.remove(new BlockCoord(xCoord, yCoord, zCoord));
-                structure.addBlocks(blocks);
-                blocks.clear();
-            } else {
-                structure.addBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
+                PartFrame frame = Utils.getFrame(worldObj, xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
+                if (frame != null) {
+                    List<BlockCoord> blocks = new ArrayList<BlockCoord>();
+                    Utils.addConnected(blocks, frame);
+                    blocks.remove(new BlockCoord(xCoord, yCoord, zCoord));
+                    structure.addBlocks(blocks);
+                    blocks.clear();
+                } else {
+                    structure.addBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
+                }
+
+                StructureTickHandler.INST.addStructure(structure);
+
+                NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
             }
-
-            StructureTickHandler.INST.addStructure(structure);
         }
         if (structure != null && structure.getMoved() >= 1)
             structure = null;
@@ -142,6 +149,11 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     public MovingStructure getStructure() {
 
         return structure;
+    }
+
+    public void setStructure(MovingStructure structure) {
+
+        this.structure = structure;
     }
 
     public void randomDisplayTick(Random rnd) {
