@@ -17,7 +17,6 @@ import codechicken.lib.vec.BlockCoord;
 import com.amadornes.framez.api.movement.IFrameMove;
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
-import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.network.NetworkHandler;
 import com.amadornes.framez.network.packet.PacketStartMoving;
 import com.amadornes.framez.part.PartFrame;
@@ -136,8 +135,6 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
                 } else {
                     structure.addBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ);
                 }
-
-                StructureTickHandler.INST.addStructure(structure);
 
                 NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
             }

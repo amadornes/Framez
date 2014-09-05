@@ -491,7 +491,7 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
                                     Tessellator.instance.draw();
                                 } catch (Exception ex) {
                                 }
-                                // FIXME e.printStackTrace();
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -520,12 +520,10 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
                 World w = te.getWorldObj();
                 te.setWorldObj(structure.getWorldWrapper());
 
-                GL11.glTranslated(b.getLocation().x, b.getLocation().y, b.getLocation().z);
-
                 TileEntitySpecialRenderer tesr = TileEntityRendererDispatcher.instance.getSpecialRenderer(te);
                 if (tesr != null) {
                     GL11.glPushMatrix();
-                    tesr.renderTileEntityAt(te, 0, 0, 0, frame);
+                    // tesr.renderTileEntityAt(te, b.getLocation().x, b.getLocation().y, b.getLocation().z, frame);
                     GL11.glPopMatrix();
                 }
 

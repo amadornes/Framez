@@ -76,7 +76,7 @@ public class PacketStartMoving extends LocatedPacket<PacketStartMoving> {
         NBTTagList list = tag.getTagList("blocks", new NBTTagCompound().getId());
         for (int i = 0; i < list.tagCount(); i++) {
             NBTTagCompound t = list.getCompoundTagAt(i);
-            blocks.add(new BlockCoord(t.getInteger("x"), tag.getInteger("y"), tag.getInteger("z")));
+            blocks.add(new BlockCoord(t.getInteger("x"), t.getInteger("y"), t.getInteger("z")));
         }
         speed = tag.getDouble("speed");
         direction = ForgeDirection.getOrientation(tag.getInteger("direction"));

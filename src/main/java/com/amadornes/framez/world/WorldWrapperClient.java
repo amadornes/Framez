@@ -48,7 +48,7 @@ public class WorldWrapperClient extends WorldClient {
             return null;
 
         MovingBlock b = structure.getBlock(x, y, z);
-        if (!b.isStored())
+        if (b != null && !b.isStored())
             return null;
         return b;
     }

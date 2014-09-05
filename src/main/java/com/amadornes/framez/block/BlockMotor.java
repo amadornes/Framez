@@ -26,7 +26,9 @@ public class BlockMotor extends BlockContainer {
 
         super(Material.iron);
         this.provider = provider;
+
         setBlockName(References.MOTOR_NAME);
+        setHardness(2);
     }
 
     @Override
