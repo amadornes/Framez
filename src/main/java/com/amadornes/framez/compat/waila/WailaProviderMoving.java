@@ -71,11 +71,12 @@ public class WailaProviderMoving implements IWailaDataProvider {
 
                     if (b != null) {
                         target = mop;
-                        world = b.getWorldWrapper();
+                        world = b.getStructure().getWorldWrapperClient();
                         ReflectUtils.set(RayTracing.instance(), "target", mop);
 
                         WorldClient w = Minecraft.getMinecraft().theWorld;
-                        Minecraft.getMinecraft().thePlayer.worldObj = Minecraft.getMinecraft().theWorld = b.getStructure().getWorldWrapperClient();
+                        Minecraft.getMinecraft().thePlayer.worldObj = Minecraft.getMinecraft().theWorld = (WorldClient) b.getStructure()
+                                .getWorldWrapperClient();
 
                         DataAccessorBlock accessor = DataAccessorBlock.instance;
                         accessor.set(world, player, target);

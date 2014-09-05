@@ -3,14 +3,15 @@ package com.amadornes.framez.movement;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 
-import com.amadornes.framez.world.WorldWrapper;
 import com.amadornes.framez.world.WorldWrapperClient;
+import com.amadornes.framez.world.WorldWrapperServer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -26,7 +27,7 @@ public class MovingStructure {
     private boolean moved = false;
     private double totalMoved = 0;
 
-    private WorldWrapper wrapper;
+    private WorldWrapperServer wrapper;
     @SideOnly(Side.CLIENT)
     private WorldWrapperClient wrapperClient;
 
@@ -36,10 +37,15 @@ public class MovingStructure {
         this.direction = direction;
         this.speed = speed;
 
-        wrapper = new WorldWrapper(this);
-
         if (world.isRemote)
             initClient();
+        else
+            initServer();
+    }
+
+    private void initServer() {
+
+        wrapper = new WorldWrapperServer(this);
     }
 
     @SideOnly(Side.CLIENT)
@@ -94,13 +100,16 @@ public class MovingStructure {
         return world;
     }
 
-    public WorldWrapper getWorldWrapper() {
+    public World getWorldWrapper() {
+
+        if (wrapper == null)
+            return getWorldWrapperClient();
 
         return wrapper;
     }
 
     @SideOnly(Side.CLIENT)
-    public WorldWrapperClient getWorldWrapperClient() {
+    public WorldClient getWorldWrapperClient() {
 
         return wrapperClient;
     }
@@ -131,7 +140,7 @@ public class MovingStructure {
                     List aabbs = new ArrayList();
 
                     b.getBlock().addCollisionBoxesToList(
-                            b.getWorldWrapper(),
+                            b.getWorld().isRemote ? b.getStructure().getWorldWrapperClient() : b.getStructure().getWorldWrapper(),
                             b.getLocation().x,
                             b.getLocation().y,
                             b.getLocation().z,
@@ -161,8 +170,7 @@ public class MovingStructure {
                     e.motionX += direction.offsetX * (speed / s);
                     e.motionZ += direction.offsetZ * (speed / s);
                     if (direction.offsetY > 0)
-                        e.motionY += (speed * (1 + speed - 0.02) * (totalMoved == 0 ? 1 : 2))
-                                + (e.onGround && totalMoved == 0 ? 0.05 : 0);
+                        e.motionY += (speed * (1 + speed - 0.02) * (totalMoved == 0 ? 1 : 2)) + (e.onGround && totalMoved == 0 ? 0.05 : 0);
                 }
             }
 

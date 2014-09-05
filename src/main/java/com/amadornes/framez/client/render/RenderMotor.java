@@ -453,7 +453,7 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
         WorldClient gameWorld = mc.theWorld;
 
         mc.thePlayer.worldObj = structure.getWorldWrapper();
-        mc.theWorld = structure.getWorldWrapperClient();
+        mc.theWorld = (WorldClient) structure.getWorldWrapperClient();
 
         if (structure.getBlocks() == null)
             return;
