@@ -34,6 +34,8 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
 
     public static int RENDER_ID = RenderingRegistry.getNextAvailableRenderId();
 
+    public static boolean renderingBorder = false;
+
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
 
@@ -43,6 +45,8 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 
         renderer.renderAllFaces = true;
+
+        renderingBorder = true;
 
         // Bottom
         renderer.setRenderBounds(0, 0, 0, 1 / 16D, 1 / 16D, 1);
@@ -73,6 +77,8 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
         renderer.renderStandardBlock(block, x, y, z);
         renderer.setRenderBounds(0, 1 / 16D, 15 / 16D, 1 / 16D, 15 / 16D, 1);
         renderer.renderStandardBlock(block, x, y, z);
+
+        renderingBorder = false;
 
         // Center
         renderer.setRenderBounds(1 / 16D, 1 / 16D, 1 / 16D, 15 / 16D, 15 / 16D, 15 / 16D);

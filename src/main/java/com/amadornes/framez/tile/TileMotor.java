@@ -40,6 +40,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
     private MovingStructure structure = null;
 
+    private String placer = "";
+
     public ForgeDirection getFace() {
 
         return face;
@@ -195,6 +197,31 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         }
 
         return super.getRenderBoundingBox();
+    }
+
+    public final int getColorMultiplier() {
+
+        switch (placer) {
+        case "amadornes":
+            return 0xCC0000;
+        case "KrystalRaven":
+            return 0x5100b3;
+        case "Quetzz":
+            return 0x441e94;
+        case "PurpleMentat":
+            return 0xAA00AA;
+        case "Aureylian":
+            return 0xEEAAAA;
+        case "Loneztar":
+            return 0xEEAAAA;
+        }
+
+        return 0xAA0000;
+    }
+
+    public void setPlacer(String placer) {
+
+        this.placer = placer;
     }
 
 }

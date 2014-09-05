@@ -6,6 +6,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
@@ -87,6 +88,10 @@ public class BlockMotor extends BlockContainer {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
 
         super.onBlockPlacedBy(world, x, y, z, entity, item);
+
+        TileMotor te = (TileMotor) world.getTileEntity(x, y, z);
+        if (entity instanceof EntityPlayer)
+            te.setPlacer(((EntityPlayer) entity).getGameProfile().getName());
     }
 
     @Override
@@ -111,6 +116,15 @@ public class BlockMotor extends BlockContainer {
     public void randomDisplayTick(World w, int x, int y, int z, Random rnd) {
 
         ((TileMotor) w.getTileEntity(x, y, z)).randomDisplayTick(rnd);
+    }
+
+    @Override
+    public int colorMultiplier(IBlockAccess w, int x, int y, int z) {
+
+        if (!RenderMotor.renderingBorder)
+            return 0xFFFFFF;
+
+        return ((TileMotor) w.getTileEntity(x, y, z)).getColorMultiplier();
     }
 
 }
