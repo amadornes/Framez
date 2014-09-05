@@ -529,7 +529,7 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
                 TileEntitySpecialRenderer tesr = TileEntityRendererDispatcher.instance.getSpecialRenderer(te);
                 if (tesr != null) {
                     GL11.glPushMatrix();
-                    // tesr.renderTileEntityAt(te, b.getLocation().x, b.getLocation().y, b.getLocation().z, frame);
+                    tesr.renderTileEntityAt(te, b.getLocation().x, b.getLocation().y, b.getLocation().z, frame);
                     GL11.glPopMatrix();
                 }
 
