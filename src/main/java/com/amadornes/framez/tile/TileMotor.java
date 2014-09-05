@@ -91,12 +91,16 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
         tag.setInteger("face", getFace().ordinal());
         tag.setInteger("direction", getDirection().ordinal());
+
+        tag.setString("placer", placer);
     }
 
     public void readUpdatePacket(NBTTagCompound tag) {
 
         face = ForgeDirection.getOrientation(tag.getInteger("face"));
         direction = ForgeDirection.getOrientation(tag.getInteger("direction"));
+
+        placer = tag.getString("placer");
     }
 
     @Override
