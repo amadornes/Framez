@@ -205,20 +205,23 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
     public final int getColorMultiplier() {
 
-        switch (placer) {
-        case "amadornes":
+        if (placer.equals("amadornes"))
             return 0xCC0000;
-        case "KrystalRaven":
-            return 0x5100b3;
-        case "Quetzz":
-            return 0x441e94;
-        case "PurpleMentat":
+
+        if (placer.equals("KrystalRaven"))
+            return 0x5100B3;
+
+        if (placer.equals("Quetzz"))
+            return 0x441E94;
+
+        if (placer.equals("PurpleMentat"))
             return 0xAA00AA;
-        case "Aureylian":
+
+        if (placer.equals("Aureylian"))
             return 0xEEAAAA;
-        case "Loneztar":
+
+        if (placer.equals("Loneztar"))
             return 0xEEAAAA;
-        }
 
         return 0xAA0000;
     }
