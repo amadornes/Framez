@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 import codechicken.multipart.TileMultipart;
 
 import com.amadornes.framez.api.IFrame;
+import com.amadornes.framez.api.movement.IFrameMove;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.tile.TileMotor;
 import com.amadornes.framez.util.Utils;
@@ -34,6 +36,11 @@ public class MovementUtils {
 
         if (!MovementApi.INST.getMovementType(w, block.x, block.y, block.z).isMovable())
             return;
+
+        TileEntity tile = w.getTileEntity(block.x, block.y, block.z);
+        if (tile != null && tile instanceof IFrameMove)
+            if (!((IFrameMove) tile).canBeMoved())
+                return;
 
         IFrame frame = Utils.getFrame(w, block.x, block.y, block.z);
         if (frame != null) {
