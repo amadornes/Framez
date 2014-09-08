@@ -9,9 +9,11 @@ import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IMotorProvider;
 import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.client.render.RenderMotor;
+import com.amadornes.framez.client.render.RenderMoving;
 import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
+import com.amadornes.framez.tile.TileMoving;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -38,6 +40,8 @@ public class ClientProxy extends CommonProxy {
             MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(b), render);
             ClientRegistry.bindTileEntitySpecialRenderer(m.getTileClass(), render);
         }
+
+        ClientRegistry.bindTileEntitySpecialRenderer(TileMoving.class, new RenderMoving());
     }
 
 }

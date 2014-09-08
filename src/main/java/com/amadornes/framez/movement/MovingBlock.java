@@ -9,11 +9,14 @@ import codechicken.lib.vec.BlockCoord;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
 
-import com.amadornes.framez.api.movement.IMovementListenerSelf;
+import com.amadornes.framez.api.movement.IMovingBlock;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.tile.TileMoving;
 
-public class MovingBlock {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+public class MovingBlock implements IMovingBlock {
 
     private World world;
     private BlockCoord loc;
@@ -42,9 +45,28 @@ public class MovingBlock {
         this.structure = structure;
     }
 
+    @Override
     public World getWorld() {
 
         return world;
+    }
+
+    @Override
+    public int getX() {
+
+        return getLocation().x;
+    }
+
+    @Override
+    public int getY() {
+
+        return getLocation().y;
+    }
+
+    @Override
+    public int getZ() {
+
+        return getLocation().z;
     }
 
     public BlockCoord getLocation() {
@@ -52,31 +74,43 @@ public class MovingBlock {
         return loc;
     }
 
+    @Override
     public Block getBlock() {
 
         return block;
     }
 
+    @Override
     public int getMetadata() {
 
         return meta;
     }
 
+    @Override
     public TileEntity getTileEntity() {
 
         return te;
     }
 
+    @Override
     public ForgeDirection getDirection() {
 
         return structure.getDirection();
     }
 
+    @Override
     public double getMoved() {
 
         return structure.getMoved();
     }
 
+    @Override
+    public double getSpeed() {
+
+        return structure.getSpeed();
+    }
+
+    @Override
     public World getWorldWrapper() {
 
         return structure.getWorldWrapper();
@@ -87,16 +121,19 @@ public class MovingBlock {
         return structure;
     }
 
+    @Override
     public void setBlock(Block block) {
 
         this.block = block;
     }
 
-    public void setMeta(int meta) {
+    @Override
+    public void setMetadata(int meta) {
 
         this.meta = meta;
     }
 
+    @Override
     public void setTileEntity(TileEntity te) {
 
         this.te = te;
@@ -111,36 +148,22 @@ public class MovingBlock {
 
     public void remove() {
 
-        world.removeTileEntity(loc.x, loc.y, loc.z);
-        world.setBlock(loc.x, loc.y, loc.z, Blocks.air, 0, 2);
+        if (!MovementApi.INST.handleRemoval(this, getDirection())) {
+            // Default handling
 
-        // Notify the TE that it has started moving
-        if (te != null) {
-            if (te instanceof IMovementListenerSelf) {
-                ((IMovementListenerSelf) te).onStartMoving(getDirection());
-            } else if (te instanceof TileMultipart) {
-                for (TMultiPart p : ((TileMultipart) te).jPartList()) {
-                    if (p instanceof IMovementListenerSelf) {
-                        ((IMovementListenerSelf) p).onStartMoving(getDirection());
-                    }
-                }
+            world.removeTileEntity(loc.x, loc.y, loc.z);
+            world.setBlock(loc.x, loc.y, loc.z, Blocks.air, 0, 2);
+
+            if (te != null) {
+                te.invalidate();// Already notifies of leaving world
+
+                te.setWorldObj(getWorldWrapper());
+
+                te.validate();
+                if (!world.isRemote && te instanceof TileMultipart)
+                    for (TMultiPart p : ((TileMultipart) te).jPartList())
+                        p.onWorldJoin();
             }
-        }
-
-        MovementApi.INST.onRemove(te != null ? te : block, getDirection());
-
-        if (te != null) {
-            te.invalidate();
-            if (!world.isRemote && te instanceof TileMultipart)
-                for (TMultiPart p : ((TileMultipart) te).jPartList())
-                    p.onWorldSeparate();
-
-            te.setWorldObj(getWorldWrapper());
-
-            te.validate();
-            if (!world.isRemote && te instanceof TileMultipart)
-                for (TMultiPart p : ((TileMultipart) te).jPartList())
-                    p.onWorldJoin();
         }
 
         isStored = true;
@@ -148,43 +171,30 @@ public class MovingBlock {
 
     public void place() {
 
-        if (te != null) {
-            te.invalidate();
-            if (!world.isRemote && te instanceof TileMultipart)
-                for (TMultiPart p : ((TileMultipart) te).jPartList())
-                    p.onWorldSeparate();
+        if (!MovementApi.INST.handlePlacement(this, getDirection())) {
+            if (te != null) {
+                te.invalidate();// Already notifies of leaving world
 
-            te.xCoord += getDirection().offsetX;
-            te.yCoord += getDirection().offsetY;
-            te.zCoord += getDirection().offsetZ;
-            te.setWorldObj(world);
+                te.xCoord += getDirection().offsetX;
+                te.yCoord += getDirection().offsetY;
+                te.zCoord += getDirection().offsetZ;
+                te.setWorldObj(world);
 
-            te.validate();
-            if (!world.isRemote && te instanceof TileMultipart)
-                for (TMultiPart p : ((TileMultipart) te).jPartList())
-                    p.onWorldJoin();
-        }
-
-        world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, block, meta, 2);
-
-        if (te != null) {
-
-            if (te instanceof IMovementListenerSelf) {
-                ((IMovementListenerSelf) te).onFinishMoving(getDirection());
-            } else if (te instanceof TileMultipart) {
-                for (TMultiPart p : ((TileMultipart) te).jPartList()) {
-                    if (p instanceof IMovementListenerSelf) {
-                        ((IMovementListenerSelf) p).onFinishMoving(getDirection());
-                    }
-                }
+                te.validate();
+                if (!world.isRemote && te instanceof TileMultipart)
+                    for (TMultiPart p : ((TileMultipart) te).jPartList())
+                        p.onWorldJoin();
             }
 
-            world.setTileEntity(te.xCoord, te.yCoord, te.zCoord, te);
+            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, block, meta, 4);
+            world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 4);
+
+            if (te != null) {
+
+                world.setTileEntity(te.xCoord, te.yCoord, te.zCoord, te);
+            }
+            world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 4);
         }
-
-        world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 2);
-
-        MovementApi.INST.onPlace(te != null ? te : block, getDirection());
 
         isStored = false;
     }
@@ -228,16 +238,29 @@ public class MovingBlock {
         te2.setBlockB(this);
     }
 
-    public void tick() {
+    public TileMoving getPlaceholder() {
 
-        if (te != null)
-            te.updateEntity();
-        block.updateTick(world, loc.x, loc.y, loc.z, world.rand);
+        return placeholder;
     }
 
     public boolean isStored() {
 
         return isStored;
+    }
+
+    @SideOnly(Side.CLIENT)
+    private int renderList = -1;
+
+    @SideOnly(Side.CLIENT)
+    public int getRenderList() {
+
+        return renderList;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void setRenderList(int renderList) {
+
+        this.renderList = renderList;
     }
 
 }

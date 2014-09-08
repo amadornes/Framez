@@ -1,5 +1,8 @@
 package com.amadornes.framez.world;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -14,6 +17,7 @@ import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.common.util.ForgeDirection;
+import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
@@ -21,6 +25,8 @@ import com.amadornes.framez.movement.MovingStructure;
 public class WorldWrapperClient extends WorldClient {
 
     private MovingStructure structure;
+
+    private List<BlockCoord> toUpdate = new ArrayList<BlockCoord>();
 
     public WorldWrapperClient(MovingStructure structure) {
 
@@ -177,6 +183,14 @@ public class WorldWrapperClient extends WorldClient {
     @Override
     public void tick() {
 
+        List<BlockCoord> toUpdateCurrent = new ArrayList<BlockCoord>(toUpdate);
+        toUpdate.clear();
+        for (BlockCoord b : toUpdateCurrent) {
+            Block bl = getBlock(b.x, b.y, b.z);
+            if (bl != null)
+                bl.updateTick(this, b.x, b.y, b.z, rand);
+        }
+        toUpdateCurrent.clear();
     }
 
     @Override
@@ -288,6 +302,26 @@ public class WorldWrapperClient extends WorldClient {
     @Override
     public void notifyBlocksOfNeighborChange(int p_147459_1_, int p_147459_2_, int p_147459_3_, Block p_147459_4_) {
 
+    }
+
+    @Override
+    public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2) {
+
+        for (int x = x1; x <= x2; x++) {
+            for (int y = y1; y <= y2; y++) {
+                for (int z = z1; z <= z2; z++) {
+                    MovingBlock b = get(x, y, z);
+                    if (b != null)
+                        b.setRenderList(-1);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void markBlockForUpdate(int x, int y, int z) {
+
+        toUpdate.add(new BlockCoord(x, y, z));
     }
 
 }

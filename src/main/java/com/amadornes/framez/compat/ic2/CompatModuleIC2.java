@@ -20,7 +20,6 @@ public class CompatModuleIC2 extends CompatModule {
         if (ev.getSide() == Side.CLIENT) {
             preInitClient();
         }
-        FramezApi.inst().getMovementApi().registerMovementListener(new MovementListenerIC2());
     }
 
     @SideOnly(Side.CLIENT)

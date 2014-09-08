@@ -129,8 +129,8 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
 
             GL11.glPushMatrix();
             {
-                if (te.getStructure() != null)
-                    renderStructure(te, frame);
+                // if (te.getStructure() != null)
+                // renderStructure(te, frame);
             }
             GL11.glPopMatrix();
 
@@ -453,7 +453,7 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
         WorldClient gameWorld = mc.theWorld;
 
         mc.thePlayer.worldObj = structure.getWorldWrapper();
-        mc.theWorld = (WorldClient) structure.getWorldWrapperClient();
+        mc.theWorld = structure.getWorldWrapperClient();
 
         if (structure.getBlocks() == null)
             return;

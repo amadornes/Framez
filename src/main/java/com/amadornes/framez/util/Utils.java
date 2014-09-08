@@ -1,11 +1,12 @@
 package com.amadornes.framez.util;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import codechicken.lib.vec.BlockCoord;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Rotation;
 import codechicken.lib.vec.Vector3;
@@ -14,12 +15,14 @@ import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
 
-import com.amadornes.framez.api.movement.IFrameMove;
+import com.amadornes.framez.api.IFrame;
+import com.amadornes.framez.api.movement.HandlingPriority;
+import com.amadornes.framez.api.movement.HandlingPriority.Priority;
 import com.amadornes.framez.part.PartFrame;
 
 public class Utils {
 
-    public static PartFrame getFrame(World world, int x, int y, int z) {
+    public static IFrame getFrame(World world, int x, int y, int z) {
 
         TileEntity te = world.getTileEntity(x, y, z);
         if (te != null && te instanceof TileMultipart) {
@@ -28,7 +31,7 @@ public class Utils {
         return null;
     }
 
-    public static PartFrame getFrame(TileMultipart te) {
+    public static IFrame getFrame(TileMultipart te) {
 
         for (TMultiPart p : te.jPartList()) {
             if (p instanceof PartFrame) {
@@ -87,43 +90,31 @@ public class Utils {
         return 0;
     }
 
-    public static void addConnected(List<BlockCoord> blocks, PartFrame frame) {
+    public static TileMultipart getMultipartTile(World w, int x, int y, int z) {
 
-        BlockCoord coords = new BlockCoord(frame.x(), frame.y(), frame.z());
-        if (blocks.contains(coords))
-            return;
-        blocks.add(coords);
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (te != null && te instanceof TileMultipart)
+            return (TileMultipart) te;
+        return null;
+    }
 
-        int i = 0;
-        for (Object o : frame.getConnections()) {
-            ForgeDirection d = ForgeDirection.getOrientation(i);
-            if (o != null) {
-                if (o instanceof PartFrame) {
-                    addConnected(blocks, (PartFrame) o);
-                } else if (o instanceof Boolean) {
-                    BlockCoord c = new BlockCoord(frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ);
-                    TileEntity te = frame.world().getTileEntity(c.x, c.y, c.z);
-                    if (te == null || (te != null && (!(te instanceof IFrameMove) || (te instanceof IFrameMove && ((IFrameMove) te).canBeMoved()))))
-                        if (!blocks.contains(c))
-                            blocks.add(c);
-                } else if (o instanceof Integer) {
-                    if (((Integer) o).intValue() > 1) {
-                        PartFrame f = getFrame(frame.world(), frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ);
-                        if (f == null) {
-                            BlockCoord c = new BlockCoord(frame.x() + d.offsetX, frame.y() + d.offsetY, frame.z() + d.offsetZ);
-                            TileEntity te = frame.world().getTileEntity(c.x, c.y, c.z);
-                            if (te == null
-                                    || (te != null && (!(te instanceof IFrameMove) || (te instanceof IFrameMove && ((IFrameMove) te).canBeMoved()))))
-                                if (!blocks.contains(c))
-                                    blocks.add(c);
-                        } else {
-                            addConnected(blocks, f);
-                        }
-                    }
-                }
-            }
-            i++;
-        }
+    public static <T> List<T> sortByPriority(Map<T, HandlingPriority.Priority> map) {
+
+        List<T> sorted = new ArrayList<T>();
+
+        for (T h : map.keySet())
+            if (map.get(h) == Priority.HIGH)
+                sorted.add(h);
+
+        for (T h : map.keySet())
+            if (map.get(h) == Priority.MEDIUM)
+                sorted.add(h);
+
+        for (T h : map.keySet())
+            if (map.get(h) == Priority.LOW)
+                sorted.add(h);
+
+        return sorted;
     }
 
 }

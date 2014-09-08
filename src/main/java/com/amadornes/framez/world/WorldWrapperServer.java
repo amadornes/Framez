@@ -32,22 +32,39 @@ import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.ForgeDirection;
+import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
+import com.amadornes.framez.movement.StructureTickHandler;
+import com.amadornes.framez.tile.TileMoving.UpdateType;
 
 public class WorldWrapperServer extends WorldServer {
 
-    private MovingStructure structure;
+    private List<MovingStructure> structures = new ArrayList<MovingStructure>();
+    private World world;
 
-    public WorldWrapperServer(MovingStructure structure) {
+    private List<BlockCoord> toUpdate = new ArrayList<BlockCoord>();
 
-        super(MinecraftServer.getServer(), new NonSavingHandler(), structure.getWorld().getWorldInfo().getWorldName(),
-                structure.getWorld().provider.dimensionId, new WorldSettings(structure.getWorld().getWorldInfo()), structure.getWorld().theProfiler);
-        DimensionManager.setWorld(structure.getWorld().provider.dimensionId, (WorldServer) structure.getWorld());
+    public WorldWrapperServer(World world) {
 
-        this.structure = structure;
-        chunkProvider = structure.getWorld().getChunkProvider();
+        super(MinecraftServer.getServer(), new NonSavingHandler(), world.getWorldInfo().getWorldName(), world.provider.dimensionId,
+                new WorldSettings(world.getWorldInfo()), world.theProfiler);
+        DimensionManager.setWorld(world.provider.dimensionId, (WorldServer) world);
+
+        chunkProvider = world.getChunkProvider();
+
+        this.world = world;
+    }
+
+    public void addStructure(MovingStructure structure) {
+
+        structures.add(structure);
+    }
+
+    public void removeStructure(MovingStructure structure) {
+
+        structures.remove(structure);
     }
 
     @Override
@@ -69,13 +86,16 @@ public class WorldWrapperServer extends WorldServer {
 
     private MovingBlock get(int x, int y, int z) {
 
-        if (structure.getMoved() >= 1)
-            return null;
+        for (MovingStructure structure : structures) {
+            if (structure.getMoved() >= 1)
+                continue;
 
-        MovingBlock b = structure.getBlock(x, y, z);
-        if (b != null && !b.isStored())
-            return null;
-        return b;
+            MovingBlock b = structure.getBlock(x, y, z);
+            if (b != null && !b.isStored())
+                continue;
+            return b;
+        }
+        return null;
     }
 
     @Override
@@ -101,7 +121,7 @@ public class WorldWrapperServer extends WorldServer {
     @Override
     public int getLightBrightnessForSkyBlocks(int x, int y, int z, int unknown) {
 
-        return structure.getWorld().getLightBrightnessForSkyBlocks(x, y, z, unknown);
+        return world.getLightBrightnessForSkyBlocks(x, y, z, unknown);
     }
 
     @Override
@@ -137,26 +157,33 @@ public class WorldWrapperServer extends WorldServer {
     @Override
     public Entity getEntityByID(int id) {
 
-        return structure.getWorld().getEntityByID(id);
+        return world.getEntityByID(id);
     }
 
     @Override
     public boolean spawnEntityInWorld(Entity entity) {
 
-        entity.posX += structure.getDirection().offsetX * structure.getMoved();
-        entity.posY += structure.getDirection().offsetY * structure.getMoved();
-        entity.posZ += structure.getDirection().offsetZ * structure.getMoved();
+        MovingStructure structure = StructureTickHandler.INST.tickingStructure;
+        if (structure != null) {
+            entity.posX += structure.getDirection().offsetX * structure.getMoved();
+            entity.posY += structure.getDirection().offsetY * structure.getMoved();
+            entity.posZ += structure.getDirection().offsetZ * structure.getMoved();
+        }
 
-        return structure.getWorld().spawnEntityInWorld(entity);
+        return world.spawnEntityInWorld(entity);
     }
 
     @Override
     public void spawnParticle(String type, double x, double y, double z, double r, double g, double b) {
 
-        structure.getWorld()
-                .spawnParticle(type, x + (structure.getDirection().offsetX * structure.getMoved()),
-                        y + (structure.getDirection().offsetY * structure.getMoved()), z + (structure.getDirection().offsetZ * structure.getMoved()),
-                        r, g, b);
+        MovingStructure structure = StructureTickHandler.INST.tickingStructure;
+        if (structure != null) {
+            world.spawnParticle(type, x + (structure.getDirection().offsetX * structure.getMoved()), y
+                    + (structure.getDirection().offsetY * structure.getMoved()), z + (structure.getDirection().offsetZ * structure.getMoved()), r, g,
+                    b);
+        } else {
+            world.spawnParticle(type, x, y, z, r, g, b);
+        }
     }
 
     @Override
@@ -167,6 +194,10 @@ public class WorldWrapperServer extends WorldServer {
             return false;
 
         b.setBlock(block);
+
+        if (b.getPlaceholder() != null)
+            b.getPlaceholder().sendUpdatePacket(UpdateType.BLOCK);
+
         return true;
     }
 
@@ -178,7 +209,11 @@ public class WorldWrapperServer extends WorldServer {
             return false;
 
         b.setBlock(block);
-        b.setMeta(meta);
+        b.setMetadata(meta);
+
+        if (b.getPlaceholder() != null)
+            b.getPlaceholder().sendUpdatePacket(UpdateType.BLOCK);
+
         return true;
     }
 
@@ -189,7 +224,11 @@ public class WorldWrapperServer extends WorldServer {
         if (b == null)
             return false;
 
-        b.setMeta(meta);
+        b.setMetadata(meta);
+
+        if (b.getPlaceholder() != null)
+            b.getPlaceholder().sendUpdatePacket(UpdateType.BLOCK);
+
         return true;
     }
 
@@ -201,6 +240,10 @@ public class WorldWrapperServer extends WorldServer {
             return false;
 
         b.setBlock(Blocks.air);
+
+        if (b.getPlaceholder() != null)
+            b.getPlaceholder().sendUpdatePacket(UpdateType.BLOCK);
+
         return true;
     }
 
@@ -217,6 +260,14 @@ public class WorldWrapperServer extends WorldServer {
     @Override
     public void tick() {
 
+        List<BlockCoord> toUpdateCurrent = new ArrayList<BlockCoord>(toUpdate);
+        toUpdate.clear();
+        for (BlockCoord b : toUpdateCurrent) {
+            Block bl = getBlock(b.x, b.y, b.z);
+            if (bl != null)
+                bl.updateTick(this, b.x, b.y, b.z, rand);
+        }
+        toUpdateCurrent.clear();
     }
 
     @Override
@@ -227,43 +278,43 @@ public class WorldWrapperServer extends WorldServer {
     @Override
     public void playSound(double x, double y, double z, String sound, float volume, float pitch, boolean unknown) {
 
-        structure.getWorld().playSound(x, y, z, sound, volume, pitch, unknown);
+        world.playSound(x, y, z, sound, volume, pitch, unknown);
     }
 
     @Override
     public void playSoundAtEntity(Entity entity, String sound, float volume, float pitch) {
 
-        structure.getWorld().playSoundAtEntity(entity, sound, volume, pitch);
+        world.playSoundAtEntity(entity, sound, volume, pitch);
     }
 
     @Override
     public void playSoundEffect(double x, double y, double z, String sound, float volume, float pitch) {
 
-        structure.getWorld().playSoundEffect(x, y, z, sound, volume, pitch);
+        world.playSoundEffect(x, y, z, sound, volume, pitch);
     }
 
     @Override
     public void playAuxSFX(int x, int y, int z, int a, int b) {
 
-        structure.getWorld().playAuxSFX(x, y, z, a, b);
+        world.playAuxSFX(x, y, z, a, b);
     }
 
     @Override
     public void playAuxSFXAtEntity(EntityPlayer player, int x, int y, int z, int a, int b) {
 
-        structure.getWorld().playAuxSFXAtEntity(player, x, y, z, a, b);
+        world.playAuxSFXAtEntity(player, x, y, z, a, b);
     }
 
     @Override
     public void playSoundToNearExcept(EntityPlayer player, String sound, float volume, float pitch) {
 
-        structure.getWorld().playSoundToNearExcept(player, sound, volume, pitch);
+        world.playSoundToNearExcept(player, sound, volume, pitch);
     }
 
     @Override
     public void playBroadcastSound(int x, int y, int z, int p_82739_4_, int p_82739_5_) {
 
-        structure.getWorld().playBroadcastSound(x, y, z, p_82739_4_, p_82739_5_);
+        world.playBroadcastSound(x, y, z, p_82739_4_, p_82739_5_);
     }
 
     @Override
@@ -275,19 +326,19 @@ public class WorldWrapperServer extends WorldServer {
     @Override
     public Chunk getChunkFromBlockCoords(int x, int z) {
 
-        return structure.getWorld().getChunkFromBlockCoords(x, z);
+        return world.getChunkFromBlockCoords(x, z);
     }
 
     @Override
     public Chunk getChunkFromChunkCoords(int x, int z) {
 
-        return structure.getWorld().getChunkFromChunkCoords(x, z);
+        return world.getChunkFromChunkCoords(x, z);
     }
 
     @Override
     public IChunkProvider getChunkProvider() {
 
-        return structure.getWorld().getChunkProvider();
+        return world.getChunkProvider();
     }
 
     @Override
@@ -354,19 +405,34 @@ public class WorldWrapperServer extends WorldServer {
     @Override
     public void joinEntityInSurroundings(Entity entity) {
 
-        structure.getWorld().joinEntityInSurroundings(entity);
+        world.joinEntityInSurroundings(entity);
     }
 
     @Override
     public void removeEntity(Entity p_72900_1_) {
 
-        structure.getWorld().removeEntity(p_72900_1_);
+        world.removeEntity(p_72900_1_);
     }
 
     @Override
     public File getChunkSaveLocation() {
 
         return null;
+    }
+
+    @Override
+    public void markBlockForUpdate(int x, int y, int z) {
+
+        toUpdate.add(new BlockCoord(x, y, z));
+
+        MovingBlock b = get(x, y, z);
+        if (b != null && b.getPlaceholder() != null)
+            b.getPlaceholder().sendUpdatePacket(UpdateType.ALL);
+    }
+
+    public World getRealWorld() {
+
+        return world;
     }
 
     private static class NonSavingHandler implements ISaveHandler {

@@ -12,6 +12,7 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.world.WorldWrapperClient;
 import com.amadornes.framez.world.WorldWrapperServer;
+import com.amadornes.framez.world.WorldWrapperServerProvider;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -45,7 +46,7 @@ public class MovingStructure {
 
     private void initServer() {
 
-        wrapper = new WorldWrapperServer(this);
+        wrapper = WorldWrapperServerProvider.getWrapper(world);
     }
 
     @SideOnly(Side.CLIENT)
@@ -114,11 +115,12 @@ public class MovingStructure {
         return wrapperClient;
     }
 
-    @SuppressWarnings("rawtypes")
     public void tick() {
 
         if (!moved) {
             if (totalMoved == 0) {
+                if (wrapper != null)
+                    wrapper.addStructure(this);
                 for (MovingBlock b : blocks) {
                     b.storeData();
                     b.remove();
@@ -133,46 +135,12 @@ public class MovingStructure {
             }
 
             // Move entities
-            {
-                List<Entity> entities = new ArrayList<Entity>();
-                double s = 2;
-                for (MovingBlock b : blocks) {
-                    List aabbs = new ArrayList();
+            moveEntities();
 
-                    b.getBlock().addCollisionBoxesToList(
-                            b.getWorld().isRemote ? b.getStructure().getWorldWrapperClient() : b.getStructure().getWorldWrapper(),
-                            b.getLocation().x,
-                            b.getLocation().y,
-                            b.getLocation().z,
-                            AxisAlignedBB.getBoundingBox(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x + 1,
-                                    b.getLocation().y + 1, b.getLocation().z + 1), aabbs, null);
-                    for (Object o : aabbs) {
-                        AxisAlignedBB aabb = ((AxisAlignedBB) o);
+            getWorldWrapper().tick();
 
-                        if (aabb == null)
-                            continue;
-                        aabb = aabb.copy();
-                        aabb.maxY += 0.25;
-
-                        aabb.minX -= direction.offsetX < 0 ? 0.25 : 0;
-                        aabb.minZ -= direction.offsetZ < 0 ? 0.25 : 0;
-                        aabb.maxX += direction.offsetX > 0 ? 0.25 : 0;
-                        aabb.maxZ += direction.offsetZ > 0 ? 0.25 : 0;
-
-                        for (Object o2 : world.getEntitiesWithinAABB(Entity.class, aabb)) {
-                            if (!entities.contains(o2))
-                                entities.add((Entity) o2);
-                        }
-                    }
-                }
-
-                for (Entity e : entities) {
-                    e.motionX += direction.offsetX * (speed / s);
-                    e.motionZ += direction.offsetZ * (speed / s);
-                    if (direction.offsetY > 0)
-                        e.motionY += (speed * (1 + speed - 0.02) * (totalMoved == 0 ? 1 : 2)) + (e.onGround && totalMoved == 0 ? 0.05 : 0);
-                }
-            }
+            for (MovingBlock b : blocks)
+                getWorld().func_147451_t(b.getLocation().x, b.getLocation().y, b.getLocation().z);
 
             totalMoved += speed;
 
@@ -192,6 +160,8 @@ public class MovingStructure {
                     world.markBlockForUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
                             b.getLocation().z + getDirection().offsetZ);
                 }
+                if (wrapper != null)
+                    wrapper.removeStructure(this);
             }
         }
     }
@@ -207,4 +177,64 @@ public class MovingStructure {
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
+    private void moveEntities() {
+
+        List<Entity> entities = new ArrayList<Entity>();
+        for (MovingBlock b : blocks) {
+            List aabbs = new ArrayList();
+
+            b.getBlock().addCollisionBoxesToList(
+                    getWorldWrapper(),
+                    b.getLocation().x,
+                    b.getLocation().y,
+                    b.getLocation().z,
+                    AxisAlignedBB.getBoundingBox(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x + 1,
+                            b.getLocation().y + 1, b.getLocation().z + 1), aabbs, null);
+            for (Object o : aabbs) {
+                AxisAlignedBB aabb = ((AxisAlignedBB) o);
+
+                if (aabb == null)
+                    continue;
+                aabb = aabb.copy();
+
+                // Translate
+                {
+                    double x = direction.offsetX * getMoved();
+                    double y = direction.offsetY * getMoved();
+                    double z = direction.offsetZ * getMoved();
+
+                    aabb.minX += x;
+                    aabb.maxX += x;
+                    aabb.minY += y;
+                    aabb.maxY += y;
+                    aabb.minZ += z;
+                    aabb.maxZ += z;
+                }
+
+                aabb.maxY += 0.25;
+
+                aabb.minX -= direction.offsetX < 0 ? 0.25 : 0;
+                aabb.minZ -= direction.offsetZ < 0 ? 0.25 : 0;
+                aabb.maxX += direction.offsetX > 0 ? 0.25 : 0;
+                aabb.maxZ += direction.offsetZ > 0 ? 0.25 : 0;
+
+                for (Object o2 : world.getEntitiesWithinAABB(Entity.class, aabb)) {
+                    if (!entities.contains(o2))
+                        entities.add((Entity) o2);
+                }
+            }
+        }
+
+        for (Entity e : entities) {
+            e.motionX += direction.offsetX * (speed / 2);
+            e.motionZ += direction.offsetZ * (speed / 2);
+            if (direction.offsetY > 0) {
+                e.motionY += (speed * 2) - 0.000125 + (totalMoved == 0 ? 0.1 : 0);
+                e.velocityChanged = true;
+                e.onGround = true;
+                e.fallDistance = 0;
+            }
+        }
+    }
 }

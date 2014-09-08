@@ -2,11 +2,16 @@ package com.amadornes.framez.tile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -17,6 +22,8 @@ import codechicken.lib.raytracer.RayTracer;
 
 import com.amadornes.framez.movement.MovingBlock;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -25,18 +32,36 @@ public class TileMoving extends TileEntity {
     private MovingBlock blockA;
     private MovingBlock blockB;
 
+    private UpdateType type;
+
+    private boolean needsUpdate = false;;
+
     @Override
     public void updateEntity() {
+
+        if (blockA != null)
+            if (blockA.getMoved() >= 1)
+                blockA = null;
+        if (blockB != null)
+            if (blockB.getMoved() >= 1)
+                blockB = null;
 
         if (blockA == null && blockB == null) {
             getWorldObj().removeTileEntity(xCoord, yCoord, zCoord);
             getWorldObj().setBlockToAir(xCoord, yCoord, zCoord);
+        }
+
+        if (needsUpdate) {
+            sendUpdatePacket(UpdateType.ALL);
+            needsUpdate = false;
         }
     }
 
     public void setBlockA(MovingBlock blockA) {
 
         this.blockA = blockA;
+
+        needsUpdate = true;
     }
 
     public void setBlockB(MovingBlock blockB) {
@@ -248,10 +273,128 @@ public class TileMoving extends TileEntity {
                 (float) mop.hitVec.xCoord - mop.blockX, (float) mop.hitVec.yCoord - mop.blockY, (float) mop.hitVec.zCoord - mop.blockZ);
     }
 
+    public int getLightValue() {
+
+        // double a = 0;
+        // double b = 0;
+        //
+        // // if (blockA != null) {
+        // // a = blockA.getBlock().getLightValue(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z)
+        // // * (1 - blockA.getMoved());
+        // // }
+        // if (blockB != null) {
+        // b = blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y, blockB.getLocation().z)
+        // * blockB.getMoved();
+        // System.out.println(b);
+        // }
+
+        // return (int) Math.min(Math.max(b, 0), 15);
+
+        if (blockA != null)
+            return blockA.getBlock().getLightValue(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z);
+        if (blockB != null)
+            return blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y, blockB.getLocation().z);
+
+        return 0;
+    }
+
+    public int getLightOpacity() {
+
+        return 0;
+    }
+
+    public void randomDisplayTick(Random rnd) {
+
+        if (blockA != null)
+            if (blockA.getBlock().getTickRandomly())
+                blockA.getBlock().randomDisplayTick(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z,
+                        rnd);
+    }
+
+    public ItemStack getPickBlock(MovingObjectPosition target) {
+
+        return null;
+    }
+
+    public void sendUpdatePacket(UpdateType type) {
+
+        this.type = type;
+        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+    }
+
+    @Override
+    public Packet getDescriptionPacket() {
+
+        NBTTagCompound tag = new NBTTagCompound();
+
+        if (blockA != null && type != null) {
+            if (type.isBlock()) {
+                UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(blockA.getBlock());
+                tag.setString("mod", ui.modId);
+                tag.setString("block", ui.name);
+                tag.setInteger("meta", blockA.getMetadata());
+            }
+            if (type.isTile() && blockA.getTileEntity() != null) {
+                Packet p = blockA.getTileEntity().getDescriptionPacket();
+                if (p != null && p instanceof S35PacketUpdateTileEntity)
+                    tag.setTag("tile", ((S35PacketUpdateTileEntity) p).func_148857_g());
+            }
+        }
+
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
+    }
+
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
-        if (blockA != null && blockA.getTileEntity() != null)
-            blockA.getTileEntity().onDataPacket(net, pkt);
+        NBTTagCompound tag = pkt.func_148857_g();
+
+        if (!tag.hasKey("block") && !tag.hasKey("tile")) {
+            if (blockA != null && blockA.getTileEntity() != null)
+                blockA.getTileEntity().onDataPacket(net, pkt);
+            return;
+        }
+
+        if (blockA == null)
+            return;
+
+        if (tag.hasKey("block")) {
+            Block bl = GameRegistry.findBlock(tag.getString("mod"), tag.getString("block"));
+            if (blockA.getBlock() != bl)
+                blockA.setBlock(bl);
+            int meta = tag.getInteger("meta");
+            if (blockA.getMetadata() != meta)
+                blockA.setMetadata(meta);
+            blockA.setRenderList(-1);
+        }
+        if (tag.hasKey("tile") && blockA.getTileEntity() != null) {
+            S35PacketUpdateTileEntity p = new S35PacketUpdateTileEntity(blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z, 0,
+                    tag.getCompoundTag("tile"));
+            blockA.getTileEntity().onDataPacket(net, p);
+        }
+    }
+
+    public static enum UpdateType {
+        BLOCK(true, false), TILE(false, true), ALL(true, true);
+
+        private boolean block;
+        private boolean tile;
+
+        private UpdateType(boolean block, boolean tile) {
+
+            this.block = block;
+            this.tile = tile;
+        }
+
+        public boolean isBlock() {
+
+            return block;
+        }
+
+        public boolean isTile() {
+
+            return tile;
+        }
+
     }
 }

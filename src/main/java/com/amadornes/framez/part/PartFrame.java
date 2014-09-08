@@ -2,7 +2,6 @@ package com.amadornes.framez.part;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -15,7 +14,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -33,10 +31,8 @@ import codechicken.lib.render.RenderUtils;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
 import codechicken.microblock.HollowMicroblock;
-import codechicken.multipart.INeighborTileChange;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TNormalOcclusion;
-import codechicken.multipart.TileMultipart;
 
 import com.amadornes.framez.ModifierRegistry;
 import com.amadornes.framez.api.FramezApi;
@@ -45,10 +41,8 @@ import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.ref.References;
-import com.amadornes.framez.util.SorterModifier;
-import com.amadornes.framez.util.Utils;
 
-public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighborTileChange, IFrame {
+public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
     private static final Cuboid6[] subParts = new Cuboid6[] { null, null, null, null, null, null };
 
@@ -570,18 +564,6 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
         onUpdate(3);
     }
 
-    @Override
-    public boolean weakTileChanges() {
-
-        return false;
-    }
-
-    @Override
-    public void onNeighborTileChanged(int arg0, boolean arg1) {
-
-        onUpdate(0);
-    }
-
     private void onUpdate(int mode) {
 
         for (int i = 0; i < 6; i++) {
@@ -643,46 +625,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, INeighbor
 
     public static Object canConnect(PartFrame frame, ForgeDirection face) {
 
-        if (frame.world().isSideSolid(frame.x() + face.offsetX, frame.y() + face.offsetY, frame.z() + face.offsetZ, face.getOpposite()))
-            return true;
-
-        if (!Utils.occlusionTest(frame.tile(), face))
-            return Utils.getMicroblockSize(frame.tile(), face);
-
-        TileEntity te = frame.world().getTileEntity(frame.x() + face.offsetX, frame.y() + face.offsetY, frame.z() + face.offsetZ);
-        if (te != null && te instanceof TileMultipart) {
-            PartFrame fr = Utils.getFrame((TileMultipart) te);
-            if (fr != null) {
-                boolean isConnected = false;
-                for (IFrameModifier m : fr.modifiers) {
-                    if (m.getIdentifier().equals(References.Modifiers.CONNECTED)) {
-                        isConnected = true;
-                        break;
-                    }
-                }
-                if (isConnected) {
-                    Collections.sort(frame.modifiers, new SorterModifier());
-                    Collections.sort(fr.modifiers, new SorterModifier());
-                    if (frame.modifiers.size() == fr.modifiers.size()) {
-                        for (int i = 0; i < frame.modifiers.size(); i++) {
-                            if (!frame.modifiers.get(i).getIdentifier().equals(fr.modifiers.get(i).getIdentifier())) {
-                                isConnected = false;
-                                break;
-                            }
-                        }
-                    } else {
-                        isConnected = false;
-                    }
-                }
-                if (isConnected && Utils.occlusionTest((TileMultipart) te, face.getOpposite()))
-                    return fr;
-            }
-
-            if (!Utils.occlusionTest((TileMultipart) te, face.getOpposite()))
-                return Utils.getMicroblockSize((TileMultipart) te, face.getOpposite());
-        }
-
-        return frame.world().getBlock(frame.x() + face.offsetX, frame.y() + face.offsetY, frame.z() + face.offsetZ) != Blocks.air ? true : null;
+        return null;
     }
 
     @Override

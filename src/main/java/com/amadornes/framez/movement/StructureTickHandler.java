@@ -13,6 +13,8 @@ public class StructureTickHandler {
 
     private List<MovingStructure> structures = new ArrayList<MovingStructure>();
 
+    public MovingStructure tickingStructure = null;
+
     private StructureTickHandler() {
 
     }
@@ -34,9 +36,13 @@ public class StructureTickHandler {
             List<MovingStructure> invalid = new ArrayList<MovingStructure>();
 
             for (MovingStructure s : new ArrayList<MovingStructure>(structures)) {
+                tickingStructure = s;
+
                 s.tick();
                 if (s.getMoved() >= 1)
                     invalid.add(s);
+
+                tickingStructure = null;
             }
 
             for (MovingStructure s : invalid) {

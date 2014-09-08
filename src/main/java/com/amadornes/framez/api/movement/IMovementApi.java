@@ -1,17 +1,15 @@
 package com.amadornes.framez.api.movement;
 
+import net.minecraft.block.Block;
+
 public interface IMovementApi {
 
-    public void registerMovementListener(IMovementListener listener);
-
-    public IMovementListener[] getListeners(Object obj);
-
-    public IMovementListener[] getRegisteredListeners();
-
-    public void registerMovementHandler(IMovementHandler listener);
-
-    public IMovementHandler[] getHandlers(Object obj);
+    public void registerMovementHandler(IMovementHandler handler);
 
     public IMovementHandler[] getRegisteredHandlers();
+
+    public void setBlockMovementType(Block block, BlockMovementType type);
+
+    public void setBlockMovementType(Block block, int metadata, BlockMovementType type);
 
 }
