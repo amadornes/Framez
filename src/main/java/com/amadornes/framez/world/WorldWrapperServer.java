@@ -1,7 +1,6 @@
 package com.amadornes.framez.world;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -489,7 +488,7 @@ public class WorldWrapperServer extends WorldServer {
         }
 
         @Override
-        public void checkSessionLock() throws MinecraftException {
+        public void checkSessionLock() {
 
         }
     }
@@ -513,13 +512,13 @@ public class WorldWrapperServer extends WorldServer {
         }
 
         @Override
-        public Chunk loadChunk(World p_75815_1_, int p_75815_2_, int p_75815_3_) throws IOException {
+        public Chunk loadChunk(World p_75815_1_, int p_75815_2_, int p_75815_3_) {
 
             return null;
         }
 
         @Override
-        public Object[] loadChunk__Async(World p_75815_1_, int p_75815_2_, int p_75815_3_) throws IOException {
+        public Object[] loadChunk__Async(World p_75815_1_, int p_75815_2_, int p_75815_3_) {
 
             return null;
         }
@@ -530,7 +529,7 @@ public class WorldWrapperServer extends WorldServer {
         }
 
         @Override
-        public void saveChunk(World p_75816_1_, Chunk p_75816_2_) throws MinecraftException, IOException {
+        public void saveChunk(World p_75816_1_, Chunk p_75816_2_) {
 
         }
 
