@@ -148,55 +148,68 @@ public class MovingBlock implements IMovingBlock {
 
     public void remove() {
 
-        if (!MovementApi.INST.handleRemoval(this, getDirection())) {
-            // Default handling
-
-            world.removeTileEntity(loc.x, loc.y, loc.z);
-            world.setBlock(loc.x, loc.y, loc.z, Blocks.air, 0, 2);
-
-            if (te != null) {
-                te.invalidate();// Already notifies of leaving world
-
-                te.setWorldObj(getWorldWrapper());
-
-                te.validate();
-                if (!world.isRemote && te instanceof TileMultipart)
-                    for (TMultiPart p : ((TileMultipart) te).jPartList())
-                        p.onWorldJoin();
-            }
-        }
+        if (!MovementApi.INST.handleRemoval(this, getDirection()))
+            remove_do(true, true);
 
         isStored = true;
     }
 
-    public void place() {
+    @Override
+    public void remove_do(boolean invalidate, boolean validate) {
 
-        if (!MovementApi.INST.handlePlacement(this, getDirection())) {
-            if (te != null) {
-                te.invalidate();// Already notifies of leaving world
+        world.removeTileEntity(loc.x, loc.y, loc.z);
+        world.setBlock(loc.x, loc.y, loc.z, Blocks.air, 0, 2);
 
-                te.xCoord += getDirection().offsetX;
-                te.yCoord += getDirection().offsetY;
-                te.zCoord += getDirection().offsetZ;
-                te.setWorldObj(world);
+        if (te != null) {
+            if (invalidate)
+                te.invalidate();
 
+            te.setWorldObj(getWorldWrapper());
+
+            if (validate) {
                 te.validate();
                 if (!world.isRemote && te instanceof TileMultipart)
                     for (TMultiPart p : ((TileMultipart) te).jPartList())
                         p.onWorldJoin();
             }
-
-            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, block, meta, 4);
-            world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 4);
-
-            if (te != null) {
-
-                world.setTileEntity(te.xCoord, te.yCoord, te.zCoord, te);
-            }
-            world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 4);
         }
+    }
+
+    public void place() {
+
+        if (!MovementApi.INST.handlePlacement(this, getDirection()))
+            place_do(true, true);
 
         isStored = false;
+    }
+
+    @Override
+    public void place_do(boolean invalidate, boolean validate) {
+
+        if (te != null) {
+            if (invalidate)
+                te.invalidate();
+
+            te.xCoord += getDirection().offsetX;
+            te.yCoord += getDirection().offsetY;
+            te.zCoord += getDirection().offsetZ;
+            te.setWorldObj(world);
+
+            if (validate) {
+                te.validate();
+                if (!world.isRemote && te instanceof TileMultipart)
+                    for (TMultiPart p : ((TileMultipart) te).jPartList())
+                        p.onWorldJoin();
+            }
+        }
+
+        world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, block, meta, 4);
+        world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 4);
+
+        if (te != null)
+            world.setTileEntity(te.xCoord, te.yCoord, te.zCoord, te);
+
+        world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 4);
     }
 
     public void removePlaceholder() {

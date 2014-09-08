@@ -35,4 +35,8 @@ public interface IMovingBlock {
 
     public void setTileEntity(TileEntity tileentity);
 
+    public void remove_do(boolean invalidate, boolean validate);
+
+    public void place_do(boolean invalidate, boolean validate);
+
 }
