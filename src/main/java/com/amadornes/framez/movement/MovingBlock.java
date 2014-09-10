@@ -12,6 +12,7 @@ import codechicken.multipart.TileMultipart;
 import com.amadornes.framez.api.movement.IMovingBlock;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.tile.TileMoving;
+import com.amadornes.framez.util.BlockUtils;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -157,8 +158,8 @@ public class MovingBlock implements IMovingBlock {
     @Override
     public void remove_do(boolean invalidate, boolean validate) {
 
-        world.removeTileEntity(loc.x, loc.y, loc.z);
-        world.setBlock(loc.x, loc.y, loc.z, Blocks.air, 0, 2);
+        BlockUtils.removeTileEntity(world, loc.x, loc.y, loc.z);
+        world.setBlock(loc.x, loc.y, loc.z, Blocks.air, 0, 0);
 
         if (te != null) {
             if (invalidate)
