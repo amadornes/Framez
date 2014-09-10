@@ -41,6 +41,7 @@ import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.ref.References;
+import com.amadornes.framez.util.Utils;
 
 public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
@@ -102,7 +103,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
     private boolean isConnected(ForgeDirection dir) {
 
-        return getConnection(dir) != null && getConnection(dir) instanceof PartFrame;
+        return getConnection(dir) != null && getConnection(dir) instanceof IFrame;
     }
 
     private Object getConnection(ForgeDirection dir) {
@@ -160,12 +161,6 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     }
 
     @Override
-    public boolean doesTick() {
-
-        return false;
-    }
-
-    @Override
     public Iterable<Cuboid6> getCollisionBoxes() {
 
         return Arrays.asList(new Cuboid6[] { new Cuboid6(0, 0, 0, 1, 1, 1) });
@@ -212,8 +207,12 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         double sep = 0.001;
 
         rb.setRenderFromInside(false);
-        rb.setRenderBounds(minx / 16D + (minx == 0 ? sep : 0), miny / 16D + (miny == 0 ? sep : 0), minz / 16D + (minz == 0 ? sep : 0), maxx / 16D
-                - (maxx == 16 ? sep : 0), maxy / 16D - (maxy == 16 ? sep : 0), maxz / 16D - (maxz == 16 ? sep : 0));
+        rb.setRenderBounds(minx / 16D + (minx == 0 && connections[ForgeDirection.WEST.ordinal()] == null ? sep : 0), miny / 16D
+                + (miny == 0 && connections[ForgeDirection.DOWN.ordinal()] == null ? sep : 0), minz / 16D
+                + (minz == 0 && connections[ForgeDirection.NORTH.ordinal()] == null ? sep : 0), maxx / 16D
+                - (maxx == 16 && connections[ForgeDirection.EAST.ordinal()] == null ? sep : 0), maxy / 16D
+                - (maxy == 16 && connections[ForgeDirection.UP.ordinal()] == null ? sep : 0), maxz / 16D
+                - (maxz == 16 && connections[ForgeDirection.SOUTH.ordinal()] == null ? sep : 0));
 
         renderFace[ForgeDirection.UP.ordinal()] = up;
         renderFace[ForgeDirection.DOWN.ordinal()] = down;
@@ -262,7 +261,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
                     renderBox(15, 0, 1, 16, 1, 15, true, renderDown, renderEast, true, false, false);
                 // South-east
                 if (render[4])
-                    renderBox(15, 0, 15, 16, 1, 16, !render[18], renderDown, renderEast, !render[5], renderSouth, !render[7]);
+                    renderBox(15, 0, 15, 16, 1, 16, !render[18], renderDown, renderEast, !render[5], renderSouth, !render[3]);
                 // South
                 if (render[5])
                     renderBox(1, 0, 15, 15, 1, 16, true, renderDown, false, false, renderSouth, true);
@@ -290,7 +289,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
                     renderBox(15, 15, 1, 16, 16, 15, renderUp, true, renderEast, true, false, false);
                 // South-east
                 if (render[12])
-                    renderBox(15, 15, 15, 16, 16, 16, renderUp, !render[18], renderEast, !render[13], renderSouth, !render[15]);
+                    renderBox(15, 15, 15, 16, 16, 16, renderUp, !render[18], renderEast, !render[13], renderSouth, !render[11]);
                 // South
                 if (render[13])
                     renderBox(1, 15, 15, 15, 16, 16, renderUp, true, false, false, renderSouth, true);
@@ -513,6 +512,12 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        try {
+            onUpdate(2);
+        } catch (Exception ex) {
+            // Not initialized yet
+        }
     }
 
     @Override
@@ -554,6 +559,8 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         super.onNeighborChanged();
 
         onUpdate(2);
+
+        sendDescUpdate();
     }
 
     @Override
@@ -569,7 +576,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         for (int i = 0; i < 6; i++) {
             ForgeDirection face = ForgeDirection.getOrientation(i);
             if (mode != 1)
-                connections[i] = canConnect(this, face);
+                connections[i] = getObjectOnSide(face);
 
             if (mode != 2)
                 if (connections[i] != null && connections[i] instanceof PartFrame) {
@@ -623,7 +630,26 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UNKNOWN, ForgeDirection.SOUTH, ForgeDirection.WEST));
     }
 
-    public static Object canConnect(PartFrame frame, ForgeDirection face) {
+    private Object getObjectOnSide(ForgeDirection face) {
+
+        int x = x() + face.offsetX;
+        int y = y() + face.offsetY;
+        int z = z() + face.offsetZ;
+
+        int mbThis = Utils.getMicroblockSize(tile(), face);
+        if (mbThis > 0)
+            return mbThis;
+
+        int mbOther = Utils.getMicroblockSize(Utils.getMultipartTile(world(), x, y, z), face.getOpposite());
+        if (mbOther > 0)
+            return mbOther;
+
+        IFrame f = Utils.getFrame(world(), x, y, z);
+        if (f != null)
+            return f;
+
+        if (world().getBlock(x, y, z).isSideSolid(world(), x, y, z, face.getOpposite()))
+            return true;
 
         return null;
     }
