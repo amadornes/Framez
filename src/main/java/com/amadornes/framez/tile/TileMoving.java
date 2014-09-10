@@ -313,7 +313,14 @@ public class TileMoving extends TileEntity {
 
     public ItemStack getPickBlock(MovingObjectPosition target) {
 
-        return null;
+        MovingObjectPosition mop = rayTrace(Minecraft.getMinecraft().thePlayer);
+        if (mop == null)
+            return null;
+        MovingBlock block = getSelected(mop);
+        if (block == null)
+            return null;
+
+        return block.getBlock().getPickBlock(mop, block.getWorldWrapper(), block.getX(), block.getY(), block.getZ());
     }
 
     public void sendUpdatePacket(UpdateType type) {
