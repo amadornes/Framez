@@ -155,27 +155,6 @@ public class MovingBlock implements IMovingBlock {
         isStored = true;
     }
 
-    @Override
-    public void remove_do(boolean invalidate, boolean validate) {
-
-        BlockUtils.removeTileEntity(world, loc.x, loc.y, loc.z);
-        world.setBlock(loc.x, loc.y, loc.z, Blocks.air, 0, 0);
-
-        if (te != null) {
-            if (invalidate)
-                te.invalidate();
-
-            te.setWorldObj(getWorldWrapper());
-
-            if (validate) {
-                te.validate();
-                if (!world.isRemote && te instanceof TileMultipart)
-                    for (TMultiPart p : ((TileMultipart) te).jPartList())
-                        p.onWorldJoin();
-            }
-        }
-    }
-
     public void place() {
 
         if (!MovementApi.INST.handlePlacement(this, getDirection()))
@@ -185,42 +164,72 @@ public class MovingBlock implements IMovingBlock {
     }
 
     @Override
-    public void place_do(boolean invalidate, boolean validate) {
+    public void remove_do(boolean invalidate, boolean validate) {
+
+        int x = getX();
+        int y = getY();
+        int z = getZ();
+        TileEntity te = getTileEntity();
+
+        BlockUtils.removeTileEntity(getWorld(), x, y, z);
+        world.setBlock(x, y, z, Blocks.air, 0, 4);
 
         if (te != null) {
             if (invalidate)
                 te.invalidate();
 
-            te.xCoord += getDirection().offsetX;
-            te.yCoord += getDirection().offsetY;
-            te.zCoord += getDirection().offsetZ;
-            te.setWorldObj(world);
+            te.setWorldObj(getWorldWrapper());
 
-            if (validate) {
+            if (validate)
                 te.validate();
-                if (!world.isRemote && te instanceof TileMultipart)
-                    for (TMultiPart p : ((TileMultipart) te).jPartList())
-                        p.onWorldJoin();
+        }
+    }
+
+    @Override
+    public void place_do(boolean invalidate, boolean validate) {
+
+        int x = getX() + getDirection().offsetX;
+        int y = getY() + getDirection().offsetY;
+        int z = getZ() + getDirection().offsetZ;
+        TileEntity te = getTileEntity();
+
+        world.setBlock(x, y, z, getBlock(), getMetadata(), 4);
+        world.setBlockMetadataWithNotify(x, y, z, getMetadata(), 4);
+
+        if (te != null) {
+            if (te instanceof TileMultipart) {
+                if (!getWorld().isRemote) {
+                    for (TMultiPart p : ((TileMultipart) te).jPartList()) {
+                        TileMultipart.addPart(getWorld(), new BlockCoord(x, y, z), p);
+                    }
+                }
+            } else {
+                if (invalidate)
+                    te.invalidate();
+
+                te.xCoord = x;
+                te.yCoord = y;
+                te.zCoord = z;
+                te.setWorldObj(getWorldWrapper());
+
+                if (validate) {
+                    te.validate();
+                    if (te instanceof TileMultipart && !getWorld().isRemote)
+                        for (TMultiPart p : ((TileMultipart) te).jPartList())
+                            p.onWorldJoin();
+                }
+
+                world.setTileEntity(x, y, z, te);
             }
         }
 
-        world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, block, meta, 4);
-        world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 4);
-
-        if (te != null)
-            world.setTileEntity(te.xCoord, te.yCoord, te.zCoord, te);
-
-        world.setBlockMetadataWithNotify(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, meta, 4);
     }
 
     public void removePlaceholder() {
 
         placeholder.setBlockA(null);
         MovingBlock b = structure.getBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
-        if (b == null) {
-            world.setBlockToAir(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
-            world.removeTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
-        } else {
+        if (b != null) {
             b.placeholder.setBlockB(null);
         }
     }

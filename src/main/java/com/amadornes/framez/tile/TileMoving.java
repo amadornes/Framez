@@ -39,9 +39,12 @@ public class TileMoving extends TileEntity {
     @Override
     public void updateEntity() {
 
-        if (blockA != null)
+        if (blockA != null) {
+            if (blockA.getTileEntity() != null)
+                blockA.getTileEntity().updateEntity();
             if (blockA.getMoved() >= 1)
                 blockA = null;
+        }
         if (blockB != null)
             if (blockB.getMoved() >= 1)
                 blockB = null;
