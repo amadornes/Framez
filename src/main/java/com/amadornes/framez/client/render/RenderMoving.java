@@ -94,6 +94,9 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                     } else {
                         GL11.glCallList(b.getRenderList());
                     }
+
+                    RenderHelper.enableStandardItemLighting();
+
                     // TESR
                     if (blockTE != null) {
                         TileEntitySpecialRenderer tesr = TileEntityRendererDispatcher.instance.getSpecialRenderer(blockTE);
@@ -106,8 +109,6 @@ public class RenderMoving extends TileEntitySpecialRenderer {
 
                     if (blockTE != null)
                         blockTE.setWorldObj(w);
-
-                    RenderHelper.enableStandardItemLighting();
 
                     GL11.glPopMatrix();
                 }
