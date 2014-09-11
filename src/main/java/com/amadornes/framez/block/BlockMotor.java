@@ -116,7 +116,11 @@ public class BlockMotor extends BlockContainer {
         if (!RenderMotor.renderingBorder)
             return 0xFFFFFF;
 
-        return ((TileMotor) w.getTileEntity(x, y, z)).getColorMultiplier();
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (te != null && te instanceof TileMotor)
+            return ((TileMotor) te).getColorMultiplier();
+
+        return 0xFF0000;
     }
 
 }
