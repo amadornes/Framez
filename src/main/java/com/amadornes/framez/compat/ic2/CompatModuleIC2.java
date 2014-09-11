@@ -2,8 +2,6 @@ package com.amadornes.framez.compat.ic2;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatModule;
-import com.amadornes.framez.compat.ic2.eu.MotorProviderEU;
-import com.amadornes.framez.compat.ic2.eu.RenderSpecialEU;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;

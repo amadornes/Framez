@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.amadornes.framez.compat.ae2.CompatModuleAE2;
+import com.amadornes.framez.compat.cc.CompatModuleCC;
 import com.amadornes.framez.compat.hc.CompatModuleHC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
 import com.amadornes.framez.compat.pc.CompatModulePC;
 import com.amadornes.framez.compat.vanilla.CompatModuleVanilla;
 import com.amadornes.framez.compat.waila.CompatModuleWaila;
+import com.amadornes.framez.ref.Dependencies;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -117,11 +118,11 @@ public class CompatibilityUtils {
      */
     static {
         registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleVanilla.class);
-        registerModule("IC2", CompatModuleIC2.class, null);
-        registerModule("PneumaticCraft", CompatModulePC.class, null);
-        registerModule("Waila", CompatModuleWaila.class, null);
-        registerModule("HydCraft", CompatModuleHC.class, null);
-        registerModule("appliedenergistics2", CompatModuleAE2.class, null);
+        registerModule(Dependencies.IC2, CompatModuleIC2.class, null);
+        registerModule(Dependencies.PC, CompatModulePC.class, null);
+        registerModule(Dependencies.WAILA, CompatModuleWaila.class, null);
+        registerModule(Dependencies.HC, CompatModuleHC.class, null);
+        registerModule(Dependencies.CC, CompatModuleCC.class, null);
     }
 
 }

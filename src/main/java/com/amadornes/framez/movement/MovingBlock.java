@@ -149,16 +149,17 @@ public class MovingBlock implements IMovingBlock {
 
     public void remove() {
 
-        if (!MovementApi.INST.handleRemoval(this, getDirection()))
-            remove_do(true, true);
+        if (!MovementApi.INST.handleRemoval(this)) {
+            remove_do(false, false);
+        }
 
         isStored = true;
     }
 
     public void place() {
 
-        if (!MovementApi.INST.handlePlacement(this, getDirection()))
-            place_do(true, true);
+        if (!MovementApi.INST.handlePlacement(this))
+            place_do(false, false);
 
         isStored = false;
     }

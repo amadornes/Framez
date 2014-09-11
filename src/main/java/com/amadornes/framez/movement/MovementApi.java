@@ -8,7 +8,6 @@ import java.util.Map;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
 import com.amadornes.framez.api.movement.BlockMovementType;
 import com.amadornes.framez.api.movement.HandlingPriority;
@@ -72,7 +71,7 @@ public class MovementApi implements IMovementApi {
         return BlockMovementType.MOVABLE;
     }
 
-    public boolean handlePlacement(IMovingBlock block, ForgeDirection d) {
+    public boolean handlePlacement(IMovingBlock block) {
 
         for (IMovementHandler h : getSortedHandlersForMovement(true))
             if (h.handleFinishMoving(block))
@@ -81,7 +80,7 @@ public class MovementApi implements IMovementApi {
         return false;
     }
 
-    public boolean handleRemoval(IMovingBlock block, ForgeDirection d) {
+    public boolean handleRemoval(IMovingBlock block) {
 
         for (IMovementHandler h : getSortedHandlersForMovement(false))
             if (h.handleStartMoving(block))
