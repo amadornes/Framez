@@ -171,13 +171,19 @@ public class WorldWrapperClient extends WorldClient {
     }
 
     @Override
-    public void setTileEntity(int p_147455_1_, int p_147455_2_, int p_147455_3_, TileEntity p_147455_4_) {
+    public void setTileEntity(int x, int y, int z, TileEntity te) {
 
+        MovingBlock b = get(x, y, z);
+        if (b != null)
+            b.setTileEntity(te);
     }
 
     @Override
-    public void removeTileEntity(int p_147475_1_, int p_147475_2_, int p_147475_3_) {
+    public void removeTileEntity(int x, int y, int z) {
 
+        MovingBlock b = get(x, y, z);
+        if (b != null)
+            b.setTileEntity(null);
     }
 
     @Override

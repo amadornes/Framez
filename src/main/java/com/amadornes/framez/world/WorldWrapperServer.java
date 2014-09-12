@@ -249,11 +249,17 @@ public class WorldWrapperServer extends WorldServer {
     @Override
     public void setTileEntity(int x, int y, int z, TileEntity te) {
 
+        MovingBlock b = get(x, y, z);
+        if (b != null)
+            b.setTileEntity(te);
     }
 
     @Override
     public void removeTileEntity(int x, int y, int z) {
 
+        MovingBlock b = get(x, y, z);
+        if (b != null)
+            b.setTileEntity(null);
     }
 
     @Override

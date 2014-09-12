@@ -184,13 +184,16 @@ public class MovingStructure {
         for (MovingBlock b : blocks) {
             List aabbs = new ArrayList();
 
-            b.getBlock().addCollisionBoxesToList(
-                    getWorldWrapper(),
-                    b.getLocation().x,
-                    b.getLocation().y,
-                    b.getLocation().z,
-                    AxisAlignedBB.getBoundingBox(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x + 1,
-                            b.getLocation().y + 1, b.getLocation().z + 1), aabbs, null);
+            try {
+                b.getBlock().addCollisionBoxesToList(
+                        getWorldWrapper(),
+                        b.getLocation().x,
+                        b.getLocation().y,
+                        b.getLocation().z,
+                        AxisAlignedBB.getBoundingBox(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x + 1,
+                                b.getLocation().y + 1, b.getLocation().z + 1), aabbs, null);
+            } catch (Exception ex) {
+            }
             for (Object o : aabbs) {
                 AxisAlignedBB aabb = ((AxisAlignedBB) o);
 
