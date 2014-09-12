@@ -43,6 +43,9 @@ import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.util.Utils;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
     private static final Cuboid6[] subParts = new Cuboid6[] { null, null, null, null, null, null };
@@ -93,7 +96,15 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         };
     };
 
-    private static RenderBlocks rb = new RenderBlocks();
+    @SideOnly(Side.CLIENT)
+    private static RenderBlocks rb;
+
+    @SideOnly(Side.CLIENT)
+    private static void initClient() {
+
+        if (rb == null)
+            rb = new RenderBlocks();
+    }
 
     private Object[] connections = new Object[] { null, null, null, null, null, null };
 
@@ -232,6 +243,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
         rendering = this;
 
+        initClient();
         rb.blockAccess = Minecraft.getMinecraft().theWorld;
 
         // Border
@@ -367,6 +379,12 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean doesTick() {
+
+        return false;
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.amadornes.framez.api.IMotorRegistry;
 import com.amadornes.framez.client.render.IRenderMotorSpecial;
 import com.amadornes.framez.tile.TileMotor;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -18,11 +19,19 @@ public class MotorRegistry implements IMotorRegistry {
     public static final MotorRegistry INST = new MotorRegistry();
 
     private List<IMotorProvider> providers = new ArrayList<IMotorProvider>();
-    @SideOnly(Side.CLIENT)
-    private List<IRenderMotorSpecial> renderers = new ArrayList<IRenderMotorSpecial>();
+
+    private List<IRenderMotorSpecial> renderers;
 
     private MotorRegistry() {
 
+        if (FMLCommonHandler.instance().getEffectiveSide().isClient())
+            initClient();
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void initClient() {
+
+        renderers = new ArrayList<IRenderMotorSpecial>();
     }
 
     @Override
@@ -43,6 +52,7 @@ public class MotorRegistry implements IMotorRegistry {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerSpecialRenderer(IRenderMotorSpecial renderer) {
 
         if (renderer == null)
@@ -54,6 +64,7 @@ public class MotorRegistry implements IMotorRegistry {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public IRenderMotorSpecial[] getRenderers(TileMotor tile, ForgeDirection face) {
 
         List<IRenderMotorSpecial> l = new ArrayList<IRenderMotorSpecial>();

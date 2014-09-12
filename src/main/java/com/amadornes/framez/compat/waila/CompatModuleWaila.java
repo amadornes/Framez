@@ -14,14 +14,25 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 public class CompatModuleWaila extends CompatModule {
 
+    private static final boolean shouldRun() {
+
+        return FMLCommonHandler.instance().getEffectiveSide().isClient();
+    }
+
     @Override
     public void preInit(FMLPreInitializationEvent ev) {
+
+        if (!shouldRun())
+            return;
 
         FMLInterModComms.sendMessage("Waila", "register", getClass().getName() + ".callbackRegister");
     }
 
     @Override
     public void init(FMLInitializationEvent ev) {
+
+        if (!shouldRun())
+            return;
 
         WailaProviderMoving handler = WailaProviderMoving.INST;
         MinecraftForge.EVENT_BUS.register(handler);
@@ -49,6 +60,9 @@ public class CompatModuleWaila extends CompatModule {
     }
 
     public static void callbackRegister(IWailaRegistrar registrar) {
+
+        if (!shouldRun())
+            return;
 
         WailaProviderMoving provider = WailaProviderMoving.INST;
         registrar.registerHeadProvider(provider, TileMoving.class);

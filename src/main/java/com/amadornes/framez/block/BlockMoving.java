@@ -18,6 +18,9 @@ import net.minecraft.world.World;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMoving;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class BlockMoving extends BlockContainer {
 
     public BlockMoving() {
@@ -74,6 +77,7 @@ public class BlockMoving extends BlockContainer {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public int getRenderType() {
 
         return -1;
@@ -130,10 +134,11 @@ public class BlockMoving extends BlockContainer {
     @Override
     public int getLightOpacity(IBlockAccess w, int x, int y, int z) {
 
-        TileMoving te = get(w, x, y, z);
-        if (te == null)
-            return 0;
-        return te.getLightOpacity();
+        return 0;
+        // TileMoving te = get(w, x, y, z);
+        // if (te == null)
+        // return 0;
+        // return te.getLightOpacity();
     }
 
     @Override

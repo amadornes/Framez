@@ -17,6 +17,9 @@ import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMotor;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class BlockMotor extends BlockContainer {
 
     private IMotorProvider provider;
@@ -66,6 +69,7 @@ public class BlockMotor extends BlockContainer {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public int getRenderType() {
 
         return RenderMotor.RENDER_ID;
