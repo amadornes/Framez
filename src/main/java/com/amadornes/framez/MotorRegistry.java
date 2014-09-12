@@ -3,6 +3,7 @@ package com.amadornes.framez;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.amadornes.framez.api.IMotorProvider;
@@ -71,6 +72,21 @@ public class MotorRegistry implements IMotorRegistry {
 
         for (IRenderMotorSpecial r : renderers)
             if (r.shouldRender(tile, face))
+                l.add(r);
+
+        IRenderMotorSpecial[] renderers = l.toArray(new IRenderMotorSpecial[0]);
+        l.clear();
+        return renderers;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IRenderMotorSpecial[] getRenderers(ItemStack item, ForgeDirection face) {
+
+        List<IRenderMotorSpecial> l = new ArrayList<IRenderMotorSpecial>();
+
+        for (IRenderMotorSpecial r : renderers)
+            if (r.shouldRender(item, face))
                 l.add(r);
 
         IRenderMotorSpecial[] renderers = l.toArray(new IRenderMotorSpecial[0]);

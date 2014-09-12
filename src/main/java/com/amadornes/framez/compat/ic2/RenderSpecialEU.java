@@ -2,11 +2,15 @@ package com.amadornes.framez.compat.ic2;
 
 import java.util.Map.Entry;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import com.amadornes.framez.api.IMotor;
 import com.amadornes.framez.api.IRenderMotorSpecial;
 import com.amadornes.framez.client.render.RenderHelper;
 import com.amadornes.framez.tile.TileMotor;
@@ -17,6 +21,19 @@ public class RenderSpecialEU implements IRenderMotorSpecial {
     public boolean shouldRender(TileMotor motor, ForgeDirection face) {
 
         return motor instanceof TileMotorEU && face == ForgeDirection.UP;
+    }
+
+    @Override
+    public boolean shouldRender(ItemStack item, ForgeDirection face) {
+
+        if (item.getItem() instanceof ItemBlock) {
+            Block b = Block.getBlockFromItem(item.getItem());
+            if (b instanceof IMotor && ((IMotor) b).getProvider() instanceof MotorProviderEU) {
+                return face == ForgeDirection.UP;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -52,6 +69,31 @@ public class RenderSpecialEU implements IRenderMotorSpecial {
         renderLightningBolt(false, powerPercentage);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 20, 20);
         renderLightningBolt(false, -powerPercentage);
+
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastx, lasty);
+    }
+
+    @Override
+    public void renderSpecial(ItemStack item, ForgeDirection face, float frame) {
+
+        float lastx = OpenGlHelper.lastBrightnessX;
+        float lasty = OpenGlHelper.lastBrightnessY;
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+        GL11.glTranslated(0.5, 0.5, 0.5);
+        GL11.glRotated(180, 0, 1, 0);
+        GL11.glTranslated(-0.5, -0.5, -0.5);
+
+        GL11.glTranslated(0.25, 0, 0.25);
+        GL11.glScaled(0.5, 1, 0.5);
+
+        GL11.glColor4d(1, 0, 0, 1);
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 20, 20);
+        renderLightningBolt(false, 0);
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 

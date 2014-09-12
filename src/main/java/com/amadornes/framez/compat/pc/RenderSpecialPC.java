@@ -3,6 +3,7 @@ package com.amadornes.framez.compat.pc;
 import java.util.Map.Entry;
 
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -17,6 +18,12 @@ public class RenderSpecialPC implements IRenderMotorSpecial {
     public boolean shouldRender(TileMotor motor, ForgeDirection face) {
 
         return motor instanceof TileMotorPC && face == ForgeDirection.UP;
+    }
+
+    @Override
+    public boolean shouldRender(ItemStack item, ForgeDirection face) {
+
+        return false;
     }
 
     @Override
@@ -53,6 +60,11 @@ public class RenderSpecialPC implements IRenderMotorSpecial {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastx, lasty);
+    }
+
+    @Override
+    public void renderSpecial(ItemStack item, ForgeDirection face, float frame) {
+
     }
 
     public void renderPressureGauge(boolean inverted, double powerPercentage) {

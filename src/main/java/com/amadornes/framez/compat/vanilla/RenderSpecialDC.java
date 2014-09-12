@@ -1,10 +1,14 @@
 package com.amadornes.framez.compat.vanilla;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import com.amadornes.framez.api.IMotor;
 import com.amadornes.framez.api.IRenderMotorSpecial;
 import com.amadornes.framez.client.render.RenderHelper;
 import com.amadornes.framez.tile.TileMotor;
@@ -15,6 +19,19 @@ public class RenderSpecialDC implements IRenderMotorSpecial {
     public boolean shouldRender(TileMotor motor, ForgeDirection face) {
 
         return motor instanceof TileMotorDC && face == ForgeDirection.UP;
+    }
+
+    @Override
+    public boolean shouldRender(ItemStack item, ForgeDirection face) {
+
+        if (item.getItem() instanceof ItemBlock) {
+            Block b = Block.getBlockFromItem(item.getItem());
+            if (b instanceof IMotor && ((IMotor) b).getProvider() instanceof MotorProviderDC) {
+                return face == ForgeDirection.UP;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -42,6 +59,40 @@ public class RenderSpecialDC implements IRenderMotorSpecial {
 
         GL11.glColor4d(1, 0, 0, 1);
         GL11.glNormal3d(0, 1, 0);
+
+        renderRedstone();
+
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastx, lasty);
+    }
+
+    @Override
+    public void renderSpecial(ItemStack item, ForgeDirection face, float frame) {
+
+        float lastx = OpenGlHelper.lastBrightnessX;
+        float lasty = OpenGlHelper.lastBrightnessY;
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+        GL11.glTranslated(0.5, 0.5, 0.5);
+        GL11.glRotated(180, 0, 1, 0);
+        GL11.glTranslated(-0.5, -0.5, -0.5);
+
+        GL11.glTranslated(0.125, 0, 0.125);
+        GL11.glScaled(0.75, 1, 0.75);
+
+        GL11.glColor4d(1, 0, 0, 1);
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 20, 20);
+        renderRedstone();
+
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastx, lasty);
+    }
+
+    private void renderRedstone() {
 
         double depth = 1;
 
@@ -344,10 +395,6 @@ public class RenderSpecialDC implements IRenderMotorSpecial {
             RenderHelper.vertex(7 / 16D, 1, 3 / 16D);
         }
         GL11.glEnd();
-
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastx, lasty);
     }
 
 }

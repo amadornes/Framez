@@ -11,6 +11,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.amadornes.framez.api.IMotor;
 import com.amadornes.framez.api.IMotorProvider;
 import com.amadornes.framez.client.render.RenderMotor;
 import com.amadornes.framez.ref.ModInfo;
@@ -20,7 +21,7 @@ import com.amadornes.framez.tile.TileMotor;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockMotor extends BlockContainer {
+public class BlockMotor extends BlockContainer implements IMotor {
 
     private IMotorProvider provider;
 
@@ -125,6 +126,12 @@ public class BlockMotor extends BlockContainer {
             return ((TileMotor) te).getColorMultiplier();
 
         return 0xFF0000;
+    }
+
+    @Override
+    public IMotorProvider getProvider() {
+
+        return provider;
     }
 
 }

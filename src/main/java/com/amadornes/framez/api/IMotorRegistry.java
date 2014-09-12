@@ -1,5 +1,6 @@
 package com.amadornes.framez.api;
 
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.amadornes.framez.tile.TileMotor;
@@ -18,5 +19,8 @@ public interface IMotorRegistry {
 
     @SideOnly(Side.CLIENT)
     public IRenderMotorSpecial[] getRenderers(TileMotor tile, ForgeDirection face);
+
+    @SideOnly(Side.CLIENT)
+    public IRenderMotorSpecial[] getRenderers(ItemStack item, ForgeDirection face);
 
 }

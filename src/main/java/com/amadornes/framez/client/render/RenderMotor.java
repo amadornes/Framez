@@ -1,21 +1,15 @@
 package com.amadornes.framez.client.render;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -23,8 +17,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IRenderMotorSpecial;
-import com.amadornes.framez.movement.MovingBlock;
-import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.tile.TileMotor;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -36,63 +28,101 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
 
     public static boolean renderingBorder = false;
 
+    private RenderBlocks rb = new RenderBlocks();
+
+    private boolean itemRenderer = false;
+
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
 
     }
 
+    private void renderStandardBlock(Block block, int x, int y, int z) {
+
+        if (!itemRenderer) {
+            rb.renderStandardBlock(block, x, y, z);
+        } else {
+            if (renderingBorder)
+                Tessellator.instance.setColorOpaque_F(0.8F, 0.1F, 0.1F);
+
+            Tessellator.instance.setNormal((float) -rb.renderMinX, 0, 0);
+            rb.renderFaceXNeg(block, x, y, z, block.getIcon(ForgeDirection.WEST.ordinal(), 0));
+            Tessellator.instance.setNormal((float) rb.renderMaxX, 0, 0);
+            rb.renderFaceXPos(block, x, y, z, block.getIcon(ForgeDirection.EAST.ordinal(), 0));
+            Tessellator.instance.setNormal(0, (float) -rb.renderMinY, 0);
+            rb.renderFaceYNeg(block, x, y, z, block.getIcon(ForgeDirection.DOWN.ordinal(), 0));
+            Tessellator.instance.setNormal(0, (float) rb.renderMaxY, 0);
+            rb.renderFaceYPos(block, x, y, z, block.getIcon(ForgeDirection.UP.ordinal(), 0));
+            Tessellator.instance.setNormal(0, 0, (float) -rb.renderMinZ);
+            rb.renderFaceZNeg(block, x, y, z, block.getIcon(ForgeDirection.NORTH.ordinal(), 0));
+            Tessellator.instance.setNormal(0, 0, (float) rb.renderMaxZ);
+            rb.renderFaceZPos(block, x, y, z, block.getIcon(ForgeDirection.SOUTH.ordinal(), 0));
+
+            if (renderingBorder)
+                Tessellator.instance.setColorOpaque_F(1, 1, 1);
+        }
+    }
+
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 
-        renderer.renderAllFaces = true;
+        RenderBlocks rbOld = rb;
+        rb = renderer;
+        render(block, x, y, z);
+        rb = rbOld;
+
+        return true;
+    }
+
+    private void render(Block block, int x, int y, int z) {
+
+        rb.renderAllFaces = true;
 
         renderingBorder = true;
 
         // Bottom
-        renderer.setRenderBounds(0, 0, 0, 1 / 16D, 1 / 16D, 1);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(15 / 16D, 0, 0, 1, 1 / 16D, 1);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(1 / 16D, 0, 0, 15 / 16D, 1 / 16D, 1 / 16D);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(1 / 16D, 0, 15 / 16D, 15 / 16D, 1 / 16D, 1);
-        renderer.renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(0, 0, 0, 1 / 16D, 1 / 16D, 1);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(15 / 16D, 0, 0, 1, 1 / 16D, 1);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(1 / 16D, 0, 0, 15 / 16D, 1 / 16D, 1 / 16D);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(1 / 16D, 0, 15 / 16D, 15 / 16D, 1 / 16D, 1);
+        renderStandardBlock(block, x, y, z);
 
         // Top
-        renderer.setRenderBounds(0, 15 / 16D, 0, 1 / 16D, 1, 1);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(15 / 16D, 15 / 16D, 0, 1, 1, 1);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(1 / 16D, 15 / 16D, 0, 15 / 16D, 1, 1 / 16D);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(1 / 16D, 15 / 16D, 15 / 16D, 15 / 16D, 1, 1);
-        renderer.renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(0, 15 / 16D, 0, 1 / 16D, 1, 1);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(15 / 16D, 15 / 16D, 0, 1, 1, 1);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(1 / 16D, 15 / 16D, 0, 15 / 16D, 1, 1 / 16D);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(1 / 16D, 15 / 16D, 15 / 16D, 15 / 16D, 1, 1);
+        renderStandardBlock(block, x, y, z);
 
         // Sides
-        renderer.setRenderBounds(0, 1 / 16D, 0, 1 / 16D, 15 / 16D, 1 / 16D);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(15 / 16D, 1 / 16D, 0, 1, 15 / 16D, 1 / 16D);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(15 / 16D, 1 / 16D, 15 / 16D, 1, 15 / 16D, 1);
-        renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(0, 1 / 16D, 15 / 16D, 1 / 16D, 15 / 16D, 1);
-        renderer.renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(0, 1 / 16D, 0, 1 / 16D, 15 / 16D, 1 / 16D);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(15 / 16D, 1 / 16D, 0, 1, 15 / 16D, 1 / 16D);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(15 / 16D, 1 / 16D, 15 / 16D, 1, 15 / 16D, 1);
+        renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(0, 1 / 16D, 15 / 16D, 1 / 16D, 15 / 16D, 1);
+        renderStandardBlock(block, x, y, z);
 
         renderingBorder = false;
 
         // Center
-        renderer.setRenderBounds(1 / 16D, 1 / 16D, 1 / 16D, 15 / 16D, 15 / 16D, 15 / 16D);
-        renderer.renderStandardBlock(block, x, y, z);
+        rb.setRenderBounds(1 / 16D, 1 / 16D, 1 / 16D, 15 / 16D, 15 / 16D, 15 / 16D);
+        renderStandardBlock(block, x, y, z);
 
-        renderer.renderAllFaces = false;
-
-        return true;
+        rb.renderAllFaces = false;
     }
 
     @Override
     public boolean shouldRender3DInInventory(int modelId) {
 
-        return false;
+        return true;
     }
 
     @Override
@@ -104,18 +134,107 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
     @Override
     public boolean handleRenderType(ItemStack item, ItemRenderType type) {
 
-        return false;
+        return true;
     }
 
     @Override
     public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
 
-        return false;
+        return true;
     }
 
     @Override
     public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
 
+        itemRenderer = true;
+
+        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+
+        GL11.glPushMatrix();
+        {
+
+            switch (type) {
+            case ENTITY:
+                GL11.glTranslated(-0.5, 0, -0.5);
+                if (item.getItemFrame() != null)
+                    GL11.glTranslated(0, -0.5, 0);
+                break;
+            case EQUIPPED:
+                break;
+            case EQUIPPED_FIRST_PERSON:
+                break;
+            case INVENTORY:
+                GL11.glTranslated(0, -0.0625, 0);
+                break;
+            default:
+                break;
+            }
+
+            GL11.glTranslated(0.5, 0.5, 0.5);
+            GL11.glRotated(-90, 1, 0, 0);
+            GL11.glTranslated(-0.5, -0.5, -0.5);
+
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+            Tessellator.instance.startDrawingQuads();
+            render(Block.getBlockFromItem(item.getItem()), 0, 0, 0);
+            Tessellator.instance.draw();
+
+            GL11.glDisable(GL11.GL_BLEND);
+
+            GL11.glPushMatrix();
+            {
+                renderArrow(false, 0);
+                renderArrow(true, 0);
+            }
+            GL11.glPopMatrix();
+
+            GL11.glTranslated(0.5, 0.5, 0.5);
+            GL11.glRotated(90, 1, 0, 0);
+            GL11.glTranslated(-0.5, -0.5, -0.5);
+
+            for (ForgeDirection f : ForgeDirection.VALID_DIRECTIONS) {
+                GL11.glPushMatrix();
+
+                GL11.glTranslated(0.5, 0.5, 0.5);
+                GL11.glRotated(-90, 0, 1, 0);
+                switch (f) {
+                case UP:
+                    break;
+                case DOWN:
+                    GL11.glRotated(180, 1, 0, 0);
+                    break;
+                case WEST:
+                    GL11.glRotated(-90, 1, 0, 0);
+                    break;
+                case EAST:
+                    GL11.glRotated(90, 1, 0, 0);
+                    break;
+                case NORTH:
+                    GL11.glRotated(-90, 0, 0, 1);
+                    break;
+                case SOUTH:
+                    GL11.glRotated(90, 0, 0, 1);
+                    break;
+                default:
+                    break;
+                }
+                GL11.glTranslated(-0.5, -0.5, -0.5);
+
+                IRenderMotorSpecial[] l = FramezApi.inst().getMotorRegistry().getRenderers(item, f);
+                for (IRenderMotorSpecial r : l) {
+                    GL11.glPushMatrix();
+                    r.renderSpecial(item, f, 0);
+                    GL11.glPopMatrix();
+                }
+
+                GL11.glPopMatrix();
+            }
+        }
+        GL11.glPopMatrix();
+
+        itemRenderer = false;
     }
 
     @Override
@@ -126,13 +245,6 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
         GL11.glPushMatrix();
         {
             GL11.glTranslated(x, y, z);
-
-            GL11.glPushMatrix();
-            {
-                // if (te.getStructure() != null)
-                // renderStructure(te, frame);
-            }
-            GL11.glPopMatrix();
 
             ForgeDirection face = te.getFace();
             ForgeDirection direction = te.getDirection();
@@ -441,104 +553,4 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
         GL11.glPopMatrix();
     }
 
-    private static RenderBlocks rb = new RenderBlocks();
-
-    public void renderStructure(TileMotor motor, float frame) {
-
-        MovingStructure structure = motor.getStructure();
-
-        Minecraft mc = Minecraft.getMinecraft();
-
-        World playerWorld = mc.thePlayer.worldObj;
-        WorldClient gameWorld = mc.theWorld;
-
-        mc.thePlayer.worldObj = structure.getWorldWrapper();
-        mc.theWorld = structure.getWorldWrapperClient();
-
-        if (structure.getBlocks() == null)
-            return;
-        List<MovingBlock> blocks = new ArrayList<MovingBlock>(structure.getBlocks());
-
-        GL11.glTranslated(-motor.xCoord, -motor.yCoord, -motor.zCoord);
-
-        double x = structure.getDirection().offsetX * structure.getMoved(frame);
-        double y = structure.getDirection().offsetY * structure.getMoved(frame);
-        double z = structure.getDirection().offsetZ * structure.getMoved(frame);
-        GL11.glTranslated(x, y, z);
-
-        // ISBRH
-        {
-            GL11.glPushMatrix();
-
-            net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-
-            Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-            rb.blockAccess = structure.getWorldWrapperClient();
-
-            for (MovingBlock b : blocks) {
-                if (b == null)
-                    continue;
-
-                World w = null;
-                if (b.getTileEntity() != null) {
-                    w = b.getTileEntity().getWorldObj();
-                    b.getTileEntity().setWorldObj(structure.getWorldWrapper());
-                }
-
-                if (b.getBlock() != null && b.getLocation() != null) {
-                    for (int pass = 0; pass < 2; pass++) {
-                        if (b.getBlock().canRenderInPass(pass)) {
-                            try {
-                                Tessellator.instance.startDrawingQuads();
-                                rb.renderBlockByRenderType(b.getBlock(), b.getLocation().x, b.getLocation().y, b.getLocation().z);
-                                Tessellator.instance.draw();
-                            } catch (Exception e) {
-                                try {
-                                    Tessellator.instance.draw();
-                                } catch (Exception ex) {
-                                }
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-
-                if (b.getTileEntity() != null)
-                    b.getTileEntity().setWorldObj(w);
-            }
-
-            net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
-
-            GL11.glPopMatrix();
-        }
-
-        // TESR
-        {
-            GL11.glPushMatrix();
-            for (MovingBlock b : blocks) {
-                if (b == null)
-                    continue;
-
-                TileEntity te = b.getTileEntity();
-                if (te == null)
-                    continue;
-
-                World w = te.getWorldObj();
-                te.setWorldObj(structure.getWorldWrapper());
-
-                TileEntitySpecialRenderer tesr = TileEntityRendererDispatcher.instance.getSpecialRenderer(te);
-                if (tesr != null) {
-                    GL11.glPushMatrix();
-                    tesr.renderTileEntityAt(te, b.getLocation().x, b.getLocation().y, b.getLocation().z, frame);
-                    GL11.glPopMatrix();
-                }
-
-                te.setWorldObj(w);
-            }
-            GL11.glPopMatrix();
-        }
-
-        mc.thePlayer.worldObj = playerWorld;
-        mc.theWorld = gameWorld;
-    }
 }
