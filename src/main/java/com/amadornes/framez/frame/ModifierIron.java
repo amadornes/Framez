@@ -11,7 +11,6 @@ import com.amadornes.framez.ref.References.Modifiers;
 
 public class ModifierIron implements IFrameModifier {
 
-    @SuppressWarnings("unused")
     private IFrame frame;
     private IFrameModifierProvider provider;
 
@@ -73,7 +72,7 @@ public class ModifierIron implements IFrameModifier {
     @Override
     public IIcon getCrossTexture(ForgeDirection side) {
 
-        return ModifierProviderIron.cross;
+        return frame.isSideBlocked(side) ? ModifierProviderIron.crossBlocked : ModifierProviderIron.cross;
     }
 
     @Override
@@ -92,6 +91,12 @@ public class ModifierIron implements IFrameModifier {
     public IFrameModifierProvider getProvider() {
 
         return provider;
+    }
+
+    @Override
+    public boolean canBlockSide(ForgeDirection side) {
+
+        return true;
     }
 
 }

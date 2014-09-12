@@ -46,6 +46,9 @@ public class MovementUtils {
         if (frame != null) {
             blocks.add(block);
             for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+                if (frame.isSideBlocked(d))
+                    continue;
+
                 TileMultipart tmp = Utils.getMultipartTile(w, block.x, block.y, block.z);
                 if (tmp != null && Utils.getMicroblockSize(tmp, d) == 1)
                     continue;

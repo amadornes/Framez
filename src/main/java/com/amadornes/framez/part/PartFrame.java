@@ -48,6 +48,8 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
     private boolean[] render = new boolean[20];
 
+    private boolean[] blocked = new boolean[6];
+
     private boolean isConnected(ForgeDirection dir) {
 
         return getConnection(dir) != null && getConnection(dir) instanceof IFrame;
@@ -273,6 +275,9 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         super.save(tag);
 
         writeModifiersToNBT(tag);
+
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
+            tag.setBoolean("blocked_" + d.name().toLowerCase(), isSideBlocked(d));
     }
 
     @Override
@@ -285,6 +290,10 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
+            if (tag.getBoolean("blocked_" + d.name().toLowerCase()))
+                toggleBlock(d);
     }
 
     @Override
@@ -293,7 +302,12 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         super.writeDesc(packet);
 
         NBTTagCompound tag = new NBTTagCompound();
+
         writeModifiersToNBT(tag);
+
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
+            tag.setBoolean("blocked_" + d.name().toLowerCase(), isSideBlocked(d));
+
         packet.writeNBTTagCompound(tag);
     }
 
@@ -308,6 +322,9 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
+            blocked[d.ordinal()] = tag.getBoolean("blocked_" + d.name().toLowerCase());
 
         try {
             onUpdate(2);
@@ -563,5 +580,32 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     public boolean[] getRender() {
 
         return render;
+    }
+
+    @Override
+    public boolean isSideBlocked(ForgeDirection side) {
+
+        return blocked[side.ordinal()];
+    }
+
+    @Override
+    public boolean toggleBlock(ForgeDirection side) {
+
+        for (IFrameModifier m : modifiers)
+            if (!m.canBlockSide(side))
+                return false;
+
+        if (!world().isRemote) {
+            blocked[side.ordinal()] = !isSideBlocked(side);
+            sendDescUpdate();
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
+
+        return toggleBlock(ForgeDirection.getOrientation(player.isSneaking() ? hit.sideHit ^ 1 : hit.sideHit));
     }
 }

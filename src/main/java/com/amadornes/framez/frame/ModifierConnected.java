@@ -94,4 +94,10 @@ public class ModifierConnected implements IFrameModifier {
         return provider;
     }
 
+    @Override
+    public boolean canBlockSide(ForgeDirection side) {
+
+        return true;
+    }
+
 }

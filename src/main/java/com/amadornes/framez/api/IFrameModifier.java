@@ -37,4 +37,6 @@ public interface IFrameModifier {
 
     public IFrameModifierProvider getProvider();
 
+    public boolean canBlockSide(ForgeDirection side);
+
 }

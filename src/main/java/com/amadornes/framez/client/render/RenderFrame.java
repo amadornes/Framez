@@ -56,9 +56,9 @@ public class RenderFrame implements IItemRenderer {
                     tex = IconProvider.iconFrameBorder;
                 return tex;
             case 2:
-                tex = ModifierRegistry.INST.getCrossTexture(Arrays.asList(rendering.getModifiers()), face);
+                tex = ModifierRegistry.INST.getCrossTexture(Arrays.asList(rendering.getModifiers()), RenderFrame.face);
                 if (tex == null)
-                    tex = IconProvider.iconFrameCross;
+                    tex = rendering.isSideBlocked(RenderFrame.face) ? IconProvider.iconFrameCrossBlocked : IconProvider.iconFrameCross;
                 return tex;
             }
             return null;
@@ -76,6 +76,8 @@ public class RenderFrame implements IItemRenderer {
     public static RenderBlocks rb = new RenderBlocks();
 
     private static boolean itemRenderer = false;
+
+    private static ForgeDirection face = ForgeDirection.UP;
 
     private static final void renderStandardBlock(int x, int y, int z) {
 
@@ -232,11 +234,13 @@ public class RenderFrame implements IItemRenderer {
             renderFace[ForgeDirection.DOWN.ordinal()] = true;
 
             rb.setRenderBounds(0 + sep, 1 - depth, 0 + sep, 1 - sep, 1 - depth, 1 - sep);
-            if (frame.getConnection(ForgeDirection.UP) == null) {
+            if (frame.getConnection(ForgeDirection.UP) == null || frame.isSideBlocked(ForgeDirection.UP)) {
+                face = ForgeDirection.UP;
                 renderStandardBlock(x, y, z);
             }
             rb.setRenderBounds(0 + sep, 0 + depth, 0 + sep, 1 - sep, 0 + depth, 1 - sep);
-            if (frame.getConnection(ForgeDirection.DOWN) == null) {
+            if (frame.getConnection(ForgeDirection.DOWN) == null || frame.isSideBlocked(ForgeDirection.DOWN)) {
+                face = ForgeDirection.DOWN;
                 renderStandardBlock(x, y, z);
             }
 
@@ -245,11 +249,13 @@ public class RenderFrame implements IItemRenderer {
             renderFace[ForgeDirection.WEST.ordinal()] = true;
 
             rb.setRenderBounds(1 - depth, 0 + sep, 0 + sep, 1 - depth, 1 - sep, 1 - sep);
-            if (frame.getConnection(ForgeDirection.EAST) == null) {
+            if (frame.getConnection(ForgeDirection.EAST) == null || frame.isSideBlocked(ForgeDirection.EAST)) {
+                face = ForgeDirection.EAST;
                 renderStandardBlock(x, y, z);
             }
             rb.setRenderBounds(0 + depth, 0 + sep, 0 + sep, 0 + depth, 1 - sep, 1 - sep);
-            if (frame.getConnection(ForgeDirection.WEST) == null) {
+            if (frame.getConnection(ForgeDirection.WEST) == null || frame.isSideBlocked(ForgeDirection.WEST)) {
+                face = ForgeDirection.WEST;
                 renderStandardBlock(x, y, z);
             }
 
@@ -258,11 +264,13 @@ public class RenderFrame implements IItemRenderer {
             renderFace[ForgeDirection.NORTH.ordinal()] = true;
 
             rb.setRenderBounds(0 + sep, 0 + sep, 1 - depth, 1 - sep, 1 - sep, 1 - depth);
-            if (frame.getConnection(ForgeDirection.SOUTH) == null) {
+            if (frame.getConnection(ForgeDirection.SOUTH) == null || frame.isSideBlocked(ForgeDirection.SOUTH)) {
+                face = ForgeDirection.SOUTH;
                 renderStandardBlock(x, y, z);
             }
             rb.setRenderBounds(0 + sep, 0 + sep, 0 + depth, 1 - sep, 1 - sep, 0 + depth);
-            if (frame.getConnection(ForgeDirection.NORTH) == null) {
+            if (frame.getConnection(ForgeDirection.NORTH) == null || frame.isSideBlocked(ForgeDirection.NORTH)) {
+                face = ForgeDirection.NORTH;
                 renderStandardBlock(x, y, z);
             }
         }

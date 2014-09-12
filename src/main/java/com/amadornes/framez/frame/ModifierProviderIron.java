@@ -19,6 +19,8 @@ public class ModifierProviderIron implements IFrameModifierProvider {
     protected static IIcon border;
     @SideOnly(Side.CLIENT)
     protected static IIcon cross;
+    @SideOnly(Side.CLIENT)
+    protected static IIcon crossBlocked;
 
     @Override
     public String getIdentifier() {
@@ -49,6 +51,7 @@ public class ModifierProviderIron implements IFrameModifierProvider {
 
         border = reg.registerIcon(ModInfo.MODID + ":frameBorderIron");
         cross = reg.registerIcon(ModInfo.MODID + ":frameCrossIron");
+        crossBlocked = reg.registerIcon(ModInfo.MODID + ":frameCrossIronClosed");
     }
 
     @Override

@@ -7,5 +7,6 @@ public class Dependencies {
     public static final String PC = "PneumaticCraft";
     public static final String HC = "HydCraft";
     public static final String WAILA = "Waila";
+    public static final String NEI = "NotEnoughItems";
 
 }

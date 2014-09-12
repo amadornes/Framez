@@ -94,4 +94,10 @@ public class ModifierGlassClear implements IFrameModifier {
         return provider;
     }
 
+    @Override
+    public boolean canBlockSide(ForgeDirection side) {
+
+        return false;
+    }
+
 }

@@ -94,4 +94,10 @@ public class ModifierGlass implements IFrameModifier {
         return provider;
     }
 
+    @Override
+    public boolean canBlockSide(ForgeDirection side) {
+
+        return false;
+    }
+
 }

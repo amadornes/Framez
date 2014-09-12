@@ -2,6 +2,7 @@ package com.amadornes.framez.api;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public interface IFrame {
 
@@ -28,5 +29,9 @@ public interface IFrame {
     public void readModifiersFromNBT(NBTTagCompound tag);
 
     public Object[] getConnections();
+
+    public boolean isSideBlocked(ForgeDirection side);
+
+    public boolean toggleBlock(ForgeDirection side);
 
 }

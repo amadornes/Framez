@@ -10,6 +10,7 @@ import java.util.UUID;
 import com.amadornes.framez.compat.cc.CompatModuleCC;
 import com.amadornes.framez.compat.hc.CompatModuleHC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
+import com.amadornes.framez.compat.nei.CompatModuleNEI;
 import com.amadornes.framez.compat.pc.CompatModulePC;
 import com.amadornes.framez.compat.vanilla.CompatModuleVanilla;
 import com.amadornes.framez.compat.waila.CompatModuleWaila;
@@ -123,6 +124,7 @@ public class CompatibilityUtils {
         registerModule(Dependencies.WAILA, CompatModuleWaila.class, null);
         registerModule(Dependencies.HC, CompatModuleHC.class, null);
         registerModule(Dependencies.CC, CompatModuleCC.class, null);
+        registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
     }
 
 }

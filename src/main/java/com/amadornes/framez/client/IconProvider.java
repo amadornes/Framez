@@ -14,7 +14,9 @@ public class IconProvider {
 
     public static IIcon iconFrameBorder;
     public static IIcon iconFrameCross;
+    public static IIcon iconFrameCrossBlocked;
     public static IIcon iconNothing;
+    public static IIcon iconCrate;
 
     @SubscribeEvent
     public void onTextureRegister(TextureStitchEvent event) {
@@ -31,7 +33,9 @@ public class IconProvider {
 
         iconFrameBorder = reg.registerIcon(ModInfo.MODID + ":frameBorder");
         iconFrameCross = reg.registerIcon(ModInfo.MODID + ":frameCross");
+        iconFrameCrossBlocked = reg.registerIcon(ModInfo.MODID + ":frameCrossClosed");
         iconNothing = reg.registerIcon(ModInfo.MODID + ":nothing");
+        iconCrate = reg.registerIcon(ModInfo.MODID + ":crate");
 
         for (IFrameModifierProvider p : FramezApi.inst().getModifierRegistry().getProviders())
             p.registerIcons(reg);

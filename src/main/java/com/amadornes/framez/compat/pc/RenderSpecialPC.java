@@ -2,12 +2,15 @@ package com.amadornes.framez.compat.pc;
 
 import java.util.Map.Entry;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import com.amadornes.framez.api.IMotor;
 import com.amadornes.framez.api.IRenderMotorSpecial;
 import com.amadornes.framez.client.render.RenderHelper;
 import com.amadornes.framez.tile.TileMotor;
@@ -22,6 +25,13 @@ public class RenderSpecialPC implements IRenderMotorSpecial {
 
     @Override
     public boolean shouldRender(ItemStack item, ForgeDirection face) {
+
+        if (item.getItem() instanceof ItemBlock) {
+            Block b = Block.getBlockFromItem(item.getItem());
+            if (b instanceof IMotor && ((IMotor) b).getProvider() instanceof MotorProviderPC) {
+                return face == ForgeDirection.UP;
+            }
+        }
 
         return false;
     }
@@ -65,6 +75,26 @@ public class RenderSpecialPC implements IRenderMotorSpecial {
     @Override
     public void renderSpecial(ItemStack item, ForgeDirection face, float frame) {
 
+        float lastx = OpenGlHelper.lastBrightnessX;
+        float lasty = OpenGlHelper.lastBrightnessY;
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+        GL11.glTranslated(0.5, 0.5, 0.5);
+        GL11.glRotated(180, 0, 1, 0);
+        GL11.glTranslated(-0.5, -0.5, -0.5);
+
+        GL11.glTranslated(0.125, 0, 0.125);
+        GL11.glScaled(0.75, 1, 0.75);
+
+        GL11.glColor4d(1, 0, 0, 1);
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 20, 20);
+        renderPressureGauge(false, 0);
+
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastx, lasty);
     }
 
     public void renderPressureGauge(boolean inverted, double powerPercentage) {

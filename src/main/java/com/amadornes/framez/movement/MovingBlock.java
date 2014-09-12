@@ -149,9 +149,8 @@ public class MovingBlock implements IMovingBlock {
 
     public void remove() {
 
-        if (!MovementApi.INST.handleRemoval(this)) {
+        if (!MovementApi.INST.handleRemoval(this))
             remove_do(false, false);
-        }
 
         isStored = true;
     }
