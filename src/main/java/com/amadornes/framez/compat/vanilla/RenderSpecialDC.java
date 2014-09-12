@@ -6,7 +6,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
 import com.amadornes.framez.api.IRenderMotorSpecial;
-import com.amadornes.framez.client.RenderHelper;
+import com.amadornes.framez.client.render.RenderHelper;
 import com.amadornes.framez.tile.TileMotor;
 
 public class RenderSpecialDC implements IRenderMotorSpecial {

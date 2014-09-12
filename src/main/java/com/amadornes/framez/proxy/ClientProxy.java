@@ -8,9 +8,11 @@ import net.minecraftforge.common.MinecraftForge;
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IMotorProvider;
 import com.amadornes.framez.client.IconProvider;
+import com.amadornes.framez.client.render.RenderFrame;
 import com.amadornes.framez.client.render.RenderMotor;
 import com.amadornes.framez.client.render.RenderMoving;
 import com.amadornes.framez.compat.CompatibilityUtils;
+import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMoving;
@@ -42,6 +44,8 @@ public class ClientProxy extends CommonProxy {
         }
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileMoving.class, new RenderMoving());
+
+        MinecraftForgeClient.registerItemRenderer(FramezItems.item_frame_part, new RenderFrame());
     }
 
 }

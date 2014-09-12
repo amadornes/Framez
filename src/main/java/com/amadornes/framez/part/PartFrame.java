@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockStone;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +14,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -34,77 +30,17 @@ import codechicken.microblock.HollowMicroblock;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TNormalOcclusion;
 
-import com.amadornes.framez.ModifierRegistry;
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IFrame;
 import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
-import com.amadornes.framez.client.IconProvider;
+import com.amadornes.framez.client.render.RenderFrame;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.util.Utils;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
     private static final Cuboid6[] subParts = new Cuboid6[] { null, null, null, null, null, null };
-
-    private static int renderType = 0;
-
-    private static PartFrame rendering;
-
-    private static boolean[] renderFace = new boolean[6];
-
-    private static Block blockFake = new BlockStone() {
-
-        @Override
-        public IIcon getIcon(IBlockAccess w, int x, int y, int z, int side) {
-
-            return getIcon(side, 0);
-        }
-
-        @Override
-        public IIcon getIcon(int side, int meta) {
-
-            ForgeDirection face = ForgeDirection.getOrientation(side);
-
-            IIcon tex = null;
-
-            switch (renderType) {
-            case 0:
-            case 1:
-                if (renderType == 1 && (face == ForgeDirection.UP || face == ForgeDirection.DOWN))
-                    return IconProvider.iconNothing;
-                tex = ModifierRegistry.INST.getBorderTexture(rendering.modifiers, face);
-                if (tex == null)
-                    tex = IconProvider.iconFrameBorder;
-                return tex;
-            case 2:
-                tex = ModifierRegistry.INST.getCrossTexture(rendering.modifiers, face);
-                if (tex == null)
-                    tex = IconProvider.iconFrameCross;
-                return tex;
-            }
-            return null;
-        }
-
-        @Override
-        public boolean shouldSideBeRendered(IBlockAccess w, int x, int y, int z, int side) {
-
-            return renderFace[side];
-        };
-    };
-
-    @SideOnly(Side.CLIENT)
-    private static RenderBlocks rb;
-
-    @SideOnly(Side.CLIENT)
-    private static void initClient() {
-
-        if (rb == null)
-            rb = new RenderBlocks();
-    }
 
     private Object[] connections = new Object[] { null, null, null, null, null, null };
 
@@ -117,7 +53,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         return getConnection(dir) != null && getConnection(dir) instanceof IFrame;
     }
 
-    private Object getConnection(ForgeDirection dir) {
+    public Object getConnection(ForgeDirection dir) {
 
         return connections[dir.ordinal()];
     }
@@ -212,171 +148,13 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         return boxes;
     }
 
-    private void renderBox(int minx, int miny, int minz, int maxx, int maxy, int maxz, boolean up, boolean down, boolean east, boolean west,
-            boolean south, boolean north) {
-
-        double sep = 0.001;
-
-        rb.setRenderFromInside(false);
-        rb.setRenderBounds(minx / 16D + (minx == 0 && connections[ForgeDirection.WEST.ordinal()] == null ? sep : 0), miny / 16D
-                + (miny == 0 && connections[ForgeDirection.DOWN.ordinal()] == null ? sep : 0), minz / 16D
-                + (minz == 0 && connections[ForgeDirection.NORTH.ordinal()] == null ? sep : 0), maxx / 16D
-                - (maxx == 16 && connections[ForgeDirection.EAST.ordinal()] == null ? sep : 0), maxy / 16D
-                - (maxy == 16 && connections[ForgeDirection.UP.ordinal()] == null ? sep : 0), maxz / 16D
-                - (maxz == 16 && connections[ForgeDirection.SOUTH.ordinal()] == null ? sep : 0));
-
-        renderFace[ForgeDirection.UP.ordinal()] = up;
-        renderFace[ForgeDirection.DOWN.ordinal()] = down;
-        renderFace[ForgeDirection.NORTH.ordinal()] = north;
-        renderFace[ForgeDirection.SOUTH.ordinal()] = south;
-        renderFace[ForgeDirection.EAST.ordinal()] = east;
-        renderFace[ForgeDirection.WEST.ordinal()] = west;
-
-        rb.renderStandardBlock(blockFake, x(), y(), z());
-    }
-
     @Override
     public boolean renderStatic(Vector3 pos, int pass) {
 
         if (pass != 0)
             return false;
 
-        rendering = this;
-
-        initClient();
-        rb.blockAccess = Minecraft.getMinecraft().theWorld;
-
-        // Border
-        {
-            renderType = 0;
-
-            boolean renderDown = connections[ForgeDirection.DOWN.ordinal()] == null;
-            boolean renderUp = connections[ForgeDirection.UP.ordinal()] == null;
-            boolean renderEast = connections[ForgeDirection.EAST.ordinal()] == null;
-            boolean renderWest = connections[ForgeDirection.WEST.ordinal()] == null;
-            boolean renderSouth = connections[ForgeDirection.SOUTH.ordinal()] == null;
-            boolean renderNorth = connections[ForgeDirection.NORTH.ordinal()] == null;
-
-            // Bottom
-            {
-                // North-west
-                if (render[0])
-                    renderBox(0, 0, 0, 1, 1, 1, !render[16], renderDown, !render[1], renderWest, !render[7], renderNorth);
-                // North
-                if (render[1])
-                    renderBox(1, 0, 0, 15, 1, 1, true, renderDown, false, false, true, renderNorth);
-                // North-east
-                if (render[2])
-                    renderBox(15, 0, 0, 16, 1, 1, !render[17], renderDown, renderEast, !render[1], !render[3], renderNorth);
-                // East
-                if (render[3])
-                    renderBox(15, 0, 1, 16, 1, 15, true, renderDown, renderEast, true, false, false);
-                // South-east
-                if (render[4])
-                    renderBox(15, 0, 15, 16, 1, 16, !render[18], renderDown, renderEast, !render[5], renderSouth, !render[3]);
-                // South
-                if (render[5])
-                    renderBox(1, 0, 15, 15, 1, 16, true, renderDown, false, false, renderSouth, true);
-                // South-west
-                if (render[6])
-                    renderBox(0, 0, 15, 1, 1, 16, !render[19], renderDown, !render[5], renderWest, renderSouth, !render[7]);
-                // West
-                if (render[7])
-                    renderBox(0, 0, 1, 1, 1, 15, true, renderDown, true, renderWest, false, false);
-            }
-
-            // Top
-            {
-                // North-west
-                if (render[8])
-                    renderBox(0, 15, 0, 1, 16, 1, renderUp, !render[16], !render[9], renderWest, !render[15], renderNorth);
-                // North
-                if (render[9])
-                    renderBox(1, 15, 0, 15, 16, 1, renderUp, true, false, false, true, renderNorth);
-                // North-east
-                if (render[10])
-                    renderBox(15, 15, 0, 16, 16, 1, renderUp, !render[17], renderEast, !render[9], !render[11], renderNorth);
-                // East
-                if (render[11])
-                    renderBox(15, 15, 1, 16, 16, 15, renderUp, true, renderEast, true, false, false);
-                // South-east
-                if (render[12])
-                    renderBox(15, 15, 15, 16, 16, 16, renderUp, !render[18], renderEast, !render[13], renderSouth, !render[11]);
-                // South
-                if (render[13])
-                    renderBox(1, 15, 15, 15, 16, 16, renderUp, true, false, false, renderSouth, true);
-                // South-west
-                if (render[14])
-                    renderBox(0, 15, 15, 1, 16, 16, renderUp, !render[19], !render[13], renderWest, renderSouth, !render[15]);
-                // West
-                if (render[15])
-                    renderBox(0, 15, 1, 1, 16, 15, renderUp, true, true, renderWest, false, false);
-            }
-
-            // North-west
-            if (render[16])
-                renderBox(0, 1, 0, 1, 15, 1, false, false, true, true, true, true);
-
-            // North-east
-            if (render[17])
-                renderBox(15, 1, 0, 16, 15, 1, false, false, true, true, true, true);
-
-            // South-east
-            if (render[18])
-                renderBox(15, 1, 15, 16, 15, 16, false, false, true, true, true, true);
-
-            // South-west
-            if (render[19])
-                renderBox(0, 1, 15, 1, 15, 16, false, false, true, true, true, true);
-        }
-
-        // Crosses
-        if (true) {
-            renderType = 2;
-
-            double sep = 1 / 32D;
-
-            rb.setRenderFromInside(false);
-
-            Arrays.fill(renderFace, false);
-            renderFace[ForgeDirection.UP.ordinal()] = true;
-            renderFace[ForgeDirection.DOWN.ordinal()] = true;
-
-            rb.setRenderBounds(0, 1 - sep, 0, 1, 1 - sep, 1);
-            if (getConnection(ForgeDirection.UP) == null) {
-                rb.renderStandardBlock(blockFake, x(), y(), z());
-            }
-            rb.setRenderBounds(0, 0 + sep, 0, 1, 0 + sep, 1);
-            if (getConnection(ForgeDirection.DOWN) == null) {
-                rb.renderStandardBlock(blockFake, x(), y(), z());
-            }
-
-            Arrays.fill(renderFace, false);
-            renderFace[ForgeDirection.EAST.ordinal()] = true;
-            renderFace[ForgeDirection.WEST.ordinal()] = true;
-
-            rb.setRenderBounds(1 - sep, 0, 0, 1 - sep, 1, 1);
-            if (getConnection(ForgeDirection.EAST) == null) {
-                rb.renderStandardBlock(blockFake, x(), y(), z());
-            }
-            rb.setRenderBounds(0 + sep, 0, 0, 0 + sep, 1, 1);
-            if (getConnection(ForgeDirection.WEST) == null) {
-                rb.renderStandardBlock(blockFake, x(), y(), z());
-            }
-
-            Arrays.fill(renderFace, false);
-            renderFace[ForgeDirection.SOUTH.ordinal()] = true;
-            renderFace[ForgeDirection.NORTH.ordinal()] = true;
-
-            rb.setRenderBounds(0, 0, 1 - sep, 1, 1, 1 - sep);
-            if (getConnection(ForgeDirection.SOUTH) == null) {
-                rb.renderStandardBlock(blockFake, x(), y(), z());
-            }
-            rb.setRenderBounds(0, 0, 0 + sep, 1, 1, 0 + sep);
-            if (getConnection(ForgeDirection.NORTH) == null) {
-                rb.renderStandardBlock(blockFake, x(), y(), z());
-            }
-        }
+        RenderFrame.render(this, x(), y(), z());
 
         return true;
     }
@@ -406,10 +184,10 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     @Override
     public void drawBreaking(RenderBlocks renderBlocks) {
 
-        RenderBlocks rb2 = rb;
-        rb = renderBlocks;
+        RenderBlocks rb2 = RenderFrame.rb;
+        RenderFrame.rb = renderBlocks;
         renderStatic(new Vector3(), 0);
-        rb = rb2;
+        RenderFrame.rb = rb2;
     }
 
     @Override
@@ -780,5 +558,10 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     public Object[] getConnections() {
 
         return connections;
+    }
+
+    public boolean[] getRender() {
+
+        return render;
     }
 }
