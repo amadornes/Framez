@@ -1,4 +1,4 @@
-package com.amadornes.framez.client.render;
+package com.amadornes.framez.api;
 
 import net.minecraftforge.common.util.ForgeDirection;
 

@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
 import com.amadornes.framez.api.FramezApi;
+import com.amadornes.framez.api.IRenderMotorSpecial;
 import com.amadornes.framez.client.RenderHelper;
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;

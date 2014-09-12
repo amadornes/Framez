@@ -7,7 +7,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import com.amadornes.framez.api.IMotorProvider;
 import com.amadornes.framez.api.IMotorRegistry;
-import com.amadornes.framez.client.render.IRenderMotorSpecial;
+import com.amadornes.framez.api.IRenderMotorSpecial;
 import com.amadornes.framez.tile.TileMotor;
 
 import cpw.mods.fml.common.FMLCommonHandler;

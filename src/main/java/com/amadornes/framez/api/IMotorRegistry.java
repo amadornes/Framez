@@ -2,7 +2,6 @@ package com.amadornes.framez.api;
 
 import net.minecraftforge.common.util.ForgeDirection;
 
-import com.amadornes.framez.client.render.IRenderMotorSpecial;
 import com.amadornes.framez.tile.TileMotor;
 
 import cpw.mods.fml.relauncher.Side;
