@@ -12,3 +12,5 @@ framez.modifier.connected=Connected
 framez.modifier.iron=Iron
 framez.modifier.glass=Glass
 framez.modifier.glass.clear=Clear Glass
+
+itemGroup.framez=Framez

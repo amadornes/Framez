@@ -14,6 +14,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import com.amadornes.framez.api.IMotor;
 import com.amadornes.framez.api.IMotorProvider;
 import com.amadornes.framez.client.render.RenderMotor;
+import com.amadornes.framez.init.CreativeTabFramez;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMotor;
@@ -32,6 +33,8 @@ public class BlockMotor extends BlockContainer implements IMotor {
 
         setBlockName(References.MOTOR_NAME);
         setHardness(2);
+
+        setCreativeTab(CreativeTabFramez.inst);
     }
 
     @Override

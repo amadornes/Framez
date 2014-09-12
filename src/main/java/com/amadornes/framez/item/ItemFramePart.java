@@ -16,6 +16,7 @@ import codechicken.multipart.TMultiPart;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IFrameModifierProvider;
+import com.amadornes.framez.init.CreativeTabFramez;
 import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.ref.References;
 
@@ -24,6 +25,8 @@ public class ItemFramePart extends JItemMultiPart {
     public ItemFramePart() {
 
         setUnlocalizedName(References.FRAME_NAME);
+
+        setCreativeTab(CreativeTabFramez.inst);
     }
 
     @Override
