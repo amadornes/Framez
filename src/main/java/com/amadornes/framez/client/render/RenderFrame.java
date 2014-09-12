@@ -233,7 +233,9 @@ public class RenderFrame implements IItemRenderer {
             renderFace[ForgeDirection.UP.ordinal()] = true;
             renderFace[ForgeDirection.DOWN.ordinal()] = true;
 
-            rb.setRenderBounds(0 + sep, 1 - depth, 0 + sep, 1 - sep, 1 - depth, 1 - sep);
+            rb.setRenderBounds(0 + (frame.getConnection(ForgeDirection.WEST) == null ? sep : 0), 1 - depth, 0 + (frame
+                    .getConnection(ForgeDirection.NORTH) == null ? sep : 0), 1 - (frame.getConnection(ForgeDirection.EAST) == null ? sep : 0),
+                    1 - depth, 1 - (frame.getConnection(ForgeDirection.SOUTH) == null ? sep : 0));
             if (frame.getConnection(ForgeDirection.UP) == null || frame.isSideBlocked(ForgeDirection.UP)) {
                 face = ForgeDirection.UP;
                 renderStandardBlock(x, y, z);
@@ -253,7 +255,9 @@ public class RenderFrame implements IItemRenderer {
                 face = ForgeDirection.EAST;
                 renderStandardBlock(x, y, z);
             }
-            rb.setRenderBounds(0 + depth, 0 + sep, 0 + sep, 0 + depth, 1 - sep, 1 - sep);
+            rb.setRenderBounds(0 + depth, 0 + (frame.getConnection(ForgeDirection.DOWN) == null ? sep : 0), 0 + (frame
+                    .getConnection(ForgeDirection.NORTH) == null ? sep : 0), 0 + depth,
+                    1 - (frame.getConnection(ForgeDirection.UP) == null ? sep : 0), 1 - (frame.getConnection(ForgeDirection.SOUTH) == null ? sep : 0));
             if (frame.getConnection(ForgeDirection.WEST) == null || frame.isSideBlocked(ForgeDirection.WEST)) {
                 face = ForgeDirection.WEST;
                 renderStandardBlock(x, y, z);
@@ -263,7 +267,10 @@ public class RenderFrame implements IItemRenderer {
             renderFace[ForgeDirection.SOUTH.ordinal()] = true;
             renderFace[ForgeDirection.NORTH.ordinal()] = true;
 
-            rb.setRenderBounds(0 + sep, 0 + sep, 1 - depth, 1 - sep, 1 - sep, 1 - depth);
+            rb.setRenderBounds(0 + (frame.getConnection(ForgeDirection.WEST) == null ? sep : 0),
+                    0 + (frame.getConnection(ForgeDirection.DOWN) == null ? sep : 0), 1 - depth,
+                    1 - (frame.getConnection(ForgeDirection.EAST) == null ? sep : 0), 1 - (frame.getConnection(ForgeDirection.UP) == null ? sep : 0),
+                    1 - depth);
             if (frame.getConnection(ForgeDirection.SOUTH) == null || frame.isSideBlocked(ForgeDirection.SOUTH)) {
                 face = ForgeDirection.SOUTH;
                 renderStandardBlock(x, y, z);

@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
@@ -36,7 +37,7 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                 Minecraft mc = Minecraft.getMinecraft();
 
                 GL11.glTranslated(x, y, z);
-                GL11.glTranslated(-b.getLocation().x, -b.getLocation().y, -b.getLocation().z);
+                GL11.glTranslated(-b.getX(), -b.getY(), -b.getZ());
 
                 double m = structure.getMoved(-f * 0.75F);
                 double x1 = structure.getDirection().offsetX * m;
@@ -72,28 +73,37 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                     if (b.getRenderList() == -1) {
                         int l = 0;
                         b.setRenderList(l = GL11.glGenLists(1));
-                        GL11.glNewList(l, GL11.GL_COMPILE_AND_EXECUTE);
-                        if (b.getBlock() != null && b.getLocation() != null) {
-                            for (int pass = 0; pass < 2; pass++) {
-                                if (b.getBlock().canRenderInPass(pass)) {
-                                    try {
-                                        Tessellator.instance.startDrawingQuads();
-                                        rb.renderBlockByRenderType(b.getBlock(), b.getLocation().x, b.getLocation().y, b.getLocation().z);
-                                        Tessellator.instance.draw();
-                                    } catch (Exception e) {
+                        GL11.glNewList(l, GL11.GL_COMPILE);
+                        boolean crashed = false;
+                        try {
+                            if (b.getBlock() != null && b.getLocation() != null) {
+                                for (int pass = 0; pass < 2; pass++) {
+                                    if (b.getBlock().canRenderInPass(pass)) {
                                         try {
+                                            Tessellator.instance.startDrawingQuads();
+                                            rb.renderBlockByRenderType(b.getBlock(), b.getX(), b.getY(), b.getZ());
                                             Tessellator.instance.draw();
-                                        } catch (Exception ex) {
+                                        } catch (Exception e) {
+                                            try {
+                                                Tessellator.instance.draw();
+                                            } catch (Exception ex) {
+                                            }
+                                            e.printStackTrace();
                                         }
-                                        e.printStackTrace();
                                     }
                                 }
                             }
+                        } catch (Exception ex) {
+                            crashed = true;
                         }
                         GL11.glEndList();
-                    } else {
-                        GL11.glCallList(b.getRenderList());
+                        if (crashed) {
+                            GL11.glNewList(l, GL11.GL_COMPILE);
+                            rb.renderStandardBlock(Blocks.stone, b.getX(), b.getY(), b.getZ());
+                            GL11.glEndList();
+                        }
                     }
+                    GL11.glCallList(b.getRenderList());
 
                     RenderHelper.enableStandardItemLighting();
 
@@ -102,7 +112,11 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                         TileEntitySpecialRenderer tesr = TileEntityRendererDispatcher.instance.getSpecialRenderer(blockTE);
                         if (tesr != null) {
                             GL11.glPushMatrix();
-                            tesr.renderTileEntityAt(blockTE, b.getLocation().x, b.getLocation().y, b.getLocation().z, f);
+                            try {
+                                tesr.renderTileEntityAt(blockTE, b.getX(), b.getY(), b.getZ(), f);
+                            } catch (Exception ex) {
+                                rb.renderStandardBlock(Blocks.stone, b.getX(), b.getY(), b.getZ());
+                            }
                             GL11.glPopMatrix();
                         }
                     }
