@@ -292,8 +292,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         }
 
         for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
-            if (tag.getBoolean("blocked_" + d.name().toLowerCase()))
-                toggleBlock(d);
+            blocked[d.ordinal()] = tag.getBoolean("blocked_" + d.name().toLowerCase());
     }
 
     @Override
