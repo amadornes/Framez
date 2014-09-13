@@ -16,9 +16,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
-import com.amadornes.framez.ModifierRegistry;
 import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.client.IconProvider;
+import com.amadornes.framez.modifier.ModifierRegistry;
 import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.ref.References;
 

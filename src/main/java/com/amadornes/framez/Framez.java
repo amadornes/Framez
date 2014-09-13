@@ -9,6 +9,7 @@ import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.init.Recipes;
+import com.amadornes.framez.modifier.ModifierRegistry;
 import com.amadornes.framez.modifier.connected.ModifierProviderConnected;
 import com.amadornes.framez.modifier.glass.ModifierProviderGlass;
 import com.amadornes.framez.modifier.glass.clear.ModifierProviderGlassClear;
