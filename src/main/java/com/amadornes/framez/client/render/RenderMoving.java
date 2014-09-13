@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 
+import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.tile.TileMoving;
@@ -76,7 +77,8 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                         GL11.glNewList(l, GL11.GL_COMPILE);
                         boolean crashed = false;
                         try {
-                            if (b.getBlock() != null && b.getLocation() != null) {
+                            if (b.getBlock() != null && b.getLocation() != null && b.getBlock() != Blocks.air
+                                    && b.getBlock() != FramezBlocks.block_moving) {
                                 for (int pass = 0; pass < 2; pass++) {
                                     if (b.getBlock().canRenderInPass(pass)) {
                                         try {
@@ -92,6 +94,8 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                                         }
                                     }
                                 }
+                            } else {
+                                rb.renderStandardBlock(Blocks.stone, b.getX(), b.getY(), b.getZ());
                             }
                         } catch (Exception ex) {
                             crashed = true;

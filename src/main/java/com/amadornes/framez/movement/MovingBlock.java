@@ -172,7 +172,7 @@ public class MovingBlock implements IMovingBlock {
         TileEntity te = getTileEntity();
 
         BlockUtils.removeTileEntity(getWorld(), x, y, z);
-        world.setBlock(x, y, z, Blocks.air, 0, 4);
+        BlockUtils.setBlockSneaky(getWorld(), x, y, z, Blocks.air);
 
         if (te != null) {
             if (invalidate)
@@ -193,8 +193,8 @@ public class MovingBlock implements IMovingBlock {
         int z = getZ() + getDirection().offsetZ;
         TileEntity te = getTileEntity();
 
-        world.setBlock(x, y, z, getBlock(), getMetadata(), 4);
-        world.setBlockMetadataWithNotify(x, y, z, getMetadata(), 4);
+        BlockUtils.setBlockSneaky(world, x, y, z, getBlock());
+        BlockUtils.setBlockMetadataSneaky(world, x, y, z, getMetadata());
 
         if (te != null) {
             if (te instanceof TileMultipart) {
