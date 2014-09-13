@@ -17,6 +17,7 @@ public class PacketModifierList extends Packet<PacketModifierList> {
 
     private boolean extra = false;
     private boolean kick = false;
+    private List<String> l = new ArrayList<String>();
 
     @Override
     public void handleClientSide(PacketModifierList message, EntityPlayer player) {
@@ -25,6 +26,22 @@ public class PacketModifierList extends Packet<PacketModifierList> {
 
     @Override
     public void handleServerSide(PacketModifierList message, EntityPlayer player) {
+
+        for (String s : l) {
+            if (ModifierRegistry.INST.getModifierProvider(s) == null) {
+                kick = true;
+                extra = true;
+                break;
+            }
+        }
+        if (!kick) {
+            for (IFrameModifierProvider m : ModifierRegistry.INST.getProviders()) {
+                if (!l.contains(m.getIdentifier())) {
+                    kick = true;
+                    break;
+                }
+            }
+        }
 
         if (kick) {
             if (extra) {
@@ -40,22 +57,9 @@ public class PacketModifierList extends Packet<PacketModifierList> {
     public void read(NBTTagCompound tag) {
 
         NBTTagList list = tag.getTagList("modifiers", new NBTTagString().getId());
-        List<String> l = new ArrayList<String>();
         for (int i = 0; i < list.tagCount(); i++)
             l.add(list.getStringTagAt(i));
-        for (String s : l) {
-            if (ModifierRegistry.INST.getModifierProvider(s) == null) {
-                kick = true;
-                extra = true;
-                return;
-            }
-        }
-        for (IFrameModifierProvider m : ModifierRegistry.INST.getProviders()) {
-            if (!l.contains(m.getIdentifier())) {
-                kick = true;
-                return;
-            }
-        }
+
     }
 
     @Override

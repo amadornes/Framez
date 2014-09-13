@@ -41,7 +41,6 @@ public abstract class Packet<REQ extends Packet> implements IMessage, IMessageHa
     @SideOnly(Side.CLIENT)
     public abstract void handleClientSide(REQ message, EntityPlayer player);
 
-    @SideOnly(Side.SERVER)
     public abstract void handleServerSide(REQ message, EntityPlayer player);
 
     @Override

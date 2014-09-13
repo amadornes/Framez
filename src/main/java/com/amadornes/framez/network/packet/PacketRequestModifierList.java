@@ -11,6 +11,7 @@ public class PacketRequestModifierList extends Packet<PacketRequestModifierList>
     @Override
     public void handleClientSide(PacketRequestModifierList message, EntityPlayer player) {
 
+        System.out.println("Received request!");
         NetworkHandler.sendToServer(new PacketModifierList());
     }
 
