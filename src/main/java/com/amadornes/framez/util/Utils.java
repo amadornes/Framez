@@ -55,18 +55,15 @@ public class Utils {
         if (tile != null) {
             TileMultipart te = tile;
             NormallyOccludedPart box = new NormallyOccludedPart(
-                    new Cuboid6(3 / 16D, 0, 3 / 16D, 12 / 16D, 1 / 16D, 12 / 16D).apply(Rotation.sideRotations[face.ordinal()].at(Vector3.center)));
+                    new Cuboid6(3 / 16D, 0, 3 / 16D, 12 / 16D, 3 / 16D, 12 / 16D).apply(Rotation.sideRotations[face.ordinal()].at(Vector3.center)));
             for (TMultiPart p : te.jPartList()) {
                 if (p instanceof PartFrame)
                     continue;
-                if (p instanceof FaceMicroblock)
-                    if (((FaceMicroblock) p).getSlot() == face.ordinal())
-                        return false;
                 if (!p.occlusionTest(box))
-                    return false;
+                    return true;
             }
 
-            return true;
+            return false;
         }
 
         return false;

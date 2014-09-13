@@ -39,7 +39,7 @@ public class ModifierRegistry implements IModifierRegistry {
         if (provider == null)
             return;
 
-        if (getModifier(provider.getIdentifier()) != null)
+        if (getModifierProvider(provider.getIdentifier()) != null)
             return;
 
         providers.add(provider);
@@ -102,25 +102,18 @@ public class ModifierRegistry implements IModifierRegistry {
             NBTTagCompound tag = item.stackTagCompound;
             NBTTagList list = tag.getTagList("modifiers", 8);
             for (int i = 0; i < list.tagCount(); i++)
-                modifiers.add(getModifier(list.getStringTagAt(i)));
+                modifiers.add(getModifierProvider(list.getStringTagAt(i)));
         }
 
         return modifiers.toArray(new IFrameModifierProvider[0]);
-    }
-
-    public IFrameModifierProvider getModifier(String modifier) {
-
-        for (IFrameModifierProvider p : providers)
-            if (p.getIdentifier().equals(modifier))
-                return p;
-
-        return null;
     }
 
     private List<ItemStack> combinations = null;
 
     @Override
     public List<ItemStack> getAllPossibleCombinations() {
+
+        combinations = null;
 
         if (combinations == null) {
             combinations = new ArrayList<ItemStack>();

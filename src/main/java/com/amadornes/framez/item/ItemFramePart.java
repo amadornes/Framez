@@ -17,6 +17,7 @@ import codechicken.multipart.TMultiPart;
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.init.CreativeTabFramez;
+import com.amadornes.framez.modifier.ModifierRegistry;
 import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.ref.References;
 
@@ -86,6 +87,22 @@ public class ItemFramePart extends JItemMultiPart {
             for (IFrameModifierProvider m : modifiers)
                 list.add(" - " + I18n.format(m.getUnlocalizedName(item)));
         }
+    }
+
+    @Override
+    public int getDamage(ItemStack stack) {
+
+        if (stack.stackTagCompound == null)
+            return 0;
+
+        int dmg = 0;
+        for (ItemStack is : ModifierRegistry.INST.getAllPossibleCombinations()) {
+            if (is.stackTagCompound != null && stack.stackTagCompound != null && ItemStack.areItemStackTagsEqual(is, stack))
+                return dmg;
+            dmg++;
+        }
+
+        return 9999;
     }
 
 }

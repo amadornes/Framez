@@ -625,6 +625,17 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
             if (!m.canBlockSide(side))
                 return false;
 
+        if (world().isRemote) {
+            if (!isSideBlocked(side)) {
+                for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+                    if (d != side && d != side.getOpposite()) {
+                        if (!Utils.occlusionTest(tile(), d) && Utils.getMicroblockSize(tile(), d) == 0)
+                            return false;
+                    }
+                }
+            }
+        }
+
         if (!world().isRemote) {
             blocked[side.ordinal()] = !isSideBlocked(side);
             sendDescUpdate();

@@ -66,7 +66,11 @@ public class Framez {
 
         CompatibilityUtils.init(ev);
 
-        StructureTickHandler eventHandler = StructureTickHandler.INST;
+        StructureTickHandler structureTickHandler = StructureTickHandler.INST;
+        MinecraftForge.EVENT_BUS.register(structureTickHandler);
+        FMLCommonHandler.instance().bus().register(structureTickHandler);
+
+        com.amadornes.framez.event.EventHandler eventHandler = new com.amadornes.framez.event.EventHandler();
         MinecraftForge.EVENT_BUS.register(eventHandler);
         FMLCommonHandler.instance().bus().register(eventHandler);
 
