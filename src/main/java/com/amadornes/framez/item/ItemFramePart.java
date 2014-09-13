@@ -96,10 +96,13 @@ public class ItemFramePart extends JItemMultiPart {
             return 0;
 
         int dmg = 0;
-        for (ItemStack is : ModifierRegistry.INST.getAllPossibleCombinations()) {
-            if (is.stackTagCompound != null && stack.stackTagCompound != null && ItemStack.areItemStackTagsEqual(is, stack))
-                return dmg;
-            dmg++;
+        List<ItemStack> l = ModifierRegistry.INST.getAllPossibleCombinations();
+        synchronized (l) {
+            for (ItemStack is : l) {
+                if (is.stackTagCompound != null && stack.stackTagCompound != null && ItemStack.areItemStackTagsEqual(is, stack))
+                    return dmg;
+                dmg++;
+            }
         }
 
         return 9999;
