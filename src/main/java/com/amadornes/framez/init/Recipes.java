@@ -27,6 +27,7 @@ public class Recipes {
         Framez.log.info("Starting to generate recipes!");
         generateFrameRecipes();
         Framez.log.info("Finished generating recipes!");
+        // System.exit(-1);
     }
 
     private static void generateFrameRecipes() {
@@ -34,13 +35,18 @@ public class Recipes {
         IModifierRegistry reg = FramezApi.inst().getModifierRegistry();
 
         for (ItemStack frame : reg.getAllPossibleCombinations()) {
+            Framez.log.debug("Generating recipes for " + frame.stackTagCompound);
             for (IFrameModifierProvider m : reg.getModifiers(frame)) {
 
+                Framez.log.debug(" Without " + m.getIdentifier());
+
                 IFrameModifierRecipe recipe = m.getRecipeProvider();
+                Framez.log.debug("   Recipe: " + recipe);
                 if (recipe == null)
                     continue;
 
                 ItemStack without = getWithoutModifier(frame, m);
+                Framez.log.debug("   NoMod: " + without);
                 if (without == null)
                     continue;
 
@@ -77,8 +83,8 @@ public class Recipes {
                                     row += chars.get(o);
                                 } else {
                                     chars.put(o, c);
-                                    c++;
                                     row += "" + c;
+                                    c++;
                                 }
                             }
                         }
@@ -86,6 +92,7 @@ public class Recipes {
                     if (!recipe.isShapeless())
                         r.add(row);
                 }
+                Framez.log.debug("   Frames: " + frames);
                 // If there's no frame in the recipe, delete it
                 if (frames == 0) {
                     r.clear();
@@ -111,6 +118,7 @@ public class Recipes {
                 } else {
                     GameRegistry.addRecipe(new ShapedOreRecipe(frame.copy(), r.toArray()));
                 }
+                Framez.log.debug("   ADDED!!! :D");
             }
         }
     }

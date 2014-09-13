@@ -8,6 +8,7 @@ import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
+import com.amadornes.framez.init.OredictHelper;
 import com.amadornes.framez.init.Recipes;
 import com.amadornes.framez.modifier.ModifierRegistry;
 import com.amadornes.framez.modifier.connected.ModifierProviderConnected;
@@ -57,6 +58,8 @@ public class Framez {
 
     @EventHandler
     public void init(FMLInitializationEvent ev) {
+
+        OredictHelper.init();
 
         proxy.init();
 
