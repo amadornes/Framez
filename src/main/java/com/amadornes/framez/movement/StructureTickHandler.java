@@ -33,7 +33,7 @@ public class StructureTickHandler {
         return structures;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @SubscribeEvent
     public void onWorldTick(WorldTickEvent event) {
 
@@ -55,17 +55,23 @@ public class StructureTickHandler {
             }
 
             List list = event.world.loadedTileEntityList;
-            List<TileEntity> removed = new ArrayList<TileEntity>();
             for (TileEntity te : BlockUtils.removedTEs) {
                 if (te.getWorldObj() == event.world) {
                     synchronized (list) {
                         list.remove(te);
-                        removed.add(te);
                     }
                 }
             }
-            BlockUtils.removedTEs.removeAll(removed);
-            removed.clear();
+            BlockUtils.removedTEs.clear();
+
+            for (TileEntity te : BlockUtils.addedTEs) {
+                if (te.getWorldObj() == event.world) {
+                    synchronized (list) {
+                        list.add(te);
+                    }
+                }
+            }
+            BlockUtils.removedTEs.clear();
         }
     }
 

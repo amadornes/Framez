@@ -26,4 +26,6 @@ public interface IFrameModifierProvider {
 
     public int overridePriorityCross();
 
+    public IFrameModifierRecipe getRecipeProvider();
+
 }

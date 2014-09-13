@@ -1,5 +1,7 @@
-package com.amadornes.framez.frame;
+package com.amadornes.framez.modifier.iron;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -33,15 +35,9 @@ public class ModifierIron implements IFrameModifier {
     }
 
     @Override
-    public int getColorMultiplier() {
-
-        return 0xFFFFFF;
-    }
-
-    @Override
     public double getHardnessMultiplier() {
 
-        return 1;
+        return 4;
     }
 
     @Override
@@ -97,6 +93,12 @@ public class ModifierIron implements IFrameModifier {
     public boolean canBlockSide(ForgeDirection side) {
 
         return true;
+    }
+
+    @Override
+    public Block getMaterialType() {
+
+        return Blocks.iron_block;
     }
 
 }

@@ -1,5 +1,7 @@
-package com.amadornes.framez.frame;
+package com.amadornes.framez.modifier.glass.clear;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -7,15 +9,16 @@ import net.minecraftforge.common.util.ForgeDirection;
 import com.amadornes.framez.api.IFrame;
 import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
+import com.amadornes.framez.modifier.glass.ModifierProviderGlass;
 import com.amadornes.framez.ref.References.Modifiers;
 
-public class ModifierGlass implements IFrameModifier {
+public class ModifierGlassClear implements IFrameModifier {
 
     @SuppressWarnings("unused")
     private IFrame frame;
     private IFrameModifierProvider provider;
 
-    public ModifierGlass(IFrame frame, IFrameModifierProvider provider) {
+    public ModifierGlassClear(IFrame frame, IFrameModifierProvider provider) {
 
         this.frame = frame;
         this.provider = provider;
@@ -24,19 +27,13 @@ public class ModifierGlass implements IFrameModifier {
     @Override
     public String getIdentifier() {
 
-        return Modifiers.GLASS;
+        return Modifiers.CLEAR_GLASS;
     }
 
     @Override
     public String getUnlocalizedName() {
 
-        return "framez.modifier.glass";
-    }
-
-    @Override
-    public int getColorMultiplier() {
-
-        return 0xFFFFFF;
+        return "framez.modifier.glass.clear";
     }
 
     @Override
@@ -73,7 +70,7 @@ public class ModifierGlass implements IFrameModifier {
     @Override
     public IIcon getCrossTexture(ForgeDirection side) {
 
-        return ModifierProviderGlass.cross;
+        return null;
     }
 
     @Override
@@ -98,6 +95,12 @@ public class ModifierGlass implements IFrameModifier {
     public boolean canBlockSide(ForgeDirection side) {
 
         return false;
+    }
+
+    @Override
+    public Block getMaterialType() {
+
+        return Blocks.glass;
     }
 
 }

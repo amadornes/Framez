@@ -2,14 +2,17 @@ package com.amadornes.framez;
 
 import net.minecraftforge.common.MinecraftForge;
 
+import org.apache.logging.log4j.Logger;
+
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatibilityUtils;
-import com.amadornes.framez.frame.ModifierProviderConnected;
-import com.amadornes.framez.frame.ModifierProviderGlass;
-import com.amadornes.framez.frame.ModifierProviderGlassClear;
-import com.amadornes.framez.frame.ModifierProviderIron;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
+import com.amadornes.framez.init.Recipes;
+import com.amadornes.framez.modifier.connected.ModifierProviderConnected;
+import com.amadornes.framez.modifier.glass.ModifierProviderGlass;
+import com.amadornes.framez.modifier.glass.clear.ModifierProviderGlassClear;
+import com.amadornes.framez.modifier.iron.ModifierProviderIron;
 import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.network.NetworkHandler;
 import com.amadornes.framez.part.RegisterParts;
@@ -34,10 +37,14 @@ public class Framez {
     @SidedProxy(serverSide = "com.amadornes.framez.proxy.CommonProxy", clientSide = "com.amadornes.framez.proxy.ClientProxy")
     public static CommonProxy proxy;
 
+    public static Logger log;
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent ev) {
 
-        FramezApi.init(new FramezApiImpl());
+        log = ev.getModLog();
+
+        FramezApi.setup(new FramezApiImpl());
 
         ModifierRegistry.INST.registerModifierProvider(new ModifierProviderConnected());
         ModifierRegistry.INST.registerModifierProvider(new ModifierProviderIron());
@@ -71,6 +78,8 @@ public class Framez {
         CompatibilityUtils.postInit(ev);
 
         proxy.registerRenders();
+
+        Recipes.init();
     }
 
 }

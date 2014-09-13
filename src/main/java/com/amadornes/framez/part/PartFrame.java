@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,10 +31,12 @@ import codechicken.microblock.HollowMicroblock;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TNormalOcclusion;
 
+import com.amadornes.framez.ModifierRegistry;
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IFrame;
 import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
+import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.client.render.RenderFrame;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.util.Utils;
@@ -170,16 +173,25 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     @Override
     public void addDestroyEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
 
-        IIcon icon = Blocks.planks.getIcon(0, 0);
-        EntityDigIconFX.addBlockDestroyEffects(world(), Cuboid6.full.copy().add(Vector3.fromTileEntity(tile())), new IIcon[] { icon, icon, icon,
-                icon, icon, icon }, effectRenderer);
+        IIcon[] icons = new IIcon[6];
+        for (int i = 0; i < 6; i++) {
+            IIcon icon = ModifierRegistry.INST.getCrossTexture(Arrays.asList(getModifiers()), ForgeDirection.getOrientation(hit.sideHit));
+            if (icon == null)
+                icon = isSideBlocked(ForgeDirection.getOrientation(hit.sideHit)) ? IconProvider.iconFrameCrossBlocked : IconProvider.iconFrameCross;
+            if (icon == null)
+                icon = IconProvider.iconNothing;
+            icons[i] = icon;
+        }
+        EntityDigIconFX.addBlockDestroyEffects(world(), Cuboid6.full.copy().add(Vector3.fromTileEntity(tile())), icons, effectRenderer);
 
     }
 
     @Override
     public void addHitEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
 
-        IIcon icon = Blocks.planks.getIcon(0, 0);
+        IIcon icon = ModifierRegistry.INST.getCrossTexture(Arrays.asList(getModifiers()), ForgeDirection.getOrientation(hit.sideHit));
+        if (icon == null)
+            icon = isSideBlocked(ForgeDirection.getOrientation(hit.sideHit)) ? IconProvider.iconFrameCrossBlocked : IconProvider.iconFrameCross;
         EntityDigIconFX.addBlockHitEffects(world(), Cuboid6.full.copy().add(Vector3.fromTileEntity(tile())), hit.sideHit, icon, effectRenderer);
     }
 
@@ -336,9 +348,28 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     public float getStrength(MovingObjectPosition hit, EntityPlayer player) {
 
         ItemStack item = player.getCurrentEquippedItem();
-        if (item != null)
-            return item.getItem().getDigSpeed(item, Blocks.planks, 0);
-        return 1;
+        double strength = 1;
+        if (item != null) {
+            Block b = null;
+
+            for (IFrameModifier m : getModifiers()) {
+                Block mat = m.getMaterialType();
+                if (mat != null) {
+                    b = mat;
+                    break;
+                }
+            }
+
+            if (b == null)
+                b = Blocks.planks;
+
+            strength = item.getItem().getDigSpeed(item, b, 0);
+        }
+
+        for (IFrameModifier m : getModifiers())
+            strength /= m.getHardnessMultiplier();
+
+        return (float) strength;
     }
 
     @Override

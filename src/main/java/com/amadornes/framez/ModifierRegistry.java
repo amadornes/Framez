@@ -52,6 +52,16 @@ public class ModifierRegistry implements IModifierRegistry {
     }
 
     @Override
+    public IFrameModifierProvider getModifierProvider(String modifier) {
+
+        for (IFrameModifierProvider p : getProviders())
+            if (p.getIdentifier().equals(modifier))
+                return p;
+
+        return null;
+    }
+
+    @Override
     public ItemStack getFrameStack(int amount, String... modifiers) {
 
         ItemStack item = new ItemStack(FramezItems.item_frame_part);

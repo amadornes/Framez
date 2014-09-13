@@ -1,4 +1,4 @@
-package com.amadornes.framez.frame;
+package com.amadornes.framez.modifier.glass;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.ItemStack;
@@ -7,37 +7,36 @@ import net.minecraft.util.IIcon;
 import com.amadornes.framez.api.IFrame;
 import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
+import com.amadornes.framez.api.IFrameModifierRecipe;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References.Modifiers;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ModifierProviderIron implements IFrameModifierProvider {
+public class ModifierProviderGlass implements IFrameModifierProvider {
 
     @SideOnly(Side.CLIENT)
-    protected static IIcon border;
+    public static IIcon border;
     @SideOnly(Side.CLIENT)
     protected static IIcon cross;
-    @SideOnly(Side.CLIENT)
-    protected static IIcon crossBlocked;
 
     @Override
     public String getIdentifier() {
 
-        return Modifiers.IRON;
+        return Modifiers.GLASS;
     }
 
     @Override
     public String getUnlocalizedName(ItemStack item) {
 
-        return "framez.modifier.iron";
+        return "framez.modifier.glass";
     }
 
     @Override
     public IFrameModifier instantiate(IFrame frame) {
 
-        return new ModifierIron(frame, this);
+        return new ModifierGlass(frame, this);
     }
 
     @Override
@@ -49,9 +48,8 @@ public class ModifierProviderIron implements IFrameModifierProvider {
     @Override
     public void registerIcons(IIconRegister reg) {
 
-        border = reg.registerIcon(ModInfo.MODID + ":frameBorderIron");
-        cross = reg.registerIcon(ModInfo.MODID + ":frameCrossIron");
-        crossBlocked = reg.registerIcon(ModInfo.MODID + ":frameCrossIronClosed");
+        border = reg.registerIcon(ModInfo.MODID + ":frameBorderGlass");
+        cross = reg.registerIcon(ModInfo.MODID + ":frameCrossGlass");
     }
 
     @Override
@@ -76,6 +74,14 @@ public class ModifierProviderIron implements IFrameModifierProvider {
     public int overridePriorityCross() {
 
         return 50;
+    }
+
+    private ModifierRecipeGlass recipe = new ModifierRecipeGlass();
+
+    @Override
+    public IFrameModifierRecipe getRecipeProvider() {
+
+        return recipe;
     }
 
 }

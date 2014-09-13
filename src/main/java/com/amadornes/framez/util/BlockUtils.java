@@ -13,6 +13,7 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 public class BlockUtils {
 
     public static final List<TileEntity> removedTEs = new ArrayList<TileEntity>();
+    public static final List<TileEntity> addedTEs = new ArrayList<TileEntity>();
 
     public static void removeTileEntity(World world, int x, int y, int z) {
 
@@ -24,6 +25,19 @@ public class BlockUtils {
         if (chunk != null) {
             chunk.chunkTileEntityMap.remove(new ChunkPosition(x & 15, y, z & 15));
             removedTEs.add(te);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void setTileEntity(World world, int x, int y, int z, TileEntity te) {
+
+        if (te == null)
+            return;
+
+        Chunk chunk = world.getChunkFromChunkCoords(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.chunkTileEntityMap.put(new ChunkPosition(x & 15, y, z & 15), te);
+            addedTEs.add(te);
         }
     }
 

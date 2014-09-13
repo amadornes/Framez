@@ -1,10 +1,12 @@
-package com.amadornes.framez.frame;
+package com.amadornes.framez.modifier.glass.clear;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.ItemStack;
 
 import com.amadornes.framez.api.IFrame;
 import com.amadornes.framez.api.IFrameModifier;
+import com.amadornes.framez.api.IFrameModifierRecipe;
+import com.amadornes.framez.modifier.glass.ModifierProviderGlass;
 import com.amadornes.framez.ref.References.Modifiers;
 
 public class ModifierProviderGlassClear extends ModifierProviderGlass {
@@ -30,6 +32,14 @@ public class ModifierProviderGlassClear extends ModifierProviderGlass {
     @Override
     public void registerIcons(IIconRegister reg) {
 
+    }
+
+    private ModifierRecipeGlassClear recipe = new ModifierRecipeGlassClear();
+
+    @Override
+    public IFrameModifierRecipe getRecipeProvider() {
+
+        return recipe;
     }
 
 }

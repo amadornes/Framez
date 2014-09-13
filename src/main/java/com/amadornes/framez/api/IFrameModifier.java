@@ -1,5 +1,6 @@
 package com.amadornes.framez.api;
 
+import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -11,8 +12,6 @@ public interface IFrameModifier {
     public String getIdentifier();
 
     public String getUnlocalizedName();
-
-    public int getColorMultiplier();
 
     public double getHardnessMultiplier();
 
@@ -38,5 +37,7 @@ public interface IFrameModifier {
     public IFrameModifierProvider getProvider();
 
     public boolean canBlockSide(ForgeDirection side);
+
+    public Block getMaterialType();
 
 }

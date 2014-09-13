@@ -1,5 +1,7 @@
-package com.amadornes.framez.frame;
+package com.amadornes.framez.modifier.glass;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -9,13 +11,13 @@ import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.ref.References.Modifiers;
 
-public class ModifierConnected implements IFrameModifier {
+public class ModifierGlass implements IFrameModifier {
 
     @SuppressWarnings("unused")
     private IFrame frame;
     private IFrameModifierProvider provider;
 
-    public ModifierConnected(IFrame frame, IFrameModifierProvider provider) {
+    public ModifierGlass(IFrame frame, IFrameModifierProvider provider) {
 
         this.frame = frame;
         this.provider = provider;
@@ -24,19 +26,13 @@ public class ModifierConnected implements IFrameModifier {
     @Override
     public String getIdentifier() {
 
-        return Modifiers.CONNECTED;
+        return Modifiers.GLASS;
     }
 
     @Override
     public String getUnlocalizedName() {
 
-        return "framez.modifier.connected";
-    }
-
-    @Override
-    public int getColorMultiplier() {
-
-        return 0xFFFFFF;
+        return "framez.modifier.glass";
     }
 
     @Override
@@ -73,13 +69,13 @@ public class ModifierConnected implements IFrameModifier {
     @Override
     public IIcon getCrossTexture(ForgeDirection side) {
 
-        return null;
+        return ModifierProviderGlass.cross;
     }
 
     @Override
     public IIcon getBorderTexture(ForgeDirection side) {
 
-        return null;
+        return ModifierProviderGlass.border;
     }
 
     @Override
@@ -97,7 +93,13 @@ public class ModifierConnected implements IFrameModifier {
     @Override
     public boolean canBlockSide(ForgeDirection side) {
 
-        return true;
+        return false;
+    }
+
+    @Override
+    public Block getMaterialType() {
+
+        return Blocks.glass;
     }
 
 }

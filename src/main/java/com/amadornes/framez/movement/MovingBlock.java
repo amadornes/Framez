@@ -219,7 +219,7 @@ public class MovingBlock implements IMovingBlock {
                             p.onWorldJoin();
                 }
 
-                world.setTileEntity(x, y, z, te);
+                BlockUtils.setTileEntity(world, x, y, z, te);
             }
         }
 

@@ -18,4 +18,6 @@ public interface IModifierRegistry {
 
     public List<ItemStack> getAllPossibleCombinations();
 
+    public IFrameModifierProvider getModifierProvider(String modifier);
+
 }

@@ -1,41 +1,32 @@
-package com.amadornes.framez.frame;
+package com.amadornes.framez.modifier.connected;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 
 import com.amadornes.framez.api.IFrame;
 import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
-import com.amadornes.framez.ref.ModInfo;
+import com.amadornes.framez.api.IFrameModifierRecipe;
 import com.amadornes.framez.ref.References.Modifiers;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-public class ModifierProviderGlass implements IFrameModifierProvider {
-
-    @SideOnly(Side.CLIENT)
-    protected static IIcon border;
-    @SideOnly(Side.CLIENT)
-    protected static IIcon cross;
+public class ModifierProviderConnected implements IFrameModifierProvider {
 
     @Override
     public String getIdentifier() {
 
-        return Modifiers.GLASS;
+        return Modifiers.CONNECTED;
     }
 
     @Override
     public String getUnlocalizedName(ItemStack item) {
 
-        return "framez.modifier.glass";
+        return "framez.modifier.connected";
     }
 
     @Override
     public IFrameModifier instantiate(IFrame frame) {
 
-        return new ModifierGlass(frame, this);
+        return new ModifierConnected(frame, this);
     }
 
     @Override
@@ -47,32 +38,38 @@ public class ModifierProviderGlass implements IFrameModifierProvider {
     @Override
     public void registerIcons(IIconRegister reg) {
 
-        border = reg.registerIcon(ModInfo.MODID + ":frameBorderGlass");
-        cross = reg.registerIcon(ModInfo.MODID + ":frameCrossGlass");
     }
 
     @Override
     public boolean overridesBorderTexture() {
 
-        return true;
+        return false;
     }
 
     @Override
     public boolean overridesCrossTexture() {
 
-        return true;
+        return false;
     }
 
     @Override
     public int overridePriorityBorder() {
 
-        return 50;
+        return 0;
     }
 
     @Override
     public int overridePriorityCross() {
 
-        return 50;
+        return 0;
+    }
+
+    private ModifierRecipeConnected recipe = new ModifierRecipeConnected();
+
+    @Override
+    public IFrameModifierRecipe getRecipeProvider() {
+
+        return recipe;
     }
 
 }
