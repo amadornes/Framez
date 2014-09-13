@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -20,6 +21,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import codechicken.lib.raytracer.RayTracer;
 
+import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.movement.MovingBlock;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -50,8 +52,9 @@ public class TileMoving extends TileEntity {
                 blockB = null;
 
         if (blockA == null && blockB == null) {
-            getWorldObj().removeTileEntity(xCoord, yCoord, zCoord);
-            getWorldObj().setBlockToAir(xCoord, yCoord, zCoord);
+            if (worldObj.getBlock(xCoord, yCoord, zCoord) == FramezBlocks.block_moving)
+                worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
+            invalidate();
         }
 
         if (needsUpdate) {

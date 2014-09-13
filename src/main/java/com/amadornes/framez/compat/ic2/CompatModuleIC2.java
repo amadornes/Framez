@@ -24,6 +24,8 @@ public class CompatModuleIC2 extends CompatModule {
     private void preInitClient() {
 
         FramezApi.inst().getMotorRegistry().registerSpecialRenderer(new RenderSpecialEU());
+
+        FramezApi.inst().getMovementApi().registerMovementHandler(new MovementListenerIC2());
     }
 
     @Override

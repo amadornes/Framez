@@ -3,6 +3,10 @@ package com.amadornes.framez.movement;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.tileentity.TileEntity;
+
+import com.amadornes.framez.util.BlockUtils;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.WorldTickEvent;
@@ -29,6 +33,7 @@ public class StructureTickHandler {
         return structures;
     }
 
+    @SuppressWarnings("rawtypes")
     @SubscribeEvent
     public void onWorldTick(WorldTickEvent event) {
 
@@ -48,6 +53,19 @@ public class StructureTickHandler {
             for (MovingStructure s : invalid) {
                 structures.remove(s);
             }
+
+            List list = event.world.loadedTileEntityList;
+            List<TileEntity> removed = new ArrayList<TileEntity>();
+            for (TileEntity te : BlockUtils.removedTEs) {
+                if (te.getWorldObj() == event.world) {
+                    synchronized (list) {
+                        list.remove(te);
+                        removed.add(te);
+                    }
+                }
+            }
+            BlockUtils.removedTEs.removeAll(removed);
+            removed.clear();
         }
     }
 

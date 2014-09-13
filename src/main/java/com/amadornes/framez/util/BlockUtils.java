@@ -1,14 +1,18 @@
 package com.amadornes.framez.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import codechicken.multipart.TileMultipart;
 
 public class BlockUtils {
+
+    public static final List<TileEntity> removedTEs = new ArrayList<TileEntity>();
 
     public static void removeTileEntity(World world, int x, int y, int z) {
 
@@ -18,17 +22,8 @@ public class BlockUtils {
 
         Chunk chunk = world.getChunkFromChunkCoords(x >> 4, z >> 4);
         if (chunk != null) {
-            ChunkPosition chunkposition = new ChunkPosition(x & 15, y, z & 15);
-
-            if (chunk.isChunkLoaded) {
-                chunk.chunkTileEntityMap.remove(chunkposition);
-                if (!(te instanceof TileMultipart)) {
-                    try {
-                        world.loadedTileEntityList.remove(te);
-                    } catch (Exception ex) {
-                    }
-                }
-            }
+            chunk.chunkTileEntityMap.remove(new ChunkPosition(x & 15, y, z & 15));
+            removedTEs.add(te);
         }
     }
 
