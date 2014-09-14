@@ -41,7 +41,8 @@ public class PacketStartMoving extends LocatedPacket<PacketStartMoving> {
         TileMotor motor = (TileMotor) player.worldObj.getTileEntity(x, y, z);
         MovingStructure structure = new MovingStructure(player.worldObj, direction, speed);
         structure.addBlocks(blocks);
-        motor.setStructure(structure);
+        if (motor != null)
+            motor.setStructure(structure);
         StructureTickHandler.INST.addStructure(structure);
     }
 

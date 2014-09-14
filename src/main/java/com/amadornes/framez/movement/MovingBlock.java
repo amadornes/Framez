@@ -175,6 +175,9 @@ public class MovingBlock implements IMovingBlock {
         BlockUtils.setBlockSneaky(getWorld(), x, y, z, Blocks.air);
 
         if (te != null) {
+            if (te instanceof TileMultipart && !getWorld().isRemote)
+                for (TMultiPart p : ((TileMultipart) te).jPartList())
+                    p.onWorldSeparate();
             if (invalidate)
                 te.invalidate();
 
@@ -182,6 +185,9 @@ public class MovingBlock implements IMovingBlock {
 
             if (validate)
                 te.validate();
+            if (te instanceof TileMultipart && !getWorld().isRemote)
+                for (TMultiPart p : ((TileMultipart) te).jPartList())
+                    p.onWorldJoin();
         }
     }
 
@@ -202,6 +208,7 @@ public class MovingBlock implements IMovingBlock {
                     for (TMultiPart p : ((TileMultipart) te).jPartList()) {
                         p.onWorldSeparate();
                         TileMultipart.addPart(getWorld(), new BlockCoord(x, y, z), p);
+                        p.onWorldJoin();
                     }
                 }
             } else {
