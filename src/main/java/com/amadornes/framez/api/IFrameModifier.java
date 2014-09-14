@@ -40,4 +40,6 @@ public interface IFrameModifier {
 
     public Block getMaterialType();
 
+    public int getMaxCarriedBlocks();
+
 }

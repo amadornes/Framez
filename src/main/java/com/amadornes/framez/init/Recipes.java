@@ -16,6 +16,7 @@ import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.api.IFrameModifierRecipe;
 import com.amadornes.framez.api.IModifierRegistry;
+import com.amadornes.framez.ref.References;
 import com.amadornes.framez.util.SorterModifierProvider;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -24,10 +25,43 @@ public class Recipes {
 
     public static void init() {
 
+        // Wooden frame
+        {
+            // Frame cross
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 5, 0), "s s", " s ", "s s", 's', "stickWood"));
+            // Frame side
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 1, 1), " s ", "scs", " s ", 's', "stickWood", 'c',
+                    new ItemStack(FramezItems.framepart, 1, 0)));
+            // Frame
+            {
+                ItemStack side = new ItemStack(FramezItems.framepart, 1, 1);
+                GameRegistry.addRecipe(new ShapelessOreRecipe(FramezApi.inst().getModifierRegistry().getFrameStack(8), side, side, side, side, side,
+                        side));
+            }
+        }
+
+        // Iron frame
+        {
+            // Frame cross
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 5, 2), "s s", " s ", "s s", 's', "stickIron"));
+            // Frame side
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 1, 3), " s ", "scs", " s ", 's', "stickIron", 'c',
+                    new ItemStack(FramezItems.framepart, 1, 2)));
+            // Frame
+            {
+                ItemStack side = new ItemStack(FramezItems.framepart, 1, 3);
+                GameRegistry.addRecipe(new ShapelessOreRecipe(FramezApi.inst().getModifierRegistry().getFrameStack(8, References.Modifiers.IRON),
+                        side, side, side, side, side, side));
+            }
+        }
+
+        // Iron stick
+        if (FramezItems.ironstick != null)
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.ironstick, 4), "i", "i", 'i', "ingotIron"));
+
         Framez.log.info("Starting to generate recipes!");
         generateFrameRecipes();
         Framez.log.info("Finished generating recipes!");
-        // System.exit(-1);
     }
 
     private static void generateFrameRecipes() {

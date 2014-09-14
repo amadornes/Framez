@@ -1,12 +1,20 @@
-framez.motor.dc.name=DC Motor
-framez.motor.pneumatic.name=Pneumatic Motor
-framez.motor.electric.name=Electric Motor
-framez.motor.hydraulic.name=Hydraulic Motor
+tile.framez:motor.dc.name=DC Motor
+tile.framez:motor.pneumatic.name=Pneumatic Motor
+tile.framez:motor.electric.name=Electric Motor
+tile.framez:motor.hydraulic.name=Hydraulic Motor
 
-item.framez.frame.name=Frame
+item.framez:frame.name=Frame
+
+item.framez:wrench.name=Wrench
+
+item.framez:framepart.cross.name=Wooden Cross
+item.framez:framepart.frame.name=Wooden Frame
+item.framez:framepart.cross.iron.name=Iron Cross
+item.framez:framepart.frame.iron.name=Iron Frame
 
 framez.hud.modifiers=Modifiers
 framez.hud.modifiers.none=None
+framez.hud.maxmoved=Max. moved blocks
 
 framez.modifier.connected=Connected
 framez.modifier.iron=Iron

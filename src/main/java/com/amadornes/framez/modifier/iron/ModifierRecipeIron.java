@@ -10,15 +10,15 @@ public class ModifierRecipeIron implements IFrameModifierRecipe {
 
     @Override
     /**
-     *       | IRON  |
+     *       | STICK |
      * ------|-------|------
-     * IRON  | FRAME | IRON
+     * STICK | FRAME | STICK
      * ------|-------|------
-     *       | IRON  |
+     *       | STICK |
      */
     public Object getItemInCraftingSlot(int slot) {
 
-        return slot == 1 || slot == 3 || slot == 5 || slot == 7 ? "ingotIron" : (slot == 4 ? true : null);
+        return slot == 1 || slot == 3 || slot == 5 || slot == 7 ? "stickIron" : (slot == 4 ? true : null);
     }
 
     @Override

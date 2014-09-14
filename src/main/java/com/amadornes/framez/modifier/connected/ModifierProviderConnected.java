@@ -72,4 +72,10 @@ public class ModifierProviderConnected implements IFrameModifierProvider {
         return recipe;
     }
 
+    @Override
+    public int getMaxCarriedBlocks() {
+
+        return -1;
+    }
+
 }

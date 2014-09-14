@@ -101,4 +101,10 @@ public class ModifierConnected implements IFrameModifier {
         return null;
     }
 
+    @Override
+    public int getMaxCarriedBlocks() {
+
+        return -1;
+    }
+
 }

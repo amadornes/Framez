@@ -1,67 +1,51 @@
 package com.amadornes.framez.item;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import codechicken.lib.vec.BlockCoord;
-import codechicken.lib.vec.Vector3;
-import codechicken.multipart.JItemMultiPart;
-import codechicken.multipart.TMultiPart;
+import net.minecraft.util.IIcon;
 
-import com.amadornes.framez.api.FramezApi;
-import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.init.CreativeTabFramez;
-import com.amadornes.framez.modifier.ModifierRegistry;
-import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.ref.References;
 
-public class ItemFramePart extends JItemMultiPart {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+public class ItemFramePart extends Item {
+
+    @SideOnly(Side.CLIENT)
+    private IIcon cross;
+    @SideOnly(Side.CLIENT)
+    private IIcon frame;
+    @SideOnly(Side.CLIENT)
+    private IIcon crossIron;
+    @SideOnly(Side.CLIENT)
+    private IIcon frameIron;
 
     public ItemFramePart() {
-
-        setUnlocalizedName(References.FRAME_NAME);
 
         setCreativeTab(CreativeTabFramez.inst);
     }
 
     @Override
-    public TMultiPart newPart(ItemStack item, EntityPlayer player, World world, BlockCoord block, int side, Vector3 hit) {
+    public void registerIcons(IIconRegister reg) {
 
-        PartFrame f = new PartFrame();
-
-        if (item.stackTagCompound != null) {
-            for (IFrameModifierProvider m : FramezApi.inst().getModifierRegistry().getModifiers(item)) {
-                f.addModifier(m.instantiate(f));
-            }
-        }
-
-        return f;
-    }
-
-    @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World w, int x, int y, int z, int side, float f, float f2, float f3) {
-
-        if (super.onItemUse(stack, player, w, x, y, z, side, f, f2, f3)) {
-            w.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, Block.soundTypeWood.getBreakSound(), Block.soundTypeWood.getVolume(),
-                    Block.soundTypeWood.getPitch());
-            return true;
-        }
-        return false;
+        cross = reg.registerIcon(References.Textures.FRAME_PART_CROSS);
+        frame = reg.registerIcon(References.Textures.FRAME_PART_FRAME);
+        crossIron = reg.registerIcon(References.Textures.FRAME_PART_CROSS_IRON);
+        frameIron = reg.registerIcon(References.Textures.FRAME_PART_FRAME_IRON);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List list) {
 
-        list.add(FramezApi.inst().getModifierRegistry().getFrameStack());
-        list.addAll(FramezApi.inst().getModifierRegistry().getAllPossibleCombinations());
+        for (int i = 0; i < 4; i++) {
+            list.add(new ItemStack(item, 1, i));
+        }
     }
 
     @Override
@@ -71,39 +55,43 @@ public class ItemFramePart extends JItemMultiPart {
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack item) {
+    public IIcon getIcon(ItemStack stack, int pass) {
 
-        return getUnlocalizedName();
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @Override
-    public void addInformation(ItemStack item, EntityPlayer player, List list, boolean shift) {
-
-        list.add(I18n.format("framez.hud.modifiers") + ":");
-        IFrameModifierProvider[] modifiers = FramezApi.inst().getModifierRegistry().getModifiers(item);
-        if (modifiers.length == 0) {
-            list.add(" " + I18n.format("framez.hud.modifiers.none"));
-        } else {
-            for (IFrameModifierProvider m : modifiers)
-                list.add(" - " + I18n.format(m.getUnlocalizedName(item)));
-        }
+        return getIconIndex(stack);
     }
 
     @Override
-    public int getDamage(ItemStack stack) {
+    public IIcon getIconIndex(ItemStack is) {
 
-        if (stack.stackTagCompound == null)
-            return 0;
-
-        int dmg = 0;
-        for (ItemStack is : new ArrayList<ItemStack>(ModifierRegistry.INST.getAllPossibleCombinations())) {
-            if (is.stackTagCompound != null && stack.stackTagCompound != null && ItemStack.areItemStackTagsEqual(is, stack))
-                return dmg;
-            dmg++;
+        switch (is.getItemDamage()) {
+        case 0:
+            return cross;
+        case 1:
+            return frame;
+        case 2:
+            return crossIron;
+        case 3:
+            return frameIron;
         }
 
-        return 9999;
+        return null;
+    }
+
+    @Override
+    public String getUnlocalizedName(ItemStack is) {
+
+        switch (is.getItemDamage()) {
+        case 0:
+            return "item." + References.Names.Unlocalized.FRAME_PART_CROSS;
+        case 1:
+            return "item." + References.Names.Unlocalized.FRAME_PART_FRAME;
+        case 2:
+            return "item." + References.Names.Unlocalized.FRAME_PART_CROSS_IRON;
+        case 3:
+            return "item." + References.Names.Unlocalized.FRAME_PART_FRAME_IRON;
+        }
+
+        return "<ERROR>";
     }
 
 }

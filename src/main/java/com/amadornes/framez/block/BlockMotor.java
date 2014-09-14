@@ -15,7 +15,6 @@ import com.amadornes.framez.api.IMotor;
 import com.amadornes.framez.api.IMotorProvider;
 import com.amadornes.framez.client.render.RenderMotor;
 import com.amadornes.framez.init.CreativeTabFramez;
-import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMotor;
 
@@ -31,7 +30,7 @@ public class BlockMotor extends BlockContainer implements IMotor {
         super(Material.iron);
         this.provider = provider;
 
-        setBlockName(References.MOTOR_NAME);
+        setBlockName(References.Names.Registry.MOTOR);
         setHardness(2);
 
         setCreativeTab(CreativeTabFramez.inst);
@@ -103,7 +102,7 @@ public class BlockMotor extends BlockContainer implements IMotor {
     @Override
     public void registerBlockIcons(IIconRegister reg) {
 
-        blockIcon = reg.registerIcon(ModInfo.MODID + ":motor");
+        blockIcon = reg.registerIcon(References.Textures.MOTOR);
     }
 
     @Override
@@ -115,7 +114,7 @@ public class BlockMotor extends BlockContainer implements IMotor {
     @Override
     public String getUnlocalizedName() {
 
-        return provider.getUnlocalizedName();
+        return "tile." + provider.getUnlocalizedName();
     }
 
     @Override

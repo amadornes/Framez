@@ -16,7 +16,7 @@ import cpw.mods.fml.common.registry.GameRegistry.ObjectHolder;
 @ObjectHolder(ModInfo.MODID)
 public final class FramezBlocks {
 
-    public static Block block_moving;
+    public static Block moving;
 
     public static final void init() {
 
@@ -27,18 +27,18 @@ public final class FramezBlocks {
 
     private static final void instantiate() {
 
-        block_moving = new BlockMoving();
+        moving = new BlockMoving();
     }
 
     private static final void register() {
 
         for (IMotorProvider m : FramezApi.inst().getMotorRegistry().getRegisteredMotors()) {
-            GameRegistry.registerBlock(new BlockMotor(m), References.MOTOR_NAME + "." + m.getId());
-            GameRegistry.registerTileEntity(m.getTileClass(), References.MOTOR_NAME + "." + m.getId());
+            GameRegistry.registerBlock(new BlockMotor(m), References.Names.Registry.MOTOR + "." + m.getId());
+            GameRegistry.registerTileEntity(m.getTileClass(), ModInfo.MODID + "." + References.Names.Registry.MOTOR + "." + m.getId());
         }
 
-        GameRegistry.registerBlock(block_moving, References.BLOCK_MOVING_NAME);
-        GameRegistry.registerTileEntity(TileMoving.class, References.BLOCK_MOVING_NAME);
+        GameRegistry.registerBlock(moving, References.Names.Registry.MOVING);
+        GameRegistry.registerTileEntity(TileMoving.class, ModInfo.MODID + "." + References.Names.Registry.MOVING);
     }
 
 }

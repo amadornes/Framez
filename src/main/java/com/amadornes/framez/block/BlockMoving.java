@@ -5,6 +5,7 @@ import java.util.Random;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -27,7 +28,13 @@ public class BlockMoving extends BlockContainer {
 
         super(Material.rock);
 
-        setBlockName(References.BLOCK_MOVING_NAME);
+        setBlockName(References.Names.Registry.MOVING);
+    }
+
+    @Override
+    public String getUnlocalizedName() {
+
+        return "Moving";
     }
 
     @Override
@@ -157,6 +164,11 @@ public class BlockMoving extends BlockContainer {
         if (te == null)
             return;
         te.randomDisplayTick(rnd);
+    }
+
+    @Override
+    public void registerBlockIcons(IIconRegister p_149651_1_) {
+
     }
 
 }

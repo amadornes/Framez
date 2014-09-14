@@ -28,4 +28,6 @@ public interface IFrameModifierProvider {
 
     public IFrameModifierRecipe getRecipeProvider();
 
+    public int getMaxCarriedBlocks();
+
 }

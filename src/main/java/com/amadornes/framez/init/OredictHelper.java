@@ -12,6 +12,12 @@ public class OredictHelper {
             OreDictionary.registerOre("glass", Blocks.glass);
             OreDictionary.registerOre("glass", new ItemStack(Blocks.stained_glass, 1, Short.MAX_VALUE));
         }
+        if (OreDictionary.getOres("glassPane").size() == 0) {
+            OreDictionary.registerOre("glassPane", Blocks.glass_pane);
+            OreDictionary.registerOre("glassPane", new ItemStack(Blocks.stained_glass_pane, 1, Short.MAX_VALUE));
+        }
+        if (FramezItems.ironstick != null)
+            OreDictionary.registerOre("stickIron", FramezItems.ironstick);
     }
 
 }

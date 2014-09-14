@@ -26,7 +26,7 @@ public class CompatModuleNEI extends CompatModule {
     @Override
     public void postInit(FMLPostInitializationEvent ev) {
 
-        API.hideItem(new ItemStack(FramezBlocks.block_moving));
+        API.hideItem(new ItemStack(FramezBlocks.moving));
         API.addSubset("Frames", FramezApi.inst().getModifierRegistry().getAllPossibleCombinations());
     }
 

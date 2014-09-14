@@ -78,7 +78,7 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                         boolean crashed = false;
                         try {
                             if (b.getBlock() != null && b.getLocation() != null && b.getBlock() != Blocks.air
-                                    && b.getBlock() != FramezBlocks.block_moving) {
+                                    && b.getBlock() != FramezBlocks.moving) {
                                 for (int pass = 0; pass < 2; pass++) {
                                     if (b.getBlock().canRenderInPass(pass)) {
                                         try {

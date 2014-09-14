@@ -37,7 +37,9 @@ import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.client.render.RenderFrame;
+import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.modifier.ModifierRegistry;
+import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.util.Utils;
 
@@ -92,7 +94,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     @Override
     public String getType() {
 
-        return References.FRAME_NAME;
+        return ModInfo.MODID + "." + References.Names.Registry.FRAME;
     }
 
     @Override
@@ -625,28 +627,42 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
             if (!m.canBlockSide(side))
                 return false;
 
-        if (world().isRemote) {
-            if (!isSideBlocked(side)) {
-                for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-                    if (d != side && d != side.getOpposite()) {
-                        if (!Utils.occlusionTest(tile(), d) && Utils.getMicroblockSize(tile(), d) == 0)
-                            return false;
-                    }
-                }
-            }
-        }
-
+        // if (world().isRemote) {
+        // if (!isSideBlocked(side)) {
+        // for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+        // if (d != side && d != side.getOpposite()) {
+        // if (Utils.occlusionTest(tile(), d) && Utils.getMicroblockSize(tile(), d) == 0)
+        // return false;
+        // }
+        // }
+        // }
+        // }
+        //
         if (!world().isRemote) {
             blocked[side.ordinal()] = !isSideBlocked(side);
             sendDescUpdate();
         }
 
-        return true;
+        return false;// true
     }
 
     @Override
     public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
 
+        if (item == null || item.getItem() != FramezItems.wrench)
+            return false;
+
         return toggleBlock(ForgeDirection.getOrientation(player.isSneaking() ? hit.sideHit ^ 1 : hit.sideHit));
+    }
+
+    @Override
+    public int getMaxCarriedBlocks() {
+
+        int max = -1;
+
+        for (IFrameModifier m : getModifiers())
+            max = Math.max(max, m.getMaxCarriedBlocks());
+
+        return max == -1 ? 3 : max;
     }
 }

@@ -23,13 +23,17 @@ public class MovementUtils {
         List<BlockCoord> blocks = new ArrayList<BlockCoord>();
         BlockCoord motorLoc = new BlockCoord(motor);
 
-        addBlockAndNeighbors(motor.getWorldObj(), getRelative(motorLoc, motor.getFace()), blocks, motor.getDirection());
+        int[] mvd = new int[] { 0 };
+        addBlockAndNeighbors(motor.getWorldObj(), getRelative(motorLoc, motor.getFace()), blocks, motor.getDirection(), mvd);
         blocks.remove(motorLoc);
+
+        if (blocks.size() > mvd[0])
+            blocks.clear();
 
         return blocks;
     }
 
-    private static final void addBlockAndNeighbors(World w, BlockCoord block, List<BlockCoord> blocks, ForgeDirection direction) {
+    private static final void addBlockAndNeighbors(World w, BlockCoord block, List<BlockCoord> blocks, ForgeDirection direction, int[] moved) {
 
         if (blocks.contains(block))
             return;
@@ -45,6 +49,7 @@ public class MovementUtils {
         IFrame frame = Utils.getFrame(w, block.x, block.y, block.z);
         if (frame != null) {
             blocks.add(block);
+            moved[0] += frame.getMaxCarriedBlocks();
             for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
                 if (frame.isSideBlocked(d))
                     continue;
@@ -58,11 +63,11 @@ public class MovementUtils {
                 if (tmp2 != null && Utils.getMicroblockSize(tmp2, d.getOpposite()) == 1)
                     continue;
 
-                addBlockAndNeighbors(w, bl, blocks, direction);
+                addBlockAndNeighbors(w, bl, blocks, direction, moved);
             }
         } else {
             Block b = w.getBlock(block.x, block.y, block.z);
-            if (!b.isAir(w, block.x, block.y, block.z) && b != FramezBlocks.block_moving)
+            if (!b.isAir(w, block.x, block.y, block.z) && b != FramezBlocks.moving)
                 blocks.add(block);
         }
     }

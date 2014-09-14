@@ -10,15 +10,15 @@ public class ModifierRecipeGlassClear implements IFrameModifierRecipe {
 
     @Override
     /**
-     * GLASS | GLASS | GLASS
+     * PANE  | PANE  | PANE 
      * ------|-------|------
-     * GLASS | FRAME | GLASS
+     * PANE  | FRAME | PANE 
      * ------|-------|------
-     * GLASS | GLASS | GLASS
+     * PANE  | PANE  | PANE 
      */
     public Object getItemInCraftingSlot(int slot) {
 
-        return slot == 4 ? true : "glass";
+        return slot == 4 ? true : "glassPane";
     }
 
     @Override

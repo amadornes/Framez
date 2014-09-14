@@ -38,7 +38,7 @@ public class ClientProxy extends CommonProxy {
 
         RenderingRegistry.registerBlockHandler(render);
         for (IMotorProvider m : FramezApi.inst().getMotorRegistry().getRegisteredMotors()) {
-            Block b = GameRegistry.findBlock(ModInfo.MODID, References.MOTOR_NAME + "." + m.getId());
+            Block b = GameRegistry.findBlock(ModInfo.MODID, References.Names.Registry.MOTOR + "." + m.getId());
             Item i = Item.getItemFromBlock(b);
             MinecraftForgeClient.registerItemRenderer(i, render);
             ClientRegistry.bindTileEntitySpecialRenderer(m.getTileClass(), render);
@@ -46,7 +46,7 @@ public class ClientProxy extends CommonProxy {
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileMoving.class, new RenderMoving());
 
-        MinecraftForgeClient.registerItemRenderer(FramezItems.item_frame_part, new RenderFrame());
+        MinecraftForgeClient.registerItemRenderer(FramezItems.frame, new RenderFrame());
     }
 
 }

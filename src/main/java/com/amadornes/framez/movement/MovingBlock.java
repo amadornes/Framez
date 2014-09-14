@@ -200,6 +200,7 @@ public class MovingBlock implements IMovingBlock {
             if (te instanceof TileMultipart) {
                 if (!getWorld().isRemote) {
                     for (TMultiPart p : ((TileMultipart) te).jPartList()) {
+                        p.onWorldSeparate();
                         TileMultipart.addPart(getWorld(), new BlockCoord(x, y, z), p);
                     }
                 }
@@ -212,14 +213,14 @@ public class MovingBlock implements IMovingBlock {
                 te.zCoord = z;
                 te.setWorldObj(getWorldWrapper());
 
+                BlockUtils.setTileEntity(world, x, y, z, te);
+
                 if (validate) {
                     te.validate();
                     if (te instanceof TileMultipart && !getWorld().isRemote)
                         for (TMultiPart p : ((TileMultipart) te).jPartList())
                             p.onWorldJoin();
                 }
-
-                BlockUtils.setTileEntity(world, x, y, z, te);
             }
         }
 
@@ -236,7 +237,7 @@ public class MovingBlock implements IMovingBlock {
 
     public void placePlaceholder() {
 
-        world.setBlock(loc.x, loc.y, loc.z, FramezBlocks.block_moving, 0, 2);
+        world.setBlock(loc.x, loc.y, loc.z, FramezBlocks.moving, 0, 2);
         TileMoving te = null;
         if (placeholder != null)
             te = placeholder;
@@ -253,8 +254,7 @@ public class MovingBlock implements IMovingBlock {
             else
                 te2 = b.placeholder;
         } else {
-            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, FramezBlocks.block_moving,
-                    0, 2);
+            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, FramezBlocks.moving, 0, 2);
             world.setTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ,
                     te2 = new TileMoving());
         }

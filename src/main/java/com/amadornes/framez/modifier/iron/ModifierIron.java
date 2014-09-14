@@ -101,4 +101,10 @@ public class ModifierIron implements IFrameModifier {
         return Blocks.iron_block;
     }
 
+    @Override
+    public int getMaxCarriedBlocks() {
+
+        return 5;
+    }
+
 }

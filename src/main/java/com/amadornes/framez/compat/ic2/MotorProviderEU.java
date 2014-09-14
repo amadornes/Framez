@@ -16,7 +16,7 @@ public class MotorProviderEU implements IMotorProvider {
     @Override
     public String getUnlocalizedName() {
 
-        return References.MOTOR_NAME + ".electric";
+        return References.Names.Unlocalized.MOTOR + ".electric";
     }
 
     @Override

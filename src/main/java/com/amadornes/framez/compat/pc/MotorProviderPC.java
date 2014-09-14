@@ -16,7 +16,7 @@ public class MotorProviderPC implements IMotorProvider {
     @Override
     public String getUnlocalizedName() {
 
-        return References.MOTOR_NAME + ".pneumatic";
+        return References.Names.Unlocalized.MOTOR + ".pneumatic";
     }
 
     @Override

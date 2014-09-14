@@ -59,13 +59,13 @@ public class Framez {
     @EventHandler
     public void init(FMLInitializationEvent ev) {
 
-        OredictHelper.init();
-
         proxy.init();
 
         RegisterParts.init();
         FramezItems.init();
         FramezBlocks.init();
+
+        OredictHelper.init();
 
         CompatibilityUtils.init(ev);
 

@@ -102,4 +102,10 @@ public class ModifierGlass implements IFrameModifier {
         return Blocks.glass;
     }
 
+    @Override
+    public int getMaxCarriedBlocks() {
+
+        return 0;
+    }
+
 }

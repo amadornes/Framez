@@ -84,4 +84,10 @@ public class ModifierProviderGlass implements IFrameModifierProvider {
         return recipe;
     }
 
+    @Override
+    public int getMaxCarriedBlocks() {
+
+        return 0;
+    }
+
 }

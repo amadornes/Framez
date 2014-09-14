@@ -16,7 +16,7 @@ public class MotorProviderHC implements IMotorProvider {
     @Override
     public String getUnlocalizedName() {
 
-        return References.MOTOR_NAME + ".hydraulic";
+        return References.Names.Unlocalized.MOTOR + ".hydraulic";
     }
 
     @Override

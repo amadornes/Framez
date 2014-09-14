@@ -34,4 +34,6 @@ public interface IFrame {
 
     public boolean toggleBlock(ForgeDirection side);
 
+    public int getMaxCarriedBlocks();
+
 }

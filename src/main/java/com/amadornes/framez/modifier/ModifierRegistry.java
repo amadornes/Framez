@@ -64,7 +64,7 @@ public class ModifierRegistry implements IModifierRegistry {
     @Override
     public ItemStack getFrameStack(int amount, String... modifiers) {
 
-        ItemStack item = new ItemStack(FramezItems.item_frame_part);
+        ItemStack item = new ItemStack(FramezItems.frame, amount);
 
         NBTTagCompound tag = item.stackTagCompound = new NBTTagCompound();
 
@@ -83,6 +83,8 @@ public class ModifierRegistry implements IModifierRegistry {
         }
 
         tag.setTag("modifiers", list);
+
+        item.setItemDamage(item.getItem().getDamage(item));
 
         return item;
     }
@@ -112,8 +114,6 @@ public class ModifierRegistry implements IModifierRegistry {
 
     @Override
     public List<ItemStack> getAllPossibleCombinations() {
-
-        combinations = null;
 
         if (combinations == null) {
             combinations = new ArrayList<ItemStack>();

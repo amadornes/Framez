@@ -52,7 +52,7 @@ public class TileMoving extends TileEntity {
                 blockB = null;
 
         if (blockA == null && blockB == null) {
-            if (worldObj.getBlock(xCoord, yCoord, zCoord) == FramezBlocks.block_moving)
+            if (worldObj.getBlock(xCoord, yCoord, zCoord) == FramezBlocks.moving)
                 worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
             invalidate();
         }
