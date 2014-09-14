@@ -12,6 +12,8 @@ import com.amadornes.framez.compat.hc.CompatModuleHC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
 import com.amadornes.framez.compat.nei.CompatModuleNEI;
 import com.amadornes.framez.compat.pc.CompatModulePC;
+import com.amadornes.framez.compat.rf.CompatModuleRF;
+import com.amadornes.framez.compat.rf.RFUtils;
 import com.amadornes.framez.compat.vanilla.CompatModuleVanilla;
 import com.amadornes.framez.compat.waila.CompatModuleWaila;
 import com.amadornes.framez.ref.Dependencies;
@@ -125,6 +127,8 @@ public class CompatibilityUtils {
         registerModule(Dependencies.HC, CompatModuleHC.class, null);
         registerModule(Dependencies.CC, CompatModuleCC.class, null);
         registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
+        if (RFUtils.isRFApiLoaded())
+            registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleRF.class);
     }
 
 }

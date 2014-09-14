@@ -2,6 +2,7 @@ tile.framez:motor.dc.name=DC Motor
 tile.framez:motor.pneumatic.name=Pneumatic Motor
 tile.framez:motor.electric.name=Electric Motor
 tile.framez:motor.hydraulic.name=Hydraulic Motor
+tile.framez:motor.rf.name=Redstone Flux Motor
 
 item.framez:frame.name=Frame
 

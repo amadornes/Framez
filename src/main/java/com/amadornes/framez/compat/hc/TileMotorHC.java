@@ -30,7 +30,7 @@ public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
     @Override
     public Entry<Double, Double> getExtraInfo() {
 
-        return new AbstractMap.SimpleEntry((double) c.getStored(), (double) c.getMaxStorage());
+        return new AbstractMap.SimpleEntry((double) c.getMaxStorage(), (double) c.getStored());
     }
 
     @Override

@@ -23,7 +23,7 @@ public class MovementUtils {
         List<BlockCoord> blocks = new ArrayList<BlockCoord>();
         BlockCoord motorLoc = new BlockCoord(motor);
 
-        int[] mvd = new int[] { 0 };
+        int[] mvd = new int[] { 1 };
         addBlockAndNeighbors(motor.getWorldObj(), getRelative(motorLoc, motor.getFace()), blocks, motor.getDirection(), mvd);
         blocks.remove(motorLoc);
 

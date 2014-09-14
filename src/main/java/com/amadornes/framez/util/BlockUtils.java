@@ -46,7 +46,8 @@ public class BlockUtils {
         Chunk chunk = world.getChunkFromChunkCoords(x >> 4, z >> 4);
         if (chunk != null) {
             ExtendedBlockStorage ebs = chunk.getBlockStorageArray()[y >> 4];
-            ebs.func_150818_a(x & 15, y & 15, z & 15, block);
+            if (ebs != null)
+                ebs.func_150818_a(x & 15, y & 15, z & 15, block);
         }
     }
 
@@ -55,6 +56,10 @@ public class BlockUtils {
         Chunk chunk = world.getChunkFromChunkCoords(x >> 4, z >> 4);
         if (chunk != null) {
             ExtendedBlockStorage ebs = chunk.getBlockStorageArray()[y >> 4];
+            if (ebs == null) {
+                ebs = new ExtendedBlockStorage(y >> 4, true);
+                chunk.getBlockStorageArray()[y >> 4] = ebs;
+            }
             ebs.setExtBlockMetadata(x & 15, y & 15, z & 15, meta);
         }
     }
