@@ -64,6 +64,7 @@ public class Framez {
         RegisterParts.init();
         FramezItems.init();
         FramezBlocks.init();
+        CompatibilityUtils.registerBlocksAndItems();
 
         OredictHelper.init();
 
@@ -88,6 +89,7 @@ public class Framez {
         proxy.registerRenders();
 
         Recipes.init();
+
     }
 
 }

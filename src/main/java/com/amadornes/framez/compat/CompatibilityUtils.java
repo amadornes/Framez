@@ -116,6 +116,14 @@ public class CompatibilityUtils {
             m.registerRenders();
     }
 
+    public static void registerBlocksAndItems() {
+
+        for (CompatModule m : getLoadedModules()) {
+            m.registerBlocks();
+            m.registerItems();
+        }
+    }
+
     /**
      * Register modules here
      */

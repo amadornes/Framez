@@ -6,6 +6,8 @@ import com.amadornes.framez.tile.TileMotor;
 
 public class MotorProviderDC implements IMotorProvider {
 
+    public static final MotorProviderDC inst = new MotorProviderDC();
+
     @Override
     public String getId() {
 
