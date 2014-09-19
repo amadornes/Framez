@@ -2,7 +2,7 @@
 {
 	"modid": "framez",
 	"name": "Framez",
-	"version": "0.1.2 beta",
+	"version": "0.1 alpha",
 	"url": "http://framez.amadornes.com/",
     "updateUrl": "http://framez.amadornes.com/downloads",
 	"authorList": [
