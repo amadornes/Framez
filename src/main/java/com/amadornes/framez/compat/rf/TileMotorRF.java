@@ -9,21 +9,35 @@ import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
 
 import com.amadornes.framez.tile.TileMotor;
+import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorRF extends TileMotor implements IEnergyHandler {
 
     private EnergyStorage buffer = new EnergyStorage(100000, 500);
 
     @Override
-    public boolean canMove() {
+    public boolean canMove(double power) {
 
-        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+        return isBeingPowered() && getEnergyStored(null) >= power;
     }
 
     @Override
     public double getMovementSpeed() {
 
         return 1;
+    }
+
+    @Override
+    public PowerUnit getPowerUnit() {
+
+        return PowerUnit.RF;
+    }
+
+    @Override
+    public void consumePower(double power) {
+
+        buffer.extractEnergy((int) power, false);
+        sendUpdatePacket();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

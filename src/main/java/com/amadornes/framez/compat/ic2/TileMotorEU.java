@@ -13,6 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.amadornes.framez.tile.TileMotor;
+import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorEU extends TileMotor implements IEnergySink {
 
@@ -20,15 +21,28 @@ public class TileMotorEU extends TileMotor implements IEnergySink {
     private double maxStored = 10000;
 
     @Override
-    public boolean canMove() {
+    public boolean canMove(double power) {
 
-        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+        return isBeingPowered() && stored >= power;
     }
 
     @Override
     public double getMovementSpeed() {
 
         return 1;
+    }
+
+    @Override
+    public PowerUnit getPowerUnit() {
+
+        return PowerUnit.EU;
+    }
+
+    @Override
+    public void consumePower(double power) {
+
+        stored -= power;
+        sendUpdatePacket();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

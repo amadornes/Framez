@@ -10,19 +10,33 @@ import pneumaticCraft.api.tileentity.IAirHandler;
 import pneumaticCraft.api.tileentity.IPneumaticMachine;
 
 import com.amadornes.framez.tile.TileMotor;
+import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorPC extends TileMotor implements IPneumaticMachine {
 
     @Override
-    public boolean canMove() {
+    public boolean canMove(double power) {
 
-        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+        return isBeingPowered() && handler.getPressure(ForgeDirection.UNKNOWN) >= power;
     }
 
     @Override
     public double getMovementSpeed() {
 
         return 1;
+    }
+
+    @Override
+    public PowerUnit getPowerUnit() {
+
+        return PowerUnit.PC_PRESSURE;
+    }
+
+    @Override
+    public void consumePower(double power) {
+
+        handler.addAir(-(int) (power * 1000), ForgeDirection.UNKNOWN);
+        sendUpdatePacket();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

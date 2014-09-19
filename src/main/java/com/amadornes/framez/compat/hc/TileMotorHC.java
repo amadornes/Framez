@@ -11,19 +11,33 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.amadornes.framez.tile.TileMotor;
+import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
 
     @Override
-    public boolean canMove() {
+    public boolean canMove(double power) {
 
-        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+        return isBeingPowered() && c.getStored() >= power;
     }
 
     @Override
     public double getMovementSpeed() {
 
         return 1;
+    }
+
+    @Override
+    public PowerUnit getPowerUnit() {
+
+        return PowerUnit.HC_PRESSURE;
+    }
+
+    @Override
+    public void consumePower(double power) {
+
+        c.setStored((int) Math.round(c.getStored() - power), true, true);
+        sendUpdatePacket();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -56,7 +70,7 @@ public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
     @Override
     public boolean canWork(ForgeDirection face) {
 
-        return canMove();
+        return false;
     }
 
     @Override

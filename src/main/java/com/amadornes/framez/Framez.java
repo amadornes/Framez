@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatibilityUtils;
+import com.amadornes.framez.config.ConfigurationHandler;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.init.OredictHelper;
@@ -30,7 +31,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = "required-after:ForgeMultipart")
+@Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = "required-after:ForgeMultipart", guiFactory = ModInfo.GUI_FACTORY)
 public class Framez {
 
     @Instance(ModInfo.MODID)
@@ -43,6 +44,9 @@ public class Framez {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent ev) {
+
+        ConfigurationHandler.init(ev.getSuggestedConfigurationFile());
+        FMLCommonHandler.instance().bus().register(new ConfigurationHandler());
 
         log = ev.getModLog();
 
