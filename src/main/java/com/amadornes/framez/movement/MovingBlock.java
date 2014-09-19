@@ -228,6 +228,8 @@ public class MovingBlock implements IMovingBlock {
                         for (TMultiPart p : ((TileMultipart) te).jPartList())
                             p.onWorldJoin();
                 }
+
+                world.setTileEntity(x, y, z, te);
             }
         }
 
