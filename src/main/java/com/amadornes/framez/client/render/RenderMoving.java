@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 
+import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
@@ -25,6 +26,10 @@ public class RenderMoving extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity tile, double x, double y, double z, float f) {
+
+        boolean blend = GL11.glGetBoolean(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         GL11.glPushMatrix();
         {
@@ -54,6 +59,8 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                 mc.thePlayer.worldObj = structure.getWorldWrapperClient();
                 mc.theWorld = structure.getWorldWrapperClient();
 
+                boolean rendered = false;
+
                 // Render
                 {
                     GL11.glPushMatrix();
@@ -75,37 +82,27 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                         int l = 0;
                         b.setRenderList(l = GL11.glGenLists(1));
                         GL11.glNewList(l, GL11.GL_COMPILE);
-                        boolean crashed = false;
-                        try {
-                            if (b.getBlock() != null && b.getLocation() != null && b.getBlock() != Blocks.air
-                                    && b.getBlock() != FramezBlocks.moving) {
-                                for (int pass = 0; pass < 2; pass++) {
-                                    if (b.getBlock().canRenderInPass(pass)) {
+                        if (b.getBlock() != null && b.getLocation() != null && b.getBlock() != Blocks.air && b.getBlock() != FramezBlocks.moving) {
+                            for (int pass = 0; pass < 2; pass++) {
+                                if (b.getBlock().canRenderInPass(pass)) {
+                                    try {
+                                        Tessellator.instance.startDrawingQuads();
+                                        if (rb.renderBlockByRenderType(b.getBlock(), b.getX(), b.getY(), b.getZ()))
+                                            rendered = true;
+                                        Tessellator.instance.draw();
+                                    } catch (Exception e) {
                                         try {
-                                            Tessellator.instance.startDrawingQuads();
-                                            rb.renderBlockByRenderType(b.getBlock(), b.getX(), b.getY(), b.getZ());
                                             Tessellator.instance.draw();
-                                        } catch (Exception e) {
-                                            try {
-                                                Tessellator.instance.draw();
-                                            } catch (Exception ex) {
-                                            }
-                                            e.printStackTrace();
+                                        } catch (Exception ex) {
                                         }
+                                        rendered = false;
                                     }
                                 }
-                            } else {
-                                rb.renderStandardBlock(Blocks.stone, b.getX(), b.getY(), b.getZ());
                             }
-                        } catch (Exception ex) {
-                            crashed = true;
                         }
                         GL11.glEndList();
-                        if (crashed) {
-                            GL11.glNewList(l, GL11.GL_COMPILE);
-                            rb.renderStandardBlock(Blocks.stone, b.getX(), b.getY(), b.getZ());
-                            GL11.glEndList();
-                        }
+                    } else {
+                        rendered = true;
                     }
                     GL11.glCallList(b.getRenderList());
 
@@ -118,8 +115,9 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                             GL11.glPushMatrix();
                             try {
                                 tesr.renderTileEntityAt(blockTE, b.getX(), b.getY(), b.getZ(), f);
+                                rendered = true;
                             } catch (Exception ex) {
-                                rb.renderStandardBlock(Blocks.stone, b.getX(), b.getY(), b.getZ());
+                                rendered = false;
                             }
                             GL11.glPopMatrix();
                         }
@@ -131,12 +129,29 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                     GL11.glPopMatrix();
                 }
 
+                // If there were any issues, render the crate
+                if (!rendered) {
+                    RenderHelper.disableStandardItemLighting();
+                    Tessellator.instance.startDrawingQuads();
+                    rb.blockAccess = structure.getWorld();
+                    rb.overrideBlockTexture = IconProvider.iconCrate;
+                    rb.setRenderBounds(0, 0, 0, 1, 1, 1);
+                    rb.setRenderAllFaces(true);
+                    rb.renderStandardBlock(Blocks.stone, b.getX(), b.getY(), b.getZ());
+                    rb.overrideBlockTexture = null;
+                    rb.blockAccess = structure.getWorldWrapperClient();
+                    Tessellator.instance.draw();
+                    RenderHelper.enableStandardItemLighting();
+                }
+
                 // Reset world instances
                 mc.thePlayer.worldObj = playerWorld;
                 mc.theWorld = gameWorld;
             }
         }
         GL11.glPopMatrix();
-    }
 
+        if (!blend)
+            GL11.glDisable(GL11.GL_BLEND);
+    }
 }
