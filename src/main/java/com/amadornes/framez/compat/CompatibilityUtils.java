@@ -129,7 +129,8 @@ public class CompatibilityUtils {
      * Register modules here
      */
     static {
-        registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleVanilla.class);
+        if (Config.Motors.isRedstoneMotorEnabled)
+            registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleVanilla.class);
         if (Config.Motors.isIC2MotorEnabled)
             registerModule(Dependencies.IC2, CompatModuleIC2.class, null);
         if (Config.Motors.isPneumaticCraftMotorEnabled)
