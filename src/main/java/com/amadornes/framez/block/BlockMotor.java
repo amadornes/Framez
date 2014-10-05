@@ -100,6 +100,7 @@ public class BlockMotor extends BlockContainer implements IMotor {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerBlockIcons(IIconRegister reg) {
 
         blockIcon = reg.registerIcon(References.Textures.MOTOR);
@@ -118,6 +119,7 @@ public class BlockMotor extends BlockContainer implements IMotor {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public int colorMultiplier(IBlockAccess w, int x, int y, int z) {
 
         if (!RenderMotor.renderingBorder)

@@ -35,12 +35,14 @@ public class RenderFrame implements IItemRenderer {
     private static Block blockFake = new BlockStone() {
 
         @Override
+        @SideOnly(Side.CLIENT)
         public IIcon getIcon(IBlockAccess w, int x, int y, int z, int side) {
 
             return getIcon(side, 0);
         }
 
         @Override
+        @SideOnly(Side.CLIENT)
         public IIcon getIcon(int side, int meta) {
 
             ForgeDirection face = ForgeDirection.getOrientation(side);
@@ -66,6 +68,7 @@ public class RenderFrame implements IItemRenderer {
         }
 
         @Override
+        @SideOnly(Side.CLIENT)
         public boolean shouldSideBeRendered(IBlockAccess w, int x, int y, int z, int side) {
 
             return renderFace[side];
@@ -109,7 +112,7 @@ public class RenderFrame implements IItemRenderer {
         rb.setRenderBounds(minx / 16D + (minx == 0 && frame.getConnections()[ForgeDirection.WEST.ordinal()] == null ? sep : 0), miny / 16D
                 + (miny == 0 && frame.getConnections()[ForgeDirection.DOWN.ordinal()] == null ? sep : 0),
                 minz / 16D + (minz == 0 && frame.getConnections()[ForgeDirection.NORTH.ordinal()] == null ? sep : 0), maxx / 16D
-                        - (maxx == 16 && frame.getConnections()[ForgeDirection.EAST.ordinal()] == null ? sep : 0),
+                - (maxx == 16 && frame.getConnections()[ForgeDirection.EAST.ordinal()] == null ? sep : 0),
                 maxy / 16D - (maxy == 16 && frame.getConnections()[ForgeDirection.UP.ordinal()] == null ? sep : 0),
                 maxz / 16D - (maxz == 16 && frame.getConnections()[ForgeDirection.SOUTH.ordinal()] == null ? sep : 0));
 

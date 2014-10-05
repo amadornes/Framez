@@ -11,6 +11,8 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class CompatModuleWaila extends CompatModule {
 
@@ -55,6 +57,7 @@ public class CompatModuleWaila extends CompatModule {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerRenders() {
 
     }

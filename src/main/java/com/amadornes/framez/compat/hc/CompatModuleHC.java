@@ -39,7 +39,7 @@ public class CompatModuleHC extends CompatModule {
 
         GameRegistry.addRecipe(new ShapedOreRecipe(GameRegistry.findBlock(ModInfo.MODID,
                 References.Names.Registry.MOTOR + "." + MotorProviderHC.inst.getId()), "rlr", "lcl", "rlr", 'c', new ItemStack(GameRegistry
-                .findBlock(Dependencies.HC, "LPBlockCore"), 1, 1), 'l', "ingotLead", 'r', Blocks.redstone_block));
+                        .findBlock(Dependencies.HC, "LPBlockCore"), 1, 1), 'l', "ingotLead", 'r', Blocks.redstone_block));
     }
 
     @Override
@@ -58,6 +58,7 @@ public class CompatModuleHC extends CompatModule {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerRenders() {
 
     }

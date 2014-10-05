@@ -41,7 +41,7 @@ public class CompatModuleIC2 extends CompatModule {
 
         GameRegistry.addRecipe(new ShapedOreRecipe(GameRegistry.findBlock(ModInfo.MODID,
                 References.Names.Registry.MOTOR + "." + MotorProviderEU.inst.getId()), "rcr", "cbc", "rcr", 'b', new ItemStack(GameRegistry
-                .findBlock(Dependencies.IC2, "blockMachine"), 1, 0), 'c', "circuitBasic", 'r', Blocks.redstone_block));
+                        .findBlock(Dependencies.IC2, "blockMachine"), 1, 0), 'c', "circuitBasic", 'r', Blocks.redstone_block));
     }
 
     @Override
@@ -60,6 +60,7 @@ public class CompatModuleIC2 extends CompatModule {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerRenders() {
 
     }

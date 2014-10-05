@@ -21,7 +21,10 @@ import com.amadornes.framez.tile.TileMotor;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlockRenderingHandler, IItemRenderer {
 
     public static int RENDER_ID = RenderingRegistry.getNextAvailableRenderId();

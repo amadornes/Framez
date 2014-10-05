@@ -20,6 +20,10 @@ import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.tile.TileMoving;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+@SideOnly(Side.CLIENT)
 public class RenderMoving extends TileEntitySpecialRenderer {
 
     private static RenderBlocks rb = new RenderBlocks();

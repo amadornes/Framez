@@ -48,6 +48,7 @@ public class ModifierProviderIron implements IFrameModifierProvider {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister reg) {
 
         border = reg.registerIcon(ModInfo.MODID + ":frameBorderIron");

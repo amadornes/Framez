@@ -64,6 +64,7 @@ public class BlockMoving extends BlockContainer {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBoxFromPool(World w, int x, int y, int z) {
 
         TileMoving te = get(w, x, y, z);
@@ -158,6 +159,7 @@ public class BlockMoving extends BlockContainer {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void randomDisplayTick(World w, int x, int y, int z, Random rnd) {
 
         TileMoving te = get(w, x, y, z);

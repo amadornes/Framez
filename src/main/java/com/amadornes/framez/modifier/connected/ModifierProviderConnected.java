@@ -9,6 +9,9 @@ import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.api.IFrameModifierRecipe;
 import com.amadornes.framez.ref.References.Modifiers;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class ModifierProviderConnected implements IFrameModifierProvider {
 
     @Override
@@ -36,6 +39,7 @@ public class ModifierProviderConnected implements IFrameModifierProvider {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister reg) {
 
     }

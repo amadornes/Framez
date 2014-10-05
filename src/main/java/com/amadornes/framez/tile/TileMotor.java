@@ -23,6 +23,9 @@ import com.amadornes.framez.network.NetworkHandler;
 import com.amadornes.framez.network.packet.PacketStartMoving;
 import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public abstract class TileMotor extends TileEntity implements IFrameMove {
 
     public abstract boolean canMove(double power);
@@ -180,6 +183,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
 
         if (structure != null) {

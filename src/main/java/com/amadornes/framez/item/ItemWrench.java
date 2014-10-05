@@ -10,6 +10,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import com.amadornes.framez.init.CreativeTabFramez;
 import com.amadornes.framez.ref.References;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class ItemWrench extends Item {
 
     public ItemWrench() {
@@ -26,6 +29,7 @@ public class ItemWrench extends Item {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister reg) {
 
         itemIcon = reg.registerIcon(References.Textures.WRENCH);

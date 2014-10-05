@@ -9,7 +9,10 @@ import com.amadornes.framez.api.IFrameModifierProvider;
 import com.amadornes.framez.ref.ModInfo;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class IconProvider {
 
     public static IIcon iconFrameBorder;

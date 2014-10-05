@@ -51,6 +51,7 @@ public class CompatModuleNEI extends CompatModule {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerRenders() {
 
     }

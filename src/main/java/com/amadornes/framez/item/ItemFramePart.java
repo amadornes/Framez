@@ -31,6 +31,7 @@ public class ItemFramePart extends Item {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister reg) {
 
         cross = reg.registerIcon(References.Textures.FRAME_PART_CROSS);
@@ -41,6 +42,7 @@ public class ItemFramePart extends Item {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
+    @SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs tab, List list) {
 
         for (int i = 0; i < 4; i++) {
@@ -55,12 +57,14 @@ public class ItemFramePart extends Item {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public IIcon getIcon(ItemStack stack, int pass) {
 
         return getIconIndex(stack);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public IIcon getIconIndex(ItemStack is) {
 
         switch (is.getItemDamage()) {

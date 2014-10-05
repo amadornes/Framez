@@ -43,6 +43,9 @@ import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.util.Utils;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
     private static final Cuboid6[] subParts = new Cuboid6[] { null, null, null, null, null, null };
@@ -156,6 +159,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public boolean renderStatic(Vector3 pos, int pass) {
 
         if (pass != 0)
@@ -173,6 +177,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void addDestroyEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
 
         IIcon[] icons = new IIcon[6];
@@ -189,6 +194,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void addHitEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
 
         IIcon icon = ModifierRegistry.INST.getCrossTexture(Arrays.asList(getModifiers()), ForgeDirection.getOrientation(hit.sideHit));
@@ -198,6 +204,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void drawBreaking(RenderBlocks renderBlocks) {
 
         RenderBlocks rb2 = RenderFrame.rb;
@@ -207,6 +214,7 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public boolean drawHighlight(MovingObjectPosition hit, EntityPlayer player, float frame) {
 
         GL11.glEnable(GL11.GL_BLEND);

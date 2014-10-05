@@ -56,6 +56,7 @@ public class CompatModulePC extends CompatModule {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerRenders() {
 
     }

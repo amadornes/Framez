@@ -21,6 +21,9 @@ import com.amadornes.framez.modifier.ModifierRegistry;
 import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.ref.References;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class ItemFrameMuptipart extends JItemMultiPart {
 
     public ItemFrameMuptipart() {
@@ -61,6 +64,7 @@ public class ItemFrameMuptipart extends JItemMultiPart {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
+    @SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs tab, List list) {
 
         list.add(FramezApi.inst().getModifierRegistry().getFrameStack());
@@ -81,6 +85,7 @@ public class ItemFrameMuptipart extends JItemMultiPart {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
+    @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack item, EntityPlayer player, List list, boolean shift) {
 
         list.add(I18n.format("framez.hud.modifiers") + ":");
