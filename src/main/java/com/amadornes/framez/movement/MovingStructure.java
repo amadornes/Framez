@@ -3,7 +3,6 @@ package com.amadornes.framez.movement;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -111,7 +110,7 @@ public class MovingStructure {
     }
 
     @SideOnly(Side.CLIENT)
-    public WorldClient getWorldWrapperClient() {
+    public World getWorldWrapperClient() {
 
         return wrapperClient;
     }
@@ -157,7 +156,7 @@ public class MovingStructure {
                             b.getLocation().z + getDirection().offsetZ, b.getBlock());
                     world.markBlockRangeForRenderUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
                             b.getLocation().z + getDirection().offsetZ, b.getLocation().x + getDirection().offsetX, b.getLocation().y
-                                    + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
+                            + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
                     world.markBlockForUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
                             b.getLocation().z + getDirection().offsetZ);
                 }
@@ -178,7 +177,7 @@ public class MovingStructure {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void moveEntities() {
 
         List<Entity> entities = new ArrayList<Entity>();
@@ -295,7 +294,7 @@ public class MovingStructure {
                 while (movedX != 0.0D
                         && movedZ != 0.0D
                         && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, movedZ))
-                                .isEmpty()) {
+                        .isEmpty()) {
                     if (movedX < d9 && movedX >= -d9) {
                         movedX = 0.0D;
                     } else if (movedX > 0.0D) {

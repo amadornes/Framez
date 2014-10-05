@@ -61,7 +61,7 @@ public class RenderMoving extends TileEntitySpecialRenderer {
 
                 // Set new world instances
                 mc.thePlayer.worldObj = structure.getWorldWrapperClient();
-                mc.theWorld = structure.getWorldWrapperClient();
+                mc.theWorld = (WorldClient) structure.getWorldWrapperClient();
 
                 boolean rendered = false;
 

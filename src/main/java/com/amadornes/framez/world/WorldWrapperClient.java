@@ -22,6 +22,10 @@ import codechicken.lib.vec.BlockCoord;
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+@SideOnly(Side.CLIENT)
 public class WorldWrapperClient extends WorldClient {
 
     private MovingStructure structure;
@@ -141,9 +145,9 @@ public class WorldWrapperClient extends WorldClient {
     public void spawnParticle(String type, double x, double y, double z, double r, double g, double b) {
 
         structure.getWorld()
-                .spawnParticle(type, x + (structure.getDirection().offsetX * structure.getMoved()),
-                        y + (structure.getDirection().offsetY * structure.getMoved()), z + (structure.getDirection().offsetZ * structure.getMoved()),
-                        r, g, b);
+        .spawnParticle(type, x + (structure.getDirection().offsetX * structure.getMoved()),
+                y + (structure.getDirection().offsetY * structure.getMoved()), z + (structure.getDirection().offsetZ * structure.getMoved()),
+                r, g, b);
     }
 
     @Override

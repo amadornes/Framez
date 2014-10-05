@@ -280,7 +280,6 @@ public class MovingBlock implements IMovingBlock {
         return isStored;
     }
 
-    @SideOnly(Side.CLIENT)
     private int renderList = -1;
 
     @SideOnly(Side.CLIENT)

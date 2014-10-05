@@ -40,7 +40,7 @@ public class BlockMoving extends BlockContainer {
     @Override
     public TileEntity createNewTileEntity(World w, int meta) {
 
-        return new TileMoving();// A TE will be assigned automatically
+        return new TileMoving();
     }
 
     private TileMoving get(IBlockAccess w, int x, int y, int z) {

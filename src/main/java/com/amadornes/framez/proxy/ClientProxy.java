@@ -1,7 +1,12 @@
 package com.amadornes.framez.proxy;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -50,6 +55,30 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(TileMoving.class, new RenderMoving());
 
         MinecraftForgeClient.registerItemRenderer(FramezItems.frame, new RenderFrame());
+    }
+
+    @Override
+    public void setPlayer(EntityPlayer player) {
+
+        Minecraft.getMinecraft().thePlayer = (EntityClientPlayerMP) player;
+    }
+
+    @Override
+    public void setWorld(World world) {
+
+        Minecraft.getMinecraft().theWorld = (WorldClient) world;
+    }
+
+    @Override
+    public EntityPlayer getPlayer() {
+
+        return Minecraft.getMinecraft().thePlayer;
+    }
+
+    @Override
+    public World getWorld() {
+
+        return Minecraft.getMinecraft().theWorld;
     }
 
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -21,6 +20,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import codechicken.lib.raytracer.RayTracer;
 
+import com.amadornes.framez.Framez;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.movement.MovingBlock;
 
@@ -142,11 +142,11 @@ public class TileMoving extends TileEntity {
             if (blockA.getTileEntity() != null)
                 blockA.getTileEntity().setWorldObj(worldObj);
 
-            World w = Minecraft.getMinecraft().thePlayer.worldObj;
-            Minecraft.getMinecraft().thePlayer.worldObj = blockA.getWorldWrapper();
+            World w = Framez.proxy.getWorld();
+            Framez.proxy.getPlayer().worldObj = blockA.getWorldWrapper();
             AxisAlignedBB b = blockA.getBlock().getSelectedBoundingBoxFromPool(blockA.getWorldWrapper(), blockA.getLocation().x,
                     blockA.getLocation().y, blockA.getLocation().z);
-            Minecraft.getMinecraft().thePlayer.worldObj = w;
+            Framez.proxy.getPlayer().worldObj = w;
 
             if (b != null) {
                 b = b.copy();
@@ -174,11 +174,11 @@ public class TileMoving extends TileEntity {
             if (blockB.getTileEntity() != null)
                 blockB.getTileEntity().setWorldObj(worldObj);
 
-            World w = Minecraft.getMinecraft().thePlayer.worldObj;
-            Minecraft.getMinecraft().thePlayer.worldObj = blockB.getWorldWrapper();
+            World w = Framez.proxy.getWorld();
+            Framez.proxy.getPlayer().worldObj = blockB.getWorldWrapper();
             AxisAlignedBB b = blockB.getBlock().getSelectedBoundingBoxFromPool(blockB.getWorldWrapper(), blockB.getLocation().x,
                     blockB.getLocation().y, blockB.getLocation().z);
-            Minecraft.getMinecraft().thePlayer.worldObj = w;
+            Framez.proxy.getPlayer().worldObj = w;
 
             if (b != null) {
                 b = b.copy();
@@ -319,7 +319,7 @@ public class TileMoving extends TileEntity {
 
     public ItemStack getPickBlock(MovingObjectPosition target) {
 
-        MovingObjectPosition mop = rayTrace(Minecraft.getMinecraft().thePlayer);
+        MovingObjectPosition mop = rayTrace(Framez.proxy.getPlayer());
         if (mop == null)
             return null;
         MovingBlock block = getSelected(mop);
