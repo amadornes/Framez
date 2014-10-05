@@ -7,9 +7,12 @@ import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatModule;
 import com.amadornes.framez.init.FramezBlocks;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class CompatModuleNEI extends CompatModule {
 
@@ -27,6 +30,13 @@ public class CompatModuleNEI extends CompatModule {
     public void postInit(FMLPostInitializationEvent ev) {
 
         API.hideItem(new ItemStack(FramezBlocks.moving));
+        if (FMLCommonHandler.instance().getEffectiveSide().isClient())
+            postInitClient();
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void postInitClient() {
+
         API.addSubset("Frames", FramezApi.inst().getModifierRegistry().getAllPossibleCombinations());
     }
 

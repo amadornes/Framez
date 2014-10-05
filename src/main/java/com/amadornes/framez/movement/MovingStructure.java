@@ -157,7 +157,7 @@ public class MovingStructure {
                             b.getLocation().z + getDirection().offsetZ, b.getBlock());
                     world.markBlockRangeForRenderUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
                             b.getLocation().z + getDirection().offsetZ, b.getLocation().x + getDirection().offsetX, b.getLocation().y
-                            + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
+                                    + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
                     world.markBlockForUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
                             b.getLocation().z + getDirection().offsetZ);
                 }
@@ -194,6 +194,7 @@ public class MovingStructure {
                         AxisAlignedBB.getBoundingBox(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x + 1,
                                 b.getLocation().y + 1, b.getLocation().z + 1), aabbs, null);
             } catch (Exception ex) {
+                aabbs.add(AxisAlignedBB.getBoundingBox(b.getX(), b.getY(), b.getZ(), b.getX() + 1, b.getY() + 1, b.getZ() + 1));
             }
             for (Object o : aabbs) {
                 AxisAlignedBB aabb = ((AxisAlignedBB) o);
@@ -294,7 +295,7 @@ public class MovingStructure {
                 while (movedX != 0.0D
                         && movedZ != 0.0D
                         && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, movedZ))
-                        .isEmpty()) {
+                                .isEmpty()) {
                     if (movedX < d9 && movedX >= -d9) {
                         movedX = 0.0D;
                     } else if (movedX > 0.0D) {
