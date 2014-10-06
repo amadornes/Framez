@@ -14,9 +14,6 @@ import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.tile.TileMoving;
 import com.amadornes.framez.util.BlockUtils;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 public class MovingBlock implements IMovingBlock {
 
     private World world;
@@ -246,7 +243,7 @@ public class MovingBlock implements IMovingBlock {
 
     public void placePlaceholder() {
 
-        world.setBlock(loc.x, loc.y, loc.z, FramezBlocks.moving, 0, 2);
+        world.setBlock(loc.x, loc.y, loc.z, FramezBlocks.moving, 0, 0);
         TileMoving te = null;
         if (placeholder != null)
             te = placeholder;
@@ -263,7 +260,7 @@ public class MovingBlock implements IMovingBlock {
             else
                 te2 = b.placeholder;
         } else {
-            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, FramezBlocks.moving, 0, 2);
+            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, FramezBlocks.moving, 0, 0);
             world.setTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ,
                     te2 = new TileMoving());
         }
@@ -282,13 +279,11 @@ public class MovingBlock implements IMovingBlock {
 
     private int renderList = -1;
 
-    @SideOnly(Side.CLIENT)
     public int getRenderList() {
 
         return renderList;
     }
 
-    @SideOnly(Side.CLIENT)
     public void setRenderList(int renderList) {
 
         this.renderList = renderList;

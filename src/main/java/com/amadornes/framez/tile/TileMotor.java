@@ -149,7 +149,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
                         power = (power / PowerUnit.RF.getPowerMultiplier()) * getPowerUnit().getPowerMultiplier();
                     }
                     if (canMove(power)) {
-                        MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 100D);
+                        MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 20D);
                         structure.addBlocks(blocks);
 
                         this.structure = structure;

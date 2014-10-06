@@ -44,6 +44,7 @@ public class PacketStartMoving extends LocatedPacket<PacketStartMoving> {
         if (motor != null)
             motor.setStructure(structure);
         StructureTickHandler.INST.addStructure(structure);
+        structure.tick();
     }
 
     @Override
