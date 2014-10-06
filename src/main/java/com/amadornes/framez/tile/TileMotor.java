@@ -177,9 +177,9 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     }
 
     @Override
-    public boolean canBeMoved() {
+    public boolean canBeMoved(ForgeDirection face, ForgeDirection direction) {
 
-        return structure == null;
+        return structure == null && face != getFace();
     }
 
     @Override

@@ -291,7 +291,6 @@ public class TileMoving extends TileEntity {
         // if (blockB != null) {
         // b = blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y, blockB.getLocation().z)
         // * blockB.getMoved();
-        // System.out.println(b);
         // }
 
         // return (int) Math.min(Math.max(b, 0), 15);

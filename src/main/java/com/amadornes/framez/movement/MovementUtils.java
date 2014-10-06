@@ -24,7 +24,8 @@ public class MovementUtils {
         BlockCoord motorLoc = new BlockCoord(motor);
 
         int[] mvd = new int[] { 1 };
-        addBlockAndNeighbors(motor.getWorldObj(), getRelative(motorLoc, motor.getFace()), blocks, motor.getDirection(), mvd);
+        addBlockAndNeighbors(motor.getWorldObj(), getRelative(motorLoc, motor.getFace()), blocks, motor.getFace().getOpposite(),
+                motor.getDirection(), mvd);
         blocks.remove(motorLoc);
 
         if (blocks.size() > mvd[0])
@@ -33,7 +34,8 @@ public class MovementUtils {
         return blocks;
     }
 
-    private static final void addBlockAndNeighbors(World w, BlockCoord block, List<BlockCoord> blocks, ForgeDirection direction, int[] moved) {
+    private static final void addBlockAndNeighbors(World w, BlockCoord block, List<BlockCoord> blocks, ForgeDirection face, ForgeDirection direction,
+            int[] moved) {
 
         if (blocks.contains(block))
             return;
@@ -43,7 +45,7 @@ public class MovementUtils {
 
         TileEntity tile = w.getTileEntity(block.x, block.y, block.z);
         if (tile != null && tile instanceof IFrameMove)
-            if (!((IFrameMove) tile).canBeMoved())
+            if (!((IFrameMove) tile).canBeMoved(face, direction))
                 return;
 
         IFrame frame = Utils.getFrame(w, block.x, block.y, block.z);
@@ -63,7 +65,7 @@ public class MovementUtils {
                 if (tmp2 != null && Utils.getMicroblockSize(tmp2, d.getOpposite()) == 1)
                     continue;
 
-                addBlockAndNeighbors(w, bl, blocks, direction, moved);
+                addBlockAndNeighbors(w, bl, blocks, d.getOpposite(), direction, moved);
             }
         } else {
             Block b = w.getBlock(block.x, block.y, block.z);
@@ -79,7 +81,7 @@ public class MovementUtils {
 
             for (MovingStructure ms : StructureTickHandler.INST.getStructures())
                 if (ms.getBlock(b.x, b.y, b.z) != null || ms.getBlock(r.x, r.y, r.z) != null
-                        || ms.getBlock(r.x - ms.getDirection().offsetX, r.y - ms.getDirection().offsetY, r.z - ms.getDirection().offsetZ) != null)
+                || ms.getBlock(r.x - ms.getDirection().offsetX, r.y - ms.getDirection().offsetY, r.z - ms.getDirection().offsetZ) != null)
                     return false;
 
             if (blocks.contains(r))
