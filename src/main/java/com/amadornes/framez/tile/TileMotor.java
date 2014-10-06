@@ -28,7 +28,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public abstract class TileMotor extends TileEntity implements IFrameMove {
 
-    public abstract boolean canMove(double power);
+    public abstract boolean shouldMove();
+
+    public abstract boolean hasEnoughPower(double power);
 
     public abstract double getMovementSpeed();
 
@@ -134,7 +136,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
         super.updateEntity();
 
-        if (!worldObj.isRemote) {
+        if (!worldObj.isRemote && shouldMove()) {
+
             if (worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air && structure == null) {
                 List<BlockCoord> blocks = MovementUtils.getMovedBlocks(this);
                 if (blocks.size() > 0 && MovementUtils.canMove(blocks, getWorldObj(), direction)) {
@@ -148,7 +151,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
                     if (getPowerUnit() != null) {
                         power = (power / PowerUnit.RF.getPowerMultiplier()) * getPowerUnit().getPowerMultiplier();
                     }
-                    if (canMove(power)) {
+                    if (hasEnoughPower(power)) {
                         MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 20D);
                         structure.addBlocks(blocks);
 

@@ -16,9 +16,15 @@ public class TileMotorRF extends TileMotor implements IEnergyHandler {
     private EnergyStorage buffer = new EnergyStorage(100000, 500);
 
     @Override
-    public boolean canMove(double power) {
+    public boolean shouldMove() {
 
-        return isBeingPowered() && getEnergyStored(null) >= power;
+        return isBeingPowered();
+    }
+
+    @Override
+    public boolean hasEnoughPower(double power) {
+
+        return getEnergyStored(null) >= power;
     }
 
     @Override

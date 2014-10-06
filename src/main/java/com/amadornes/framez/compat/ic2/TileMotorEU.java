@@ -21,9 +21,15 @@ public class TileMotorEU extends TileMotor implements IEnergySink {
     private double maxStored = 10000;
 
     @Override
-    public boolean canMove(double power) {
+    public boolean shouldMove() {
 
-        return isBeingPowered() && stored >= power;
+        return isBeingPowered();
+    }
+
+    @Override
+    public boolean hasEnoughPower(double power) {
+
+        return stored >= power;
     }
 
     @Override

@@ -6,9 +6,15 @@ import com.amadornes.framez.util.PowerHelper.PowerUnit;
 public class TileMotorDC extends TileMotor {
 
     @Override
-    public boolean canMove(double power) {
+    public boolean shouldMove() {
 
         return isBeingPowered();
+    }
+
+    @Override
+    public boolean hasEnoughPower(double power) {
+
+        return true;
     }
 
     @Override

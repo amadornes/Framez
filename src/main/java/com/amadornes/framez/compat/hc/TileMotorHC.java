@@ -16,9 +16,15 @@ import com.amadornes.framez.util.PowerHelper.PowerUnit;
 public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
 
     @Override
-    public boolean canMove(double power) {
+    public boolean shouldMove() {
 
-        return isBeingPowered() && c.getStored() >= power;
+        return isBeingPowered();
+    }
+
+    @Override
+    public boolean hasEnoughPower(double power) {
+
+        return c.getStored() >= power;
     }
 
     @Override

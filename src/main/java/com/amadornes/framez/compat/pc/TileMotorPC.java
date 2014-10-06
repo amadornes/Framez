@@ -15,9 +15,15 @@ import com.amadornes.framez.util.PowerHelper.PowerUnit;
 public class TileMotorPC extends TileMotor implements IPneumaticMachine {
 
     @Override
-    public boolean canMove(double power) {
+    public boolean shouldMove() {
 
-        return isBeingPowered() && handler.getPressure(ForgeDirection.UNKNOWN) >= power;
+        return isBeingPowered();
+    }
+
+    @Override
+    public boolean hasEnoughPower(double power) {
+
+        return handler.getPressure(ForgeDirection.UNKNOWN) >= power;
     }
 
     @Override
