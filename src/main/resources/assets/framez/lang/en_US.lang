@@ -7,6 +7,7 @@ tile.framez:motor.rf.name=Redstone Flux Motor
 item.framez:frame.name=Frame
 
 item.framez:wrench.name=Wrench
+item.framez:stickiron.name=Iron Stick
 
 item.framez:framepart.cross.name=Wooden Cross
 item.framez:framepart.frame.name=Wooden Frame
