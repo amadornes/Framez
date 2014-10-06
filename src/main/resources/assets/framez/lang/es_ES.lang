@@ -1,0 +1,26 @@
+tile.framez:motor.dc.name=Motor DC
+tile.framez:motor.pneumatic.name=Motor Neumático
+tile.framez:motor.electric.name=Motor Eléctrico
+tile.framez:motor.hydraulic.name=Motor Hidráulico
+tile.framez:motor.rf.name=Motor de Redstone Flux
+
+item.framez:frame.name=Frame
+
+item.framez:wrench.name=Llave inglesa
+item.framez:stickiron.name=Palo de hierro
+
+item.framez:framepart.cross.name=Cruz de madera
+item.framez:framepart.frame.name=Frame de madera
+item.framez:framepart.cross.iron.name=Cruz de hierro
+item.framez:framepart.frame.iron.name=Frame de hierro
+
+framez.hud.modifiers=Modificadores
+framez.hud.modifiers.none=Ninguno
+framez.hud.maxmoved=Máx. bloques movidos
+
+framez.modifier.connected=Connectado
+framez.modifier.iron=Hierro
+framez.modifier.glass=Cristal
+framez.modifier.glass.clear=Cristal transparente
+
+itemGroup.framez=Framez
