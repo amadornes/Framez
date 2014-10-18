@@ -8,7 +8,7 @@ public class PowerHelper {
     }
 
     public static enum PowerUnit {
-        HC_PRESSURE(5), EU(2.5), PC_PRESSURE(0.005), RF(1);
+        HC_PRESSURE(5), EU(2.5), PC_PRESSURE(0.005), RF(1), LP(1.75);
 
         private double powerMultiplier = 0;
 

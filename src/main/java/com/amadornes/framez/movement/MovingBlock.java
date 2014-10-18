@@ -184,7 +184,7 @@ public class MovingBlock implements IMovingBlock {
                 te.validate();
             if (te instanceof TileMultipart && !getWorld().isRemote)
                 for (TMultiPart p : ((TileMultipart) te).jPartList())
-                    p.onWorldJoin();
+                    p.onMoved();
         }
     }
 
@@ -200,34 +200,25 @@ public class MovingBlock implements IMovingBlock {
         BlockUtils.setBlockMetadataSneaky(world, x, y, z, getMetadata());
 
         if (te != null) {
-            if (te instanceof TileMultipart) {
-                if (!getWorld().isRemote) {
-                    for (TMultiPart p : ((TileMultipart) te).jPartList()) {
-                        p.onWorldSeparate();
-                        TileMultipart.addPart(getWorld(), new BlockCoord(x, y, z), p);
-                        p.onWorldJoin();
-                    }
-                }
-            } else {
-                if (invalidate)
-                    te.invalidate();
+            if (invalidate)
+                te.invalidate();
 
-                te.xCoord = x;
-                te.yCoord = y;
-                te.zCoord = z;
-                te.setWorldObj(getWorldWrapper());
+            te.xCoord = x;
+            te.yCoord = y;
+            te.zCoord = z;
+            te.setWorldObj(getWorldWrapper());
 
-                BlockUtils.setTileEntity(world, x, y, z, te);
+            getWorld().setTileEntity(x, y, z, te);
 
-                if (validate) {
-                    te.validate();
-                    if (te instanceof TileMultipart && !getWorld().isRemote)
-                        for (TMultiPart p : ((TileMultipart) te).jPartList())
-                            p.onWorldJoin();
-                }
-
-                world.setTileEntity(x, y, z, te);
+            if (validate) {
+                te.validate();
+                if (te instanceof TileMultipart && !getWorld().isRemote)
+                    for (TMultiPart p : ((TileMultipart) te).jPartList())
+                        p.onMoved();
             }
+
+            BlockUtils.removeTileEntity(getWorld(), x, y, z, false, true);
+            getWorld().setTileEntity(x, y, z, te);
         }
 
     }
@@ -260,7 +251,8 @@ public class MovingBlock implements IMovingBlock {
             else
                 te2 = b.placeholder;
         } else {
-            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ, FramezBlocks.moving, 0, 0);
+            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ,
+                    FramezBlocks.moving, 0, 0);
             world.setTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ,
                     te2 = new TileMoving());
         }

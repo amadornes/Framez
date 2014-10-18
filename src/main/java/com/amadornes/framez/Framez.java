@@ -5,6 +5,7 @@ import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.Logger;
 
 import com.amadornes.framez.api.FramezApi;
+import com.amadornes.framez.client.gui.ModGuiHandler;
 import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.config.ConfigurationHandler;
 import com.amadornes.framez.init.FramezBlocks;
@@ -30,6 +31,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 
 @Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = "required-after:ForgeMultipart", guiFactory = ModInfo.GUI_FACTORY)
 public class Framez {
@@ -83,6 +85,9 @@ public class Framez {
         FMLCommonHandler.instance().bus().register(eventHandler);
 
         NetworkHandler.init();
+
+        ModGuiHandler modGuiHandler = new ModGuiHandler();
+        NetworkRegistry.INSTANCE.registerGuiHandler(inst, modGuiHandler);
     }
 
     @EventHandler

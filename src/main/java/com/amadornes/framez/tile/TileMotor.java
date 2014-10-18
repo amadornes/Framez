@@ -152,7 +152,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
                         power = (power / PowerUnit.RF.getPowerMultiplier()) * getPowerUnit().getPowerMultiplier();
                     }
                     if (hasEnoughPower(power)) {
-                        MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 20D);
+                        MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / (20D * 0.75D));
                         structure.addBlocks(blocks);
 
                         this.structure = structure;
@@ -238,6 +238,11 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     public void setPlacer(String placer) {
 
         this.placer = placer;
+    }
+
+    public String getPlacer() {
+
+        return placer;
     }
 
     protected boolean isBeingPowered() {

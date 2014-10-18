@@ -20,6 +20,8 @@ public class ItemWrench extends Item {
         setUnlocalizedName(References.Names.Unlocalized.WRENCH);
 
         setCreativeTab(CreativeTabFramez.inst);
+        setMaxStackSize(1);
+        setFull3D();
     }
 
     @Override

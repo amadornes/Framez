@@ -37,7 +37,7 @@ public class ModifierIron implements IFrameModifier {
     @Override
     public double getHardnessMultiplier() {
 
-        return 4;
+        return 2.5;
     }
 
     @Override

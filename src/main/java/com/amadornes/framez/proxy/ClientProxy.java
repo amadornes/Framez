@@ -81,4 +81,18 @@ public class ClientProxy extends CommonProxy {
         return Minecraft.getMinecraft().theWorld;
     }
 
+    private double frame = 0;
+
+    @Override
+    public double getFrame() {
+
+        return frame;
+    }
+
+    @Override
+    public void setFrame(double frame) {
+
+        this.frame = frame;
+    }
+
 }

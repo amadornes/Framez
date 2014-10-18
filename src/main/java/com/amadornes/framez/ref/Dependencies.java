@@ -8,5 +8,6 @@ public class Dependencies {
     public static final String HC = "HydCraft";
     public static final String WAILA = "Waila";
     public static final String NEI = "NotEnoughItems";
+    public static final String BM = "AWWayofTime";
 
 }

@@ -2,6 +2,7 @@ package com.amadornes.framez.movement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +15,7 @@ import com.amadornes.framez.world.WorldWrapperClient;
 import com.amadornes.framez.world.WorldWrapperServer;
 import com.amadornes.framez.world.WorldWrapperServerProvider;
 
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -115,53 +117,80 @@ public class MovingStructure {
         return wrapperClient;
     }
 
-    public void tick() {
+    public void tick(Phase phase) {
 
         if (!moved) {
-            if (totalMoved == 0) {
-                if (wrapper != null)
-                    wrapper.addStructure(this);
-                for (MovingBlock b : blocks) {
-                    b.storeData();
-                    b.remove();
-                    b.placePlaceholder();
-                }
-                for (MovingBlock b : blocks) {
-                    world.notifyBlocksOfNeighborChange(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getBlock());
-                    world.markBlockRangeForRenderUpdate(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x,
-                            b.getLocation().y, b.getLocation().z);
-                    world.markBlockForUpdate(b.getLocation().x, b.getLocation().y, b.getLocation().z);
-                }
-            }
 
             // Move entities
-            moveEntities();
+            if (phase == Phase.END)
+                moveEntities();
 
-            getWorldWrapper().tick();
-
-            for (MovingBlock b : blocks)
-                getWorld().func_147451_t(b.getLocation().x, b.getLocation().y, b.getLocation().z);
-
-            totalMoved += speed;
-
-            if (totalMoved >= 1) {
-                moved = true;
-
-                for (MovingBlock b : blocks) {
-                    b.removePlaceholder();
-                    b.place();
+            if (phase == Phase.START) {
+                if (totalMoved == 0) {
+                    if (wrapper != null)
+                        wrapper.addStructure(this);
+                    for (MovingBlock b : blocks) {
+                        b.storeData();
+                        b.remove();
+                        b.placePlaceholder();
+                    }
+                    for (MovingBlock b : blocks) {
+                        world.notifyBlocksOfNeighborChange(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getBlock());
+                        world.markBlockRangeForRenderUpdate(b.getLocation().x, b.getLocation().y, b.getLocation().z, b.getLocation().x,
+                                b.getLocation().y, b.getLocation().z);
+                        world.markBlockForUpdate(b.getLocation().x, b.getLocation().y, b.getLocation().z);
+                    }
                 }
-                for (MovingBlock b : blocks) {
-                    world.notifyBlocksOfNeighborChange(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
-                            b.getLocation().z + getDirection().offsetZ, b.getBlock());
-                    world.markBlockRangeForRenderUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
-                            b.getLocation().z + getDirection().offsetZ, b.getLocation().x + getDirection().offsetX, b.getLocation().y
-                                    + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
-                    world.markBlockForUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
-                            b.getLocation().z + getDirection().offsetZ);
+
+                getWorldWrapper().tick();
+
+                // Update lighting
+                {
+                    List<BlockCoord> l = new ArrayList<BlockCoord>();
+                    for (MovingBlock b : blocks) {
+                        if (!l.contains(b))
+                            l.add(b.getLocation());
+                        BlockCoord d = b.getLocation().copy().add(getDirection().offsetX, getDirection().offsetY, getDirection().offsetZ);
+                        if (!l.contains(d))
+                            l.add(d);
+                    }
+
+                    for (BlockCoord b : l) {
+                        getWorld().func_147451_t(b.x, b.y, b.z);
+                    }
+
+                    l.clear();
                 }
-                if (wrapper != null)
-                    wrapper.removeStructure(this);
+
+                totalMoved += speed;
+
+                if (totalMoved >= 1) {
+                    moved = true;
+
+                    for (MovingBlock b : blocks) {
+                        b.removePlaceholder();
+                        b.place();
+                    }
+
+                    Random rnd = new Random();
+
+                    if (!world.isRemote) {
+                        for (MovingBlock b : blocks) {
+                            b.getBlock().updateTick(world, b.getLocation().x + getDirection().offsetX,
+                                    b.getLocation().y + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ, rnd);
+                            b.getBlock().onNeighborBlockChange(world, b.getLocation().x + getDirection().offsetX,
+                                    b.getLocation().y + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ, b.getBlock());
+                            world.markBlockRangeForRenderUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y
+                                    + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ, b.getLocation().x
+                                    + getDirection().offsetX, b.getLocation().y + getDirection().offsetY, b.getLocation().z
+                                    + getDirection().offsetZ);
+                            world.markBlockForUpdate(b.getLocation().x + getDirection().offsetX,
+                                    b.getLocation().y + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
+                        }
+                    }
+                    if (wrapper != null)
+                        wrapper.removeStructure(this);
+                }
             }
         }
     }
@@ -224,8 +253,9 @@ public class MovingStructure {
                 aabb.maxZ += direction.offsetZ > 0 ? 0.25 : 0;
 
                 for (Object o2 : world.getEntitiesWithinAABB(Entity.class, aabb)) {
-                    if (!entities.contains(o2))
+                    if (!entities.contains(o2)) {
                         entities.add((Entity) o2);
+                    }
                 }
             }
         }
@@ -270,7 +300,8 @@ public class MovingStructure {
                 double d9;
 
                 for (d9 = 0.05D; movedX != 0.0D
-                        && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, 0.0D)).isEmpty(); d6 = movedX) {
+                        && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, 0.0D))
+                        .isEmpty(); d6 = movedX) {
                     if (movedX < d9 && movedX >= -d9) {
                         movedX = 0.0D;
                     } else if (movedX > 0.0D) {
@@ -281,7 +312,8 @@ public class MovingStructure {
                 }
 
                 for (; movedZ != 0.0D
-                        && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(0.0D, -1.0D, movedZ)).isEmpty(); d8 = movedZ) {
+                        && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(0.0D, -1.0D, movedZ))
+                        .isEmpty(); d8 = movedZ) {
                     if (movedZ < d9 && movedZ >= -d9) {
                         movedZ = 0.0D;
                     } else if (movedZ > 0.0D) {
@@ -293,7 +325,8 @@ public class MovingStructure {
 
                 while (movedX != 0.0D
                         && movedZ != 0.0D
-                        && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, movedZ))
+                        && entity.worldObj
+                        .getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, movedZ))
                                 .isEmpty()) {
                     if (movedX < d9 && movedX >= -d9) {
                         movedX = 0.0D;

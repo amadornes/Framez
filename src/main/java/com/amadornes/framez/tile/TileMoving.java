@@ -151,12 +151,12 @@ public class TileMoving extends TileEntity {
             if (b != null) {
                 b = b.copy();
 
-                b.minX += blockA.getDirection().offsetX * blockA.getMoved();
-                b.minY += blockA.getDirection().offsetY * blockA.getMoved();
-                b.minZ += blockA.getDirection().offsetZ * blockA.getMoved();
-                b.maxX += blockA.getDirection().offsetX * blockA.getMoved();
-                b.maxY += blockA.getDirection().offsetY * blockA.getMoved();
-                b.maxZ += blockA.getDirection().offsetZ * blockA.getMoved();
+                b.minX += blockA.getDirection().offsetX * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.minY += blockA.getDirection().offsetY * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.minZ += blockA.getDirection().offsetZ * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.maxX += blockA.getDirection().offsetX * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.maxY += blockA.getDirection().offsetY * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.maxZ += blockA.getDirection().offsetZ * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
 
                 if (blockA.getTileEntity() != null)
                     blockA.getTileEntity().setWorldObj(blockA.getWorldWrapper());
@@ -183,12 +183,12 @@ public class TileMoving extends TileEntity {
             if (b != null) {
                 b = b.copy();
 
-                b.minX += blockB.getDirection().offsetX * blockB.getMoved();
-                b.minY += blockB.getDirection().offsetY * blockB.getMoved();
-                b.minZ += blockB.getDirection().offsetZ * blockB.getMoved();
-                b.maxX += blockB.getDirection().offsetX * blockB.getMoved();
-                b.maxY += blockB.getDirection().offsetY * blockB.getMoved();
-                b.maxZ += blockB.getDirection().offsetZ * blockB.getMoved();
+                b.minX += blockB.getDirection().offsetX * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.minY += blockB.getDirection().offsetY * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.minZ += blockB.getDirection().offsetZ * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.maxX += blockB.getDirection().offsetX * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.maxY += blockB.getDirection().offsetY * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
+                b.maxZ += blockB.getDirection().offsetZ * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
 
                 if (blockB.getTileEntity() != null)
                     blockB.getTileEntity().setWorldObj(blockB.getWorldWrapper());
@@ -275,32 +275,28 @@ public class TileMoving extends TileEntity {
         if (b == null)
             return false;
 
-        return b.getBlock().onBlockActivated(b.getWorldWrapper(), b.getLocation().x, b.getLocation().y, b.getLocation().z, player, mop.sideHit,
-                (float) mop.hitVec.xCoord - mop.blockX, (float) mop.hitVec.yCoord - mop.blockY, (float) mop.hitVec.zCoord - mop.blockZ);
+        boolean result = b.getBlock().onBlockActivated(b.getWorldWrapper(), b.getLocation().x, b.getLocation().y, b.getLocation().z, player,
+                mop.sideHit, (float) mop.hitVec.xCoord - mop.blockX, (float) mop.hitVec.yCoord - mop.blockY, (float) mop.hitVec.zCoord - mop.blockZ);
+
+        sendUpdatePacket(UpdateType.ALL);
+
+        return result;
     }
 
     public int getLightValue() {
 
-        // double a = 0;
-        // double b = 0;
-        //
-        // // if (blockA != null) {
-        // // a = blockA.getBlock().getLightValue(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z)
-        // // * (1 - blockA.getMoved());
-        // // }
-        // if (blockB != null) {
-        // b = blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y, blockB.getLocation().z)
-        // * blockB.getMoved();
-        // }
+        int a = 0;
+        int b = 0;
 
-        // return (int) Math.min(Math.max(b, 0), 15);
+        if (blockA != null) {
+            a = blockA.getBlock().getLightValue(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z);
+        }
+        if (blockB != null) {
+            b = blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y, blockB.getLocation().z);
+        }
 
-        if (blockA != null)
-            return blockA.getBlock().getLightValue(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z);
-        if (blockB != null)
-            return blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y, blockB.getLocation().z);
-
-        return 0;
+        // Temporary!
+        return Math.max(a, b);
     }
 
     public int getLightOpacity() {
@@ -310,10 +306,10 @@ public class TileMoving extends TileEntity {
 
     public void randomDisplayTick(Random rnd) {
 
-        if (blockA != null)
-            if (blockA.getBlock().getTickRandomly())
-                blockA.getBlock().randomDisplayTick(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z,
-                        rnd);
+        if (blockA != null) {
+            blockA.getBlock()
+            .randomDisplayTick(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z, rnd);
+        }
     }
 
     public ItemStack getPickBlock(MovingObjectPosition target) {
@@ -384,6 +380,25 @@ public class TileMoving extends TileEntity {
                     tag.getCompoundTag("tile"));
             blockA.getTileEntity().onDataPacket(net, p);
         }
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+
+        if (blockA != null) {
+            TileEntity te = blockA.getTileEntity();
+            if (te != null)
+                return te
+                        .getRenderBoundingBox()
+                        .copy()
+                        .offset(blockA.getDirection().offsetX * blockA.getMoved(), blockA.getDirection().offsetY * blockA.getMoved(),
+                                blockA.getDirection().offsetZ * blockA.getMoved());
+            return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1, zCoord + 1).offset(
+                    blockA.getDirection().offsetX * blockA.getMoved(), blockA.getDirection().offsetY * blockA.getMoved(),
+                    blockA.getDirection().offsetZ * blockA.getMoved());
+        }
+
+        return super.getRenderBoundingBox();
     }
 
     public static enum UpdateType {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.amadornes.framez.compat.bm.CompatModuleBM;
 import com.amadornes.framez.compat.cc.CompatModuleCC;
 import com.amadornes.framez.compat.hc.CompatModuleHC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
@@ -142,6 +143,8 @@ public class CompatibilityUtils {
         registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
         if (RFUtils.isRFApiLoaded() && Config.Motors.isRedstoneFluxMotorEnabled)
             registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleRF.class);
+        if (Config.Motors.isBloodMagicMotorEnabled)
+            registerModule(Dependencies.BM, CompatModuleBM.class, null);
     }
 
 }

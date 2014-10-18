@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 
+import com.amadornes.framez.Framez;
 import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.movement.MovingBlock;
@@ -30,6 +31,8 @@ public class RenderMoving extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity tile, double x, double y, double z, float f) {
+
+        Framez.proxy.setFrame(f);
 
         boolean blend = GL11.glGetBoolean(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_BLEND);
@@ -49,7 +52,7 @@ public class RenderMoving extends TileEntitySpecialRenderer {
                 GL11.glTranslated(x, y, z);
                 GL11.glTranslated(-b.getX(), -b.getY(), -b.getZ());
 
-                double m = structure.getMoved(-f * 0.75F);
+                double m = structure.getMoved(-f * 0.75F) - structure.getSpeed();
                 double x1 = structure.getDirection().offsetX * m;
                 double y1 = structure.getDirection().offsetY * m;
                 double z1 = structure.getDirection().offsetZ * m;

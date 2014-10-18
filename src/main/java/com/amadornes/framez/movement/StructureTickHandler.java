@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import com.amadornes.framez.Framez;
-import com.amadornes.framez.util.BlockUtils;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 public class StructureTickHandler {
@@ -38,22 +36,19 @@ public class StructureTickHandler {
     }
 
     @SubscribeEvent
-    public void onWorldTick(ServerTickEvent event) {
+    public void onServerTick(ServerTickEvent event) {
 
-        if (event.phase == Phase.END)
-            for (World w : MinecraftServer.getServer().worldServers)
-                tick(w);
+        for (World w : MinecraftServer.getServer().worldServers)
+            tick(w, event.phase);
     }
 
     @SubscribeEvent
     public void onClientTick(ClientTickEvent event) {
 
-        if (event.phase == Phase.END)
-            tick(Framez.proxy.getWorld());
+        tick(Framez.proxy.getWorld(), event.phase);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void tick(World world) {
+    private void tick(World world, TickEvent.Phase phase) {
 
         if (world == null)
             return;
@@ -63,37 +58,17 @@ public class StructureTickHandler {
         for (MovingStructure s : new ArrayList<MovingStructure>(structures)) {
             if (s.getWorld() != world)
                 continue;
-            tickingStructure = s;
 
-            s.tick();
+            tickingStructure = s;
+            s.tick(phase);
+            tickingStructure = null;
+
             if (s.getMoved() >= 1)
                 invalid.add(s);
-
-            tickingStructure = null;
         }
 
-        for (MovingStructure s : invalid) {
+        for (MovingStructure s : invalid)
             structures.remove(s);
-        }
-
-        List list = world.loadedTileEntityList;
-        for (TileEntity te : BlockUtils.removedTEs) {
-            if (te.getWorldObj() == world) {
-                synchronized (list) {
-                    list.remove(te);
-                }
-            }
-        }
-        BlockUtils.removedTEs.clear();
-
-        for (TileEntity te : BlockUtils.addedTEs) {
-            if (te.getWorldObj() == world) {
-                synchronized (list) {
-                    list.add(te);
-                }
-            }
-        }
-        BlockUtils.removedTEs.clear();
     }
 
 }

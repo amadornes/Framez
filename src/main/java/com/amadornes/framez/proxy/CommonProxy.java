@@ -31,4 +31,13 @@ public class CommonProxy {
         return null;
     }
 
+    public double getFrame() {
+
+        return 0;
+    }
+
+    public void setFrame(double frame) {
+
+    }
+
 }

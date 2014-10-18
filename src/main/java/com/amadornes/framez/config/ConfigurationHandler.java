@@ -42,6 +42,9 @@ public class ConfigurationHandler {
             Config.Motors.isRedstoneFluxMotorEnabled = cfg.getBoolean("isRedstoneFluxMotorEnabled", CATEGORY_MOTORS,
                     Config.Motors.isRedstoneFluxMotorEnabled,
                     "Enables/disables the redstone flux motor. This one needs RF to run and it also requires a redstone signal");
+            Config.Motors.isBloodMagicMotorEnabled = cfg.getBoolean("isBloodMagicMotorEnabled", CATEGORY_MOTORS,
+                    Config.Motors.isBloodMagicMotorEnabled,
+                    "Enables/disables the Blood Magic motor. This one needs LP to run and it also requires a redstone signal");
         }
 
         // Power

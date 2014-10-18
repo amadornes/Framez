@@ -15,6 +15,8 @@ import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.network.LocatedPacket;
 import com.amadornes.framez.tile.TileMotor;
 
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+
 public class PacketStartMoving extends LocatedPacket<PacketStartMoving> {
 
     private List<BlockCoord> blocks = new ArrayList<BlockCoord>();
@@ -44,7 +46,7 @@ public class PacketStartMoving extends LocatedPacket<PacketStartMoving> {
         if (motor != null)
             motor.setStructure(structure);
         StructureTickHandler.INST.addStructure(structure);
-        structure.tick();
+        structure.tick(Phase.START);
     }
 
     @Override

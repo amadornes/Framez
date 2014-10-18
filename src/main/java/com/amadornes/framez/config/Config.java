@@ -9,6 +9,7 @@ public class Config {
         public static boolean isIC2MotorEnabled = true;
         public static boolean isPneumaticCraftMotorEnabled = true;
         public static boolean isRedstoneFluxMotorEnabled = true;
+        public static boolean isBloodMagicMotorEnabled = true;
     }
 
     /**
