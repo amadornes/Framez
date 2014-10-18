@@ -75,6 +75,7 @@ dependencies {
     compile "codechicken:ForgeMultipart:1.7.10-1.1.0.297:dev"
     compile "mcp.mobius.waila:Waila:1.5.3a_1.7.10"
     compile 'net.industrial-craft:industrialcraft-2:2.2.558-experimental:api'
+	grabDep("http://addons.cursecdn.com/files/2216/566/Blood%20Magic-v1.2.0(1.7.10).jar")
     println("  Finished adding dependencies!")
 }
 
