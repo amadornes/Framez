@@ -57,11 +57,11 @@ public class RenderSpecialBM implements IRenderMotorSpecial {
         GL11.glDisable(GL11.GL_TEXTURE_2D);
 
         GL11.glTranslated(0.5, 0.5, 0.5);
-        GL11.glRotated(180, 0, 1, 0);
+        GL11.glRotated(90, 0, 1, 0);
         GL11.glTranslated(-0.5, -0.5, -0.5);
 
-        GL11.glTranslated(0.25, 0, 0.25);
-        GL11.glScaled(0.5, 1, 0.5);
+        GL11.glTranslated(0.2, 0, 0.2);
+        GL11.glScaled(0.6, 1, 0.6);
 
         GL11.glColor4d(1, 0, 0, 1);
 
@@ -87,8 +87,8 @@ public class RenderSpecialBM implements IRenderMotorSpecial {
         GL11.glRotated(180, 0, 1, 0);
         GL11.glTranslated(-0.5, -0.5, -0.5);
 
-        GL11.glTranslated(0.25, 0, 0.25);
-        GL11.glScaled(0.5, 1, 0.5);
+        GL11.glTranslated(0.2, 0, 0.2);
+        GL11.glScaled(0.6, 1, 0.6);
 
         GL11.glColor4d(1, 0, 0, 1);
 
@@ -117,75 +117,345 @@ public class RenderSpecialBM implements IRenderMotorSpecial {
         double depth = 1;
 
         GL11.glNormal3d(0, 1, 0);
-        GL11.glBegin(GL11.GL_POLYGON);
+        GL11.glBegin(GL11.GL_TRIANGLE_FAN);
         {
-            RenderHelper.vertex(0.5, 1, 0.4);
-            RenderHelper.vertex(0, 1, 0.1);
-            RenderHelper.vertex(0.5, 1, 0.6);
             RenderHelper.vertex(0.5, 1, 0.5);
-            RenderHelper.vertex(1, 1, 1);
-            RenderHelper.vertex(1, 1, 0.5);
-            RenderHelper.vertex(0.4, 1, 0.2);
-            RenderHelper.vertex(0.4, 1, 0.4);
+            RenderHelper.vertex(10 / 16D, 1, 0);//
+            RenderHelper.vertex(6 / 16D, 1, 0);//
+            RenderHelper.vertex(6 / 16D, 1, 1 / 16D);//
+            RenderHelper.vertex(4 / 16D, 1, 1 / 16D);//
+            RenderHelper.vertex(4 / 16D, 1, 2 / 16D);//
+            RenderHelper.vertex(3 / 16D, 1, 2 / 16D);//
+            RenderHelper.vertex(3 / 16D, 1, 4 / 16D);//
+            RenderHelper.vertex(2 / 16D, 1, 4 / 16D);//
+            RenderHelper.vertex(2 / 16D, 1, 7 / 16D);//
+            RenderHelper.vertex(1 / 16D, 1, 7 / 16D);//
+            RenderHelper.vertex(1 / 16D, 1, 8 / 16D);//
+            RenderHelper.vertex(0 / 16D, 1, 8 / 16D);//
+            RenderHelper.vertex(0 / 16D, 1, 12 / 16D);//
+            RenderHelper.vertex(1 / 16D, 1, 12 / 16D);//
+            RenderHelper.vertex(1 / 16D, 1, 13 / 16D);//
+            RenderHelper.vertex(2 / 16D, 1, 13 / 16D);//
+            RenderHelper.vertex(2 / 16D, 1, 14 / 16D);//
+            RenderHelper.vertex(3 / 16D, 1, 14 / 16D);//
+            RenderHelper.vertex(3 / 16D, 1, 15 / 16D);//
+            RenderHelper.vertex(13 / 16D, 1, 15 / 16D);//
+            RenderHelper.vertex(13 / 16D, 1, 14 / 16D);//
+            RenderHelper.vertex(14 / 16D, 1, 14 / 16D);//
+            RenderHelper.vertex(14 / 16D, 1, 13 / 16D);//
+            RenderHelper.vertex(15 / 16D, 1, 13 / 16D);//
+            RenderHelper.vertex(15 / 16D, 1, 12 / 16D);//
+            RenderHelper.vertex(16 / 16D, 1, 12 / 16D);//
+            RenderHelper.vertex(16 / 16D, 1, 8 / 16D);//
+            RenderHelper.vertex(15 / 16D, 1, 8 / 16D);//
+            RenderHelper.vertex(15 / 16D, 1, 7 / 16D);//
+            RenderHelper.vertex(14 / 16D, 1, 7 / 16D);//
+            RenderHelper.vertex(14 / 16D, 1, 4 / 16D);//
+            RenderHelper.vertex(13 / 16D, 1, 4 / 16D);//
+            RenderHelper.vertex(13 / 16D, 1, 2 / 16D);//
+            RenderHelper.vertex(12 / 16D, 1, 2 / 16D);//
+            RenderHelper.vertex(12 / 16D, 1, 1 / 16D);//
+            RenderHelper.vertex(10 / 16D, 1, 1 / 16D);
+            RenderHelper.vertex(10 / 16D, 1, 0);
         }
         GL11.glEnd();
 
         GL11.glBegin(GL11.GL_QUADS);
 
-        GL11.glNormal3d(-0.5, 0, -0.5);
+        GL11.glNormal3d(0, 0, -1);
         {
-            RenderHelper.vertex(0, 1 - (depth / 16D), 0.1);
-            RenderHelper.vertex(0.5, 1 - (depth / 16D), 0.6);
-            RenderHelper.vertex(0.5, 1, 0.6);
-            RenderHelper.vertex(0, 1, 0.1);
+            RenderHelper.vertex(10 / 16D, 1 - (depth / 16D), 0);
+            RenderHelper.vertex(6 / 16D, 1 - (depth / 16D), 0);
+            RenderHelper.vertex(6 / 16D, 1, 0);
+            RenderHelper.vertex(10 / 16D, 1, 0);
         }
 
-        GL11.glNormal3d(0, 0, 1);
+        GL11.glNormal3d(1, 0, 0);
         {
-            RenderHelper.vertex(0.5, 1 - (depth / 16D), 0.6);
-            RenderHelper.vertex(0.5, 1 - (depth / 16D), 0.5);
-            RenderHelper.vertex(0.5, 1, 0.5);
-            RenderHelper.vertex(0.5, 1, 0.6);
-        }
-
-        GL11.glNormal3d(-0.5, 0, -0.5);
-        {
-            RenderHelper.vertex(0.5, 1 - (depth / 16D), 0.5);
-            RenderHelper.vertex(1, 1 - (depth / 16D), 1);
-            RenderHelper.vertex(1, 1, 1);
-            RenderHelper.vertex(0.5, 1, 0.5);
-        }
-
-        GL11.glNormal3d(0, 0, 1);
-        {
-            RenderHelper.vertex(1, 1 - (depth / 16D), 1);
-            RenderHelper.vertex(1, 1 - (depth / 16D), 0.5);
-            RenderHelper.vertex(1, 1, 0.5);
-            RenderHelper.vertex(1, 1, 1);
-        }
-
-        GL11.glNormal3d(0.5, 0, 0.5);
-        {
-            RenderHelper.vertex(1, 1 - (depth / 16D), 0.5);
-            RenderHelper.vertex(0.4, 1 - (depth / 16D), 0.2);
-            RenderHelper.vertex(0.4, 1, 0.2);
-            RenderHelper.vertex(1, 1, 0.5);
+            RenderHelper.vertex(6 / 16D, 1 - (depth / 16D), 0);
+            RenderHelper.vertex(6 / 16D, 1 - (depth / 16D), 1 / 16D);
+            RenderHelper.vertex(6 / 16D, 1, 1 / 16D);
+            RenderHelper.vertex(6 / 16D, 1, 0);
         }
 
         GL11.glNormal3d(0, 0, -1);
         {
-            RenderHelper.vertex(0.4, 1 - (depth / 16D), 0.2);
-            RenderHelper.vertex(0.4, 1 - (depth / 16D), 0.4);
-            RenderHelper.vertex(0.4, 1, 0.4);
-            RenderHelper.vertex(0.4, 1, 0.2);
+            RenderHelper.vertex(6 / 16D, 1 - (depth / 16D), 1 / 16D);
+            RenderHelper.vertex(4 / 16D, 1 - (depth / 16D), 1 / 16D);
+            RenderHelper.vertex(4 / 16D, 1, 1 / 16D);
+            RenderHelper.vertex(6 / 16D, 1, 1 / 16D);
         }
 
-        GL11.glNormal3d(0.5, 0, 0.5);
+        GL11.glNormal3d(1, 0, 0);
         {
-            RenderHelper.vertex(0.5, 1 - (depth / 16D), 0.4);
-            RenderHelper.vertex(0, 1 - (depth / 16D), 0.1);
-            RenderHelper.vertex(0, 1, 0.1);
-            RenderHelper.vertex(0.5, 1, 0.4);
+            RenderHelper.vertex(4 / 16D, 1 - (depth / 16D), 1 / 16D);
+            RenderHelper.vertex(4 / 16D, 1 - (depth / 16D), 2 / 16D);
+            RenderHelper.vertex(4 / 16D, 1, 2 / 16D);
+            RenderHelper.vertex(4 / 16D, 1, 1 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(4 / 16D, 1 - (depth / 16D), 2 / 16D);
+            RenderHelper.vertex(3 / 16D, 1 - (depth / 16D), 2 / 16D);
+            RenderHelper.vertex(3 / 16D, 1, 2 / 16D);
+            RenderHelper.vertex(4 / 16D, 1, 2 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(3 / 16D, 1 - (depth / 16D), 2 / 16D);
+            RenderHelper.vertex(3 / 16D, 1 - (depth / 16D), 4 / 16D);
+            RenderHelper.vertex(3 / 16D, 1, 4 / 16D);
+            RenderHelper.vertex(3 / 16D, 1, 2 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(3 / 16D, 1 - (depth / 16D), 4 / 16D);
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 4 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 4 / 16D);
+            RenderHelper.vertex(3 / 16D, 1, 4 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 4 / 16D);
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 7 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 7 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 4 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 7 / 16D);
+            RenderHelper.vertex(1 / 16D, 1 - (depth / 16D), 7 / 16D);
+            RenderHelper.vertex(1 / 16D, 1, 7 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 7 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(1 / 16D, 1 - (depth / 16D), 7 / 16D);
+            RenderHelper.vertex(1 / 16D, 1 - (depth / 16D), 8 / 16D);
+            RenderHelper.vertex(1 / 16D, 1, 8 / 16D);
+            RenderHelper.vertex(1 / 16D, 1, 7 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(1 / 16D, 1 - (depth / 16D), 8 / 16D);
+            RenderHelper.vertex(0 / 16D, 1 - (depth / 16D), 8 / 16D);
+            RenderHelper.vertex(0 / 16D, 1, 8 / 16D);
+            RenderHelper.vertex(1 / 16D, 1, 8 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(0 / 16D, 1 - (depth / 16D), 8 / 16D);
+            RenderHelper.vertex(0 / 16D, 1 - (depth / 16D), 12 / 16D);
+            RenderHelper.vertex(0 / 16D, 1, 12 / 16D);
+            RenderHelper.vertex(0 / 16D, 1, 8 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, 1);
+        {
+            RenderHelper.vertex(0 / 16D, 1 - (depth / 16D), 12 / 16D);
+            RenderHelper.vertex(1 / 16D, 1 - (depth / 16D), 12 / 16D);
+            RenderHelper.vertex(1 / 16D, 1, 12 / 16D);
+            RenderHelper.vertex(0 / 16D, 1, 12 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(1 / 16D, 1 - (depth / 16D), 12 / 16D);
+            RenderHelper.vertex(1 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(1 / 16D, 1, 13 / 16D);
+            RenderHelper.vertex(1 / 16D, 1, 12 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, 1);
+        {
+            RenderHelper.vertex(1 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 13 / 16D);
+            RenderHelper.vertex(1 / 16D, 1, 13 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 14 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 13 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, 1);
+        {
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 14 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 13 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(2 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(3 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(3 / 16D, 1, 14 / 16D);
+            RenderHelper.vertex(2 / 16D, 1, 14 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, 1);
+        {
+            RenderHelper.vertex(3 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(3 / 16D, 1 - (depth / 16D), 15 / 16D);
+            RenderHelper.vertex(3 / 16D, 1, 15 / 16D);
+            RenderHelper.vertex(3 / 16D, 1, 14 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(3 / 16D, 1 - (depth / 16D), 15 / 16D);
+            RenderHelper.vertex(13 / 16D, 1 - (depth / 16D), 15 / 16D);
+            RenderHelper.vertex(13 / 16D, 1, 15 / 16D);
+            RenderHelper.vertex(3 / 16D, 1, 15 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(13 / 16D, 1 - (depth / 16D), 15 / 16D);
+            RenderHelper.vertex(13 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(13 / 16D, 1, 14 / 16D);
+            RenderHelper.vertex(13 / 16D, 1, 15 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(13 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(14 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(14 / 16D, 1, 14 / 16D);
+            RenderHelper.vertex(13 / 16D, 1, 14 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(14 / 16D, 1 - (depth / 16D), 14 / 16D);
+            RenderHelper.vertex(14 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(14 / 16D, 1, 13 / 16D);
+            RenderHelper.vertex(14 / 16D, 1, 14 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(14 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(15 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(15 / 16D, 1, 13 / 16D);
+            RenderHelper.vertex(14 / 16D, 1, 13 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(15 / 16D, 1 - (depth / 16D), 13 / 16D);
+            RenderHelper.vertex(15 / 16D, 1 - (depth / 16D), 12 / 16D);
+            RenderHelper.vertex(15 / 16D, 1, 12 / 16D);
+            RenderHelper.vertex(15 / 16D, 1, 13 / 16D);
+        }
+
+        GL11.glNormal3d(1, 0, 0);
+        {
+            RenderHelper.vertex(15 / 16D, 1 - (depth / 16D), 12 / 16D);
+            RenderHelper.vertex(16 / 16D, 1 - (depth / 16D), 12 / 16D);
+            RenderHelper.vertex(16 / 16D, 1, 12 / 16D);
+            RenderHelper.vertex(15 / 16D, 1, 12 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(16 / 16D, 1 - (depth / 16D), 12 / 16D);
+            RenderHelper.vertex(16 / 16D, 1 - (depth / 16D), 8 / 16D);
+            RenderHelper.vertex(16 / 16D, 1, 8 / 16D);
+            RenderHelper.vertex(16 / 16D, 1, 12 / 16D);
+        }
+
+        GL11.glNormal3d(-1, 0, 0);
+        {
+            RenderHelper.vertex(16 / 16D, 1 - (depth / 16D), 8 / 16D);
+            RenderHelper.vertex(15 / 16D, 1 - (depth / 16D), 8 / 16D);
+            RenderHelper.vertex(15 / 16D, 1, 8 / 16D);
+            RenderHelper.vertex(16 / 16D, 1, 8 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(15 / 16D, 1 - (depth / 16D), 8 / 16D);
+            RenderHelper.vertex(15 / 16D, 1 - (depth / 16D), 7 / 16D);
+            RenderHelper.vertex(15 / 16D, 1, 7 / 16D);
+            RenderHelper.vertex(15 / 16D, 1, 8 / 16D);
+        }
+
+        GL11.glNormal3d(-1, 0, 0);
+        {
+            RenderHelper.vertex(15 / 16D, 1 - (depth / 16D), 7 / 16D);
+            RenderHelper.vertex(14 / 16D, 1 - (depth / 16D), 7 / 16D);
+            RenderHelper.vertex(14 / 16D, 1, 7 / 16D);
+            RenderHelper.vertex(15 / 16D, 1, 7 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(14 / 16D, 1 - (depth / 16D), 7 / 16D);
+            RenderHelper.vertex(14 / 16D, 1 - (depth / 16D), 4 / 16D);
+            RenderHelper.vertex(14 / 16D, 1, 4 / 16D);
+            RenderHelper.vertex(14 / 16D, 1, 7 / 16D);
+        }
+
+        GL11.glNormal3d(-1, 0, 0);
+        {
+            RenderHelper.vertex(14 / 16D, 1 - (depth / 16D), 4 / 16D);
+            RenderHelper.vertex(13 / 16D, 1 - (depth / 16D), 4 / 16D);
+            RenderHelper.vertex(13 / 16D, 1, 4 / 16D);
+            RenderHelper.vertex(14 / 16D, 1, 4 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(13 / 16D, 1 - (depth / 16D), 4 / 16D);
+            RenderHelper.vertex(13 / 16D, 1 - (depth / 16D), 2 / 16D);
+            RenderHelper.vertex(13 / 16D, 1, 2 / 16D);
+            RenderHelper.vertex(13 / 16D, 1, 4 / 16D);
+        }
+
+        GL11.glNormal3d(-1, 0, 0);
+        {
+            RenderHelper.vertex(13 / 16D, 1 - (depth / 16D), 2 / 16D);
+            RenderHelper.vertex(12 / 16D, 1 - (depth / 16D), 2 / 16D);
+            RenderHelper.vertex(12 / 16D, 1, 2 / 16D);
+            RenderHelper.vertex(13 / 16D, 1, 2 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(12 / 16D, 1 - (depth / 16D), 2 / 16D);
+            RenderHelper.vertex(12 / 16D, 1 - (depth / 16D), 1 / 16D);
+            RenderHelper.vertex(12 / 16D, 1, 1 / 16D);
+            RenderHelper.vertex(12 / 16D, 1, 2 / 16D);
+        }
+
+        GL11.glNormal3d(-1, 0, 0);
+        {
+            RenderHelper.vertex(12 / 16D, 1 - (depth / 16D), 1 / 16D);
+            RenderHelper.vertex(10 / 16D, 1 - (depth / 16D), 1 / 16D);
+            RenderHelper.vertex(10 / 16D, 1, 1 / 16D);
+            RenderHelper.vertex(12 / 16D, 1, 1 / 16D);
+        }
+
+        GL11.glNormal3d(0, 0, -1);
+        {
+            RenderHelper.vertex(10 / 16D, 1 - (depth / 16D), 1 / 16D);
+            RenderHelper.vertex(10 / 16D, 1 - (depth / 16D), 0);
+            RenderHelper.vertex(10 / 16D, 1, 0);
+            RenderHelper.vertex(10 / 16D, 1, 1 / 16D);
         }
 
         GL11.glEnd();
