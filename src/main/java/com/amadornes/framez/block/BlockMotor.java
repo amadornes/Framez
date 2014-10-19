@@ -86,10 +86,13 @@ public class BlockMotor extends BlockContainer implements IMotor {
     @Override
     public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axis) {
 
-        TileMotor te = (TileMotor) world.getTileEntity(x, y, z);
+        if (!world.isRemote) {
+            TileMotor te = (TileMotor) world.getTileEntity(x, y, z);
 
-        te.setFace(te.getFace().getRotation(axis));
-        te.setDirection(te.getDirection().getRotation(axis));
+            te.setFace(te.getFace().getRotation(axis));
+            te.setDirection(te.getDirection().getRotation(axis));
+            te.sendUpdatePacket();
+        }
 
         return false;
     }
