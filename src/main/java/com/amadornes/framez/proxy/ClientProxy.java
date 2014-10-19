@@ -15,6 +15,7 @@ import com.amadornes.framez.api.IMotorProvider;
 import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.client.render.RenderFrame;
 import com.amadornes.framez.client.render.RenderMotor;
+import com.amadornes.framez.client.render.RenderMotorPlacement;
 import com.amadornes.framez.client.render.RenderMoving;
 import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.init.FramezItems;
@@ -24,6 +25,7 @@ import com.amadornes.framez.tile.TileMoving;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -55,6 +57,10 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(TileMoving.class, new RenderMoving());
 
         MinecraftForgeClient.registerItemRenderer(FramezItems.frame, new RenderFrame());
+
+        RenderMotorPlacement renderMotorPlacement = new RenderMotorPlacement();
+        FMLCommonHandler.instance().bus().register(renderMotorPlacement);
+        MinecraftForge.EVENT_BUS.register(renderMotorPlacement);
     }
 
     @Override

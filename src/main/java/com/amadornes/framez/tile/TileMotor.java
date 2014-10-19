@@ -124,6 +124,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
         readUpdatePacket(pkt.func_148857_g());
+
+        getWorldObj().markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
     }
 
     public void sendUpdatePacket() {
@@ -213,6 +215,11 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     }
 
     public final int getColorMultiplier() {
+
+        return getColorMultiplierForPlayer(placer);
+    }
+
+    public static final int getColorMultiplierForPlayer(String placer) {
 
         if (placer.equals("amadornes"))
             return 0xCC0000;

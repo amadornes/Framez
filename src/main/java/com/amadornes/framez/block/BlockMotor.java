@@ -7,6 +7,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -17,6 +19,7 @@ import com.amadornes.framez.client.render.RenderMotor;
 import com.amadornes.framez.init.CreativeTabFramez;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMotor;
+import com.amadornes.framez.util.MotorPlacement;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -24,6 +27,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class BlockMotor extends BlockContainer implements IMotor {
 
     private IMotorProvider provider;
+
+    private MovingObjectPosition placeMOP = null;
 
     public BlockMotor(IMotorProvider provider) {
 
@@ -95,8 +100,14 @@ public class BlockMotor extends BlockContainer implements IMotor {
         super.onBlockPlacedBy(world, x, y, z, entity, item);
 
         TileMotor te = (TileMotor) world.getTileEntity(x, y, z);
-        if (entity instanceof EntityPlayer)
+        if (entity instanceof EntityPlayer) {
             te.setPlacer(((EntityPlayer) entity).getGameProfile().getName());
+
+            ForgeDirection face = ForgeDirection.getOrientation(placeMOP.sideHit).getOpposite();
+            te.setFace(face);
+            te.setDirection(MotorPlacement.getPlacementDirection(placeMOP, face));
+        }
+        te.sendUpdatePacket();
     }
 
     @Override
@@ -138,4 +149,20 @@ public class BlockMotor extends BlockContainer implements IMotor {
         return provider;
     }
 
+    @Override
+    public int onBlockPlaced(World w, int x, int y, int z, int side, float x_, float y_, float z_, int meta) {
+
+        TileMotor te = (TileMotor) w.getTileEntity(x, y, z);
+        if (te == null)
+            w.setTileEntity(x, y, z, te = (TileMotor) createNewTileEntity(w, meta));
+
+        MovingObjectPosition mop = placeMOP = new MovingObjectPosition(x, y, z, side, Vec3.createVectorHelper(x + x_, y + y_, z + z_));
+
+        ForgeDirection face = ForgeDirection.getOrientation(mop.sideHit).getOpposite();
+        te.setFace(face);
+        te.setDirection(MotorPlacement.getPlacementDirection(mop, face));
+        te.sendUpdatePacket();
+
+        return super.onBlockPlaced(w, x, y, z, side, x_, y_, z_, meta);
+    }
 }

@@ -18,7 +18,8 @@ public class RenderHelper {
         GL11.glVertex3d(x, y, z);
     }
 
-    public static DoubleBuffer planeEquation(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3) {
+    public static DoubleBuffer planeEquation(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3,
+            double z3) {
 
         double[] eq = new double[4];
         eq[0] = (y1 * (z2 - z3)) + (y2 * (z3 - z1)) + (y3 * (z1 - z2));
@@ -33,6 +34,51 @@ public class RenderHelper {
         DoubleBuffer b = BufferUtils.createDoubleBuffer(eq.length * 2).put(eq);
         b.flip();
         return b;
+    }
+
+    public static void drawColoredCube() {
+
+        // Top side
+        GL11.glColor3f(1.0F, 0.0F, 0.0F);
+        GL11.glVertex3f(0, 1, 1);
+        GL11.glVertex3f(1, 1, 1);
+        GL11.glVertex3f(1, 1, 0);
+        GL11.glVertex3f(0, 1, 0);
+
+        // Bottom side
+        GL11.glColor3f(1.0F, 1.0F, 0.0F);
+        GL11.glVertex3f(1, 0, 1);
+        GL11.glVertex3f(0, 0, 1);
+        GL11.glVertex3f(0, 0, 0);
+        GL11.glVertex3f(1, 0, 0);
+
+        // Draw west side:
+        GL11.glColor3f(0.0F, 1.0F, 0.0F);
+        GL11.glVertex3f(0, 0, 1);
+        GL11.glVertex3f(0, 1, 1);
+        GL11.glVertex3f(0, 1, 0);
+        GL11.glVertex3f(0, 0, 0);
+
+        // Draw east side:
+        GL11.glColor3f(0.0F, 1.0F, 1.0F);
+        GL11.glVertex3f(1, 0, 0);
+        GL11.glVertex3f(1, 1, 0);
+        GL11.glVertex3f(1, 1, 1);
+        GL11.glVertex3f(1, 0, 1);
+
+        // Draw north side
+        GL11.glColor3f(0.0F, 0.0F, 1.0F);
+        GL11.glVertex3f(0, 0, 0);
+        GL11.glVertex3f(0, 1, 0);
+        GL11.glVertex3f(1, 1, 0);
+        GL11.glVertex3f(1, 0, 0);
+
+        // Draw south side
+        GL11.glColor3f(0.0F, 0.0F, 0.0F);
+        GL11.glVertex3f(0, 0, 1);
+        GL11.glVertex3f(1, 0, 1);
+        GL11.glVertex3f(1, 1, 1);
+        GL11.glVertex3f(0, 1, 1);
     }
 
 }

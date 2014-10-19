@@ -45,8 +45,14 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
         if (!itemRenderer) {
             rb.renderStandardBlock(block, x, y, z);
         } else {
-            if (renderingBorder)
-                Tessellator.instance.setColorOpaque_F(0.8F, 0.1F, 0.1F);
+            if (renderingBorder) {
+                int rgb = TileMotor.getColorMultiplierForPlayer(Minecraft.getMinecraft().thePlayer.getGameProfile().getName());
+                float r = ((rgb >> 16) & 0xff) / 256F;
+                float g = ((rgb >> 8) & 0xff) / 256F;
+                float b = (rgb & 0xff) / 256F;
+
+                Tessellator.instance.setColorOpaque_F(r, g, b);
+            }
 
             Tessellator.instance.setNormal((float) -rb.renderMinX, 0, 0);
             rb.renderFaceXNeg(block, x, y, z, block.getIcon(ForgeDirection.WEST.ordinal(), 0));
