@@ -26,6 +26,7 @@ import com.amadornes.framez.movement.MovingBlock;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -210,10 +211,10 @@ public class TileMoving extends TileEntity {
 
         if (blockA != null) {
             MovingBlock blockA = this.blockA;
-            Vec3 start2 = start.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()), blockA.getDirection().offsetY * (-blockA.getMoved()),
-                    blockA.getDirection().offsetZ * (-blockA.getMoved()));
-            Vec3 end2 = end.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()), blockA.getDirection().offsetY * (-blockA.getMoved()),
-                    blockA.getDirection().offsetZ * (-blockA.getMoved()));
+            Vec3 start2 = start.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()),
+                    blockA.getDirection().offsetY * (-blockA.getMoved()), blockA.getDirection().offsetZ * (-blockA.getMoved()));
+            Vec3 end2 = end.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()),
+                    blockA.getDirection().offsetY * (-blockA.getMoved()), blockA.getDirection().offsetZ * (-blockA.getMoved()));
 
             mopA = blockA.getBlock().collisionRayTrace(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
                     blockA.getLocation().z, start2, end2);
@@ -223,10 +224,10 @@ public class TileMoving extends TileEntity {
 
         if (blockB != null) {
             MovingBlock blockB = this.blockB;
-            Vec3 start2 = start.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()), blockB.getDirection().offsetY * (-blockB.getMoved()),
-                    blockB.getDirection().offsetZ * (-blockB.getMoved()));
-            Vec3 end2 = end.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()), blockB.getDirection().offsetY * (-blockB.getMoved()),
-                    blockB.getDirection().offsetZ * (-blockB.getMoved()));
+            Vec3 start2 = start.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()),
+                    blockB.getDirection().offsetY * (-blockB.getMoved()), blockB.getDirection().offsetZ * (-blockB.getMoved()));
+            Vec3 end2 = end.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()),
+                    blockB.getDirection().offsetY * (-blockB.getMoved()), blockB.getDirection().offsetZ * (-blockB.getMoved()));
 
             mopB = blockB.getBlock().collisionRayTrace(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
                     blockB.getLocation().z, start2, end2);
@@ -275,8 +276,9 @@ public class TileMoving extends TileEntity {
         if (b == null)
             return false;
 
-        boolean result = b.getBlock().onBlockActivated(b.getWorldWrapper(), b.getLocation().x, b.getLocation().y, b.getLocation().z, player,
-                mop.sideHit, (float) mop.hitVec.xCoord - mop.blockX, (float) mop.hitVec.yCoord - mop.blockY, (float) mop.hitVec.zCoord - mop.blockZ);
+        boolean result = b.getBlock().onBlockActivated(b.getWorldWrapper(), b.getLocation().x, b.getLocation().y, b.getLocation().z,
+                player, mop.sideHit, (float) mop.hitVec.xCoord - mop.blockX, (float) mop.hitVec.yCoord - mop.blockY,
+                (float) mop.hitVec.zCoord - mop.blockZ);
 
         sendUpdatePacket(UpdateType.ALL);
 
@@ -289,10 +291,12 @@ public class TileMoving extends TileEntity {
         int b = 0;
 
         if (blockA != null) {
-            a = blockA.getBlock().getLightValue(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z);
+            a = blockA.getBlock().getLightValue(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
+                    blockA.getLocation().z);
         }
         if (blockB != null) {
-            b = blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y, blockB.getLocation().z);
+            b = blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
+                    blockB.getLocation().z);
         }
 
         // Temporary!
@@ -307,8 +311,8 @@ public class TileMoving extends TileEntity {
     public void randomDisplayTick(Random rnd) {
 
         if (blockA != null) {
-            blockA.getBlock()
-            .randomDisplayTick(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z, rnd);
+            blockA.getBlock().randomDisplayTick(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
+                    blockA.getLocation().z, rnd);
         }
     }
 
@@ -344,8 +348,14 @@ public class TileMoving extends TileEntity {
             }
             if (type.isTile() && blockA.getTileEntity() != null) {
                 Packet p = blockA.getTileEntity().getDescriptionPacket();
-                if (p != null && p instanceof S35PacketUpdateTileEntity)
-                    tag.setTag("tile", ((S35PacketUpdateTileEntity) p).func_148857_g());
+                if (p != null && p instanceof S35PacketUpdateTileEntity) {
+                    try {
+                        NBTTagCompound t = ReflectionHelper.getPrivateValue(S35PacketUpdateTileEntity.class,
+                                ((S35PacketUpdateTileEntity) p), "field_148860_e");
+                        tag.setTag("tile", t);
+                    } catch (Exception ex) {
+                    }
+                }
             }
         }
 
@@ -376,8 +386,8 @@ public class TileMoving extends TileEntity {
             blockA.setRenderList(-1);
         }
         if (tag.hasKey("tile") && blockA.getTileEntity() != null) {
-            S35PacketUpdateTileEntity p = new S35PacketUpdateTileEntity(blockA.getLocation().x, blockA.getLocation().y, blockA.getLocation().z, 0,
-                    tag.getCompoundTag("tile"));
+            S35PacketUpdateTileEntity p = new S35PacketUpdateTileEntity(blockA.getLocation().x, blockA.getLocation().y,
+                    blockA.getLocation().z, 0, tag.getCompoundTag("tile"));
             blockA.getTileEntity().onDataPacket(net, p);
         }
     }

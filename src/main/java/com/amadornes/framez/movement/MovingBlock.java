@@ -200,25 +200,31 @@ public class MovingBlock implements IMovingBlock {
         BlockUtils.setBlockMetadataSneaky(world, x, y, z, getMetadata());
 
         if (te != null) {
-            if (invalidate)
-                te.invalidate();
-
-            te.xCoord = x;
-            te.yCoord = y;
-            te.zCoord = z;
-            te.setWorldObj(getWorldWrapper());
-
-            getWorld().setTileEntity(x, y, z, te);
-
-            if (validate) {
-                te.validate();
-                if (te instanceof TileMultipart && !getWorld().isRemote)
-                    for (TMultiPart p : ((TileMultipart) te).jPartList())
+            if (te instanceof TileMultipart) {
+                if (!getWorld().isRemote) {
+                    TileMultipart tmp = TileMultipart.getTile(getWorld(), new BlockCoord(x, y, z));
+                    if (tmp != null)
+                        tmp.clearParts();
+                    for (TMultiPart p : ((TileMultipart) te).jPartList()) {
+                        p.onWorldSeparate();
+                        TileMultipart.addPart(getWorld(), new BlockCoord(x, y, z), p);
                         p.onMoved();
-            }
+                    }
+                }
+            } else {
+                if (invalidate)
+                    te.invalidate();
 
-            BlockUtils.removeTileEntity(getWorld(), x, y, z, false, true);
-            getWorld().setTileEntity(x, y, z, te);
+                te.xCoord = x;
+                te.yCoord = y;
+                te.zCoord = z;
+                te.setWorldObj(getWorldWrapper());
+
+                if (validate)
+                    te.validate();
+
+                getWorld().setTileEntity(x, y, z, te);
+            }
         }
 
     }

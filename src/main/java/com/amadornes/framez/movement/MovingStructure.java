@@ -174,18 +174,19 @@ public class MovingStructure {
 
                     Random rnd = new Random();
 
-                    if (!world.isRemote) {
-                        for (MovingBlock b : blocks) {
+                    for (MovingBlock b : blocks) {
+                        if (!world.isRemote) {
                             b.getBlock().updateTick(world, b.getLocation().x + getDirection().offsetX,
                                     b.getLocation().y + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ, rnd);
                             b.getBlock().onNeighborBlockChange(world, b.getLocation().x + getDirection().offsetX,
                                     b.getLocation().y + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ, b.getBlock());
+                            world.markBlockForUpdate(b.getLocation().x + getDirection().offsetX,
+                                    b.getLocation().y + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
+                        } else {
                             world.markBlockRangeForRenderUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y
                                     + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ, b.getLocation().x
                                     + getDirection().offsetX, b.getLocation().y + getDirection().offsetY, b.getLocation().z
                                     + getDirection().offsetZ);
-                            world.markBlockForUpdate(b.getLocation().x + getDirection().offsetX,
-                                    b.getLocation().y + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
                         }
                     }
                     if (wrapper != null)
@@ -327,7 +328,7 @@ public class MovingStructure {
                         && movedZ != 0.0D
                         && entity.worldObj
                         .getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, movedZ))
-                                .isEmpty()) {
+                        .isEmpty()) {
                     if (movedX < d9 && movedX >= -d9) {
                         movedX = 0.0D;
                     } else if (movedX > 0.0D) {
