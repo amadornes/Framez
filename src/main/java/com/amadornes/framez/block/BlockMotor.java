@@ -155,16 +155,16 @@ public class BlockMotor extends BlockContainer implements IMotor {
     @Override
     public int onBlockPlaced(World w, int x, int y, int z, int side, float x_, float y_, float z_, int meta) {
 
-        TileMotor te = (TileMotor) w.getTileEntity(x, y, z);
-        if (te == null)
-            w.setTileEntity(x, y, z, te = (TileMotor) createNewTileEntity(w, meta));
+        // TileMotor te = (TileMotor) w.getTileEntity(x, y, z);
+        // if (te == null)
+        // w.setTileEntity(x, y, z, te = (TileMotor) createNewTileEntity(w, meta));
 
-        MovingObjectPosition mop = placeMOP = new MovingObjectPosition(x, y, z, side, Vec3.createVectorHelper(x + x_, y + y_, z + z_));
+        /* MovingObjectPosition mop = */placeMOP = new MovingObjectPosition(x, y, z, side, Vec3.createVectorHelper(x + x_, y + y_, z + z_));
 
-        ForgeDirection face = ForgeDirection.getOrientation(mop.sideHit).getOpposite();
-        te.setFace(face);
-        te.setDirection(MotorPlacement.getPlacementDirection(mop, face));
-        te.sendUpdatePacket();
+        // ForgeDirection face = ForgeDirection.getOrientation(mop.sideHit).getOpposite();
+        // te.setFace(face);
+        // te.setDirection(MotorPlacement.getPlacementDirection(mop, face));
+        // te.sendUpdatePacket();
 
         return super.onBlockPlaced(w, x, y, z, side, x_, y_, z_, meta);
     }

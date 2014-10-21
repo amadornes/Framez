@@ -63,12 +63,18 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
     public void setFace(ForgeDirection face) {
 
+        if (structure != null)
+            return;
+
         this.face = face;
 
         sendUpdatePacket();
     }
 
     public void setDirection(ForgeDirection direction) {
+
+        if (structure != null)
+            return;
 
         this.direction = direction;
 
@@ -163,6 +169,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
                         NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
 
                         consumePower(power);
+                        System.out.println("Moving!");
                     }
                 }
             }
