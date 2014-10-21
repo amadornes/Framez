@@ -169,7 +169,6 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
                         NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
 
                         consumePower(power);
-                        System.out.println("Moving!");
                     }
                 }
             }
