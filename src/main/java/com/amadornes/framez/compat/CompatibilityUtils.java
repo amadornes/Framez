@@ -12,6 +12,7 @@ import com.amadornes.framez.compat.cc.CompatModuleCC;
 import com.amadornes.framez.compat.hc.CompatModuleHC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
 import com.amadornes.framez.compat.nei.CompatModuleNEI;
+import com.amadornes.framez.compat.oc.CompatModuleOC;
 import com.amadornes.framez.compat.pc.CompatModulePC;
 import com.amadornes.framez.compat.rf.CompatModuleRF;
 import com.amadornes.framez.compat.rf.RFUtils;
@@ -136,15 +137,17 @@ public class CompatibilityUtils {
             registerModule(Dependencies.IC2, CompatModuleIC2.class, null);
         if (Config.Motors.isPneumaticCraftMotorEnabled)
             registerModule(Dependencies.PC, CompatModulePC.class, null);
-        registerModule(Dependencies.WAILA, CompatModuleWaila.class, null);
         if (Config.Motors.isHydCraftMotorEnabled)
             registerModule(Dependencies.HC, CompatModuleHC.class, null);
-        registerModule(Dependencies.CC, CompatModuleCC.class, null);
-        registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
         if (RFUtils.isRFApiLoaded() && Config.Motors.isRedstoneFluxMotorEnabled)
             registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleRF.class);
         if (Config.Motors.isBloodMagicMotorEnabled)
             registerModule(Dependencies.BM, CompatModuleBM.class, null);
+
+        registerModule(Dependencies.CC, CompatModuleCC.class, null);
+        registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
+        registerModule(Dependencies.WAILA, CompatModuleWaila.class, null);
+        registerModule(Dependencies.OC, CompatModuleOC.class, null);
     }
 
 }

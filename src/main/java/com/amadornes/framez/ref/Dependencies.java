@@ -9,5 +9,6 @@ public class Dependencies {
     public static final String WAILA = "Waila";
     public static final String NEI = "NotEnoughItems";
     public static final String BM = "AWWayofTime";
+    public static final String OC = "OpenComputers";
 
 }
