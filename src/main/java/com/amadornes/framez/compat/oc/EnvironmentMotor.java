@@ -28,7 +28,7 @@ public final class EnvironmentMotor extends ManagedTileEntityEnvironment<TileMot
         return 0;
     }
 
-    @Callback(doc = "function(face):bool -- Sets the motor's face. Returns true if it succeeded, false if it didn't.")
+    @Callback(doc = "function(face):boolean -- Sets the motor's face. Returns true if it succeeded, false if it didn't.")
     public Object[] setFace(Context context, Arguments args) {
 
         if (args.count() == 0)
@@ -42,7 +42,7 @@ public final class EnvironmentMotor extends ManagedTileEntityEnvironment<TileMot
         return new Object[] { te.getFace().ordinal() };
     }
 
-    @Callback(doc = "function(direction):bool -- Sets the motor's direction. Returns true if it succeeded, false if it didn't.")
+    @Callback(doc = "function(direction):boolean -- Sets the motor's direction. Returns true if it succeeded, false if it didn't.")
     public Object[] setDirection(Context context, Arguments args) {
 
         if (args.count() == 0)
@@ -56,7 +56,7 @@ public final class EnvironmentMotor extends ManagedTileEntityEnvironment<TileMot
         return new Object[] { te.getDirection().ordinal() };
     }
 
-    @Callback(doc = "function(face, direction):bool -- Sets the motor's face and direction. Returns true if it succeeded, false if it didn't.")
+    @Callback(doc = "function(face, direction):boolean -- Sets the motor's face and direction. Returns true if it succeeded, false if it didn't.")
     public Object[] set(Context context, Arguments args) {
 
         if (args.count() < 2)
@@ -76,7 +76,7 @@ public final class EnvironmentMotor extends ManagedTileEntityEnvironment<TileMot
         return new Object[] { true };
     }
 
-    @Callback(doc = "function():bool -- Attempts to move the motor. Returns true if it succeeded, false if it didn't.")
+    @Callback(doc = "function():boolean -- Attempts to move the motor. Returns true if it succeeded, false if it didn't.")
     public Object[] move(Context context, Arguments args) {
 
         return new Object[] { te.move() };
