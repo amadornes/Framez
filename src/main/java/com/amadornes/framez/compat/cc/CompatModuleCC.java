@@ -8,6 +8,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import dan200.computercraft.api.ComputerCraftAPI;
 
 public class CompatModuleCC extends CompatModule {
 
@@ -20,6 +21,8 @@ public class CompatModuleCC extends CompatModule {
     public void init(FMLInitializationEvent ev) {
 
         FramezApi.inst().getMovementApi().registerMovementHandler(new MovementHandlerCC());
+
+        ComputerCraftAPI.registerPeripheralProvider(new PeripheralProviderFramez());
     }
 
     @Override

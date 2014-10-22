@@ -61,24 +61,48 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         return direction;
     }
 
-    public void setFace(ForgeDirection face) {
+    public boolean setFace(ForgeDirection face) {
 
-        if (structure != null)
-            return;
-
-        this.face = face;
-
-        sendUpdatePacket();
+        return setFace(face, false);
     }
 
-    public void setDirection(ForgeDirection direction) {
+    public boolean setFace(ForgeDirection face, boolean force) {
 
         if (structure != null)
-            return;
+            return false;
+
+        if (face == null)
+            return false;
+
+        if ((face == direction || face == direction.getOpposite()) && !force)
+            return false;
+
+        this.face = face;
+        sendUpdatePacket();
+
+        return true;
+    }
+
+    public boolean setDirection(ForgeDirection direction) {
+
+        return setDirection(direction, false);
+    }
+
+    public boolean setDirection(ForgeDirection direction, boolean force) {
+
+        if (structure != null)
+            return false;
+
+        if (direction == null)
+            return false;
+
+        if ((direction == face || direction == face.getOpposite()) && !force)
+            return false;
 
         this.direction = direction;
-
         sendUpdatePacket();
+
+        return true;
     }
 
     public double getMoved() {
@@ -144,35 +168,9 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
         super.updateEntity();
 
-        if (!worldObj.isRemote && shouldMove()) {
+        if (shouldMove())
+            move();
 
-            if (worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air && structure == null) {
-                List<BlockCoord> blocks = MovementUtils.getMovedBlocks(this);
-                if (blocks.size() > 0 && MovementUtils.canMove(blocks, getWorldObj(), direction)) {
-                    double power = 0;
-                    power += Config.Power.getPowerUsedPerMove;
-                    for (BlockCoord b : blocks) {
-                        power += Config.Power.getPowerUsedPerBlock;
-                        if (getWorldObj().getTileEntity(b.x, b.y, b.z) != null)
-                            power += Config.Power.getPowerUsedPerTileEntity;
-                    }
-                    if (getPowerUnit() != null) {
-                        power = (power / PowerUnit.RF.getPowerMultiplier()) * getPowerUnit().getPowerMultiplier();
-                    }
-                    if (hasEnoughPower(power)) {
-                        MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / (20D * 0.75D));
-                        structure.addBlocks(blocks);
-
-                        this.structure = structure;
-                        StructureTickHandler.INST.addStructure(structure);
-
-                        NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
-
-                        consumePower(power);
-                    }
-                }
-            }
-        }
         if (structure != null && structure.getMoved() >= 1)
             structure = null;
     }
@@ -191,6 +189,44 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     public boolean canBeMoved(ForgeDirection face, ForgeDirection direction) {
 
         return structure == null && face != getFace();
+    }
+
+    public boolean move() {
+
+        if (worldObj.isRemote)
+            return false;
+        if (structure != null)
+            return false;
+
+        if (worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air) {
+            List<BlockCoord> blocks = MovementUtils.getMovedBlocks(this);
+            if (blocks.size() > 0 && MovementUtils.canMove(blocks, getWorldObj(), direction)) {
+                double power = 0;
+                power += Config.Power.getPowerUsedPerMove;
+                for (BlockCoord b : blocks) {
+                    power += Config.Power.getPowerUsedPerBlock;
+                    if (getWorldObj().getTileEntity(b.x, b.y, b.z) != null)
+                        power += Config.Power.getPowerUsedPerTileEntity;
+                }
+                if (getPowerUnit() != null) {
+                    power = (power / PowerUnit.RF.getPowerMultiplier()) * getPowerUnit().getPowerMultiplier();
+                }
+                if (hasEnoughPower(power)) {
+                    MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / (20D * 0.75D));
+                    structure.addBlocks(blocks);
+
+                    this.structure = structure;
+                    StructureTickHandler.INST.addStructure(structure);
+
+                    NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
+
+                    consumePower(power);
+
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
