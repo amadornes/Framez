@@ -103,12 +103,14 @@ public class BlockMotor extends BlockContainer implements IMotor {
         super.onBlockPlacedBy(world, x, y, z, entity, item);
 
         TileMotor te = (TileMotor) world.getTileEntity(x, y, z);
-        if (entity instanceof EntityPlayer) {
+        if (entity instanceof EntityPlayer && placeMOP != null) {
             te.setPlacer(((EntityPlayer) entity).getGameProfile().getName());
 
             ForgeDirection face = ForgeDirection.getOrientation(placeMOP.sideHit).getOpposite();
             te.setFace(face, true);
             te.setDirection(MotorPlacement.getPlacementDirection(placeMOP, face), true);
+
+            placeMOP = null;
         }
         te.sendUpdatePacket();
     }
