@@ -107,8 +107,8 @@ public class BlockMotor extends BlockContainer implements IMotor {
             te.setPlacer(((EntityPlayer) entity).getGameProfile().getName());
 
             ForgeDirection face = ForgeDirection.getOrientation(placeMOP.sideHit).getOpposite();
-            te.setFace(face);
-            te.setDirection(MotorPlacement.getPlacementDirection(placeMOP, face));
+            te.setFace(face, true);
+            te.setDirection(MotorPlacement.getPlacementDirection(placeMOP, face), true);
         }
         te.sendUpdatePacket();
     }
