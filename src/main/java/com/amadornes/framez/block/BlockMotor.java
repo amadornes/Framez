@@ -36,7 +36,7 @@ public class BlockMotor extends BlockContainer implements IMotor {
         this.provider = provider;
 
         setBlockName(References.Names.Registry.MOTOR);
-        setHardness(2);
+        setHardness(4);
 
         setCreativeTab(CreativeTabFramez.inst);
     }

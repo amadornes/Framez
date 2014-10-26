@@ -29,6 +29,9 @@ public class BlockMoving extends BlockContainer {
         super(Material.rock);
 
         setBlockName(References.Names.Registry.MOVING);
+
+        setHardness(-1);
+        setResistance(-1);
     }
 
     @Override
