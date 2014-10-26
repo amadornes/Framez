@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IRenderMotorSpecial;
+import com.amadornes.framez.item.ItemBlockMotorCore;
 import com.amadornes.framez.tile.TileMotor;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -192,53 +193,55 @@ public class RenderMotor extends TileEntitySpecialRenderer implements ISimpleBlo
 
             GL11.glDisable(GL11.GL_BLEND);
 
-            GL11.glPushMatrix();
-            {
-                renderArrow(false, 0);
-                renderArrow(true, 0);
-            }
-            GL11.glPopMatrix();
-
-            GL11.glTranslated(0.5, 0.5, 0.5);
-            GL11.glRotated(90, 1, 0, 0);
-            GL11.glTranslated(-0.5, -0.5, -0.5);
-
-            for (ForgeDirection f : ForgeDirection.VALID_DIRECTIONS) {
+            if (!(item.getItem() instanceof ItemBlockMotorCore)) {
                 GL11.glPushMatrix();
+                {
+                    renderArrow(false, 0);
+                    renderArrow(true, 0);
+                }
+                GL11.glPopMatrix();
 
                 GL11.glTranslated(0.5, 0.5, 0.5);
-                GL11.glRotated(-90, 0, 1, 0);
-                switch (f) {
-                case UP:
-                    break;
-                case DOWN:
-                    GL11.glRotated(180, 1, 0, 0);
-                    break;
-                case WEST:
-                    GL11.glRotated(-90, 1, 0, 0);
-                    break;
-                case EAST:
-                    GL11.glRotated(90, 1, 0, 0);
-                    break;
-                case NORTH:
-                    GL11.glRotated(-90, 0, 0, 1);
-                    break;
-                case SOUTH:
-                    GL11.glRotated(90, 0, 0, 1);
-                    break;
-                default:
-                    break;
-                }
+                GL11.glRotated(90, 1, 0, 0);
                 GL11.glTranslated(-0.5, -0.5, -0.5);
 
-                IRenderMotorSpecial[] l = FramezApi.inst().getMotorRegistry().getRenderers(item, f);
-                for (IRenderMotorSpecial r : l) {
+                for (ForgeDirection f : ForgeDirection.VALID_DIRECTIONS) {
                     GL11.glPushMatrix();
-                    r.renderSpecial(item, f, 0);
+
+                    GL11.glTranslated(0.5, 0.5, 0.5);
+                    GL11.glRotated(-90, 0, 1, 0);
+                    switch (f) {
+                    case UP:
+                        break;
+                    case DOWN:
+                        GL11.glRotated(180, 1, 0, 0);
+                        break;
+                    case WEST:
+                        GL11.glRotated(-90, 1, 0, 0);
+                        break;
+                    case EAST:
+                        GL11.glRotated(90, 1, 0, 0);
+                        break;
+                    case NORTH:
+                        GL11.glRotated(-90, 0, 0, 1);
+                        break;
+                    case SOUTH:
+                        GL11.glRotated(90, 0, 0, 1);
+                        break;
+                    default:
+                        break;
+                    }
+                    GL11.glTranslated(-0.5, -0.5, -0.5);
+
+                    IRenderMotorSpecial[] l = FramezApi.inst().getMotorRegistry().getRenderers(item, f);
+                    for (IRenderMotorSpecial r : l) {
+                        GL11.glPushMatrix();
+                        r.renderSpecial(item, f, 0);
+                        GL11.glPopMatrix();
+                    }
+
                     GL11.glPopMatrix();
                 }
-
-                GL11.glPopMatrix();
             }
         }
         GL11.glPopMatrix();

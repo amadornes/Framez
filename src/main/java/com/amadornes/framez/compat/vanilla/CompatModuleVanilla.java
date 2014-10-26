@@ -1,11 +1,10 @@
 package com.amadornes.framez.compat.vanilla;
 
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatModule;
+import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 
@@ -36,9 +35,8 @@ public class CompatModuleVanilla extends CompatModule {
     @Override
     public void init(FMLInitializationEvent ev) {
 
-        GameRegistry.addRecipe(new ShapedOreRecipe(GameRegistry.findBlock(ModInfo.MODID,
-                References.Names.Registry.MOTOR + "." + MotorProviderDC.inst.getId()), "rir", "isi", "rir", 's', Blocks.stone, 'i', Items.iron_ingot,
-                'r', Blocks.redstone_block));
+        GameRegistry.addRecipe(new ShapedOreRecipe(GameRegistry.findBlock(ModInfo.MODID, References.Names.Registry.MOTOR + "."
+                + MotorProviderDC.inst.getId()), "rrr", "rcr", "rrr", 'r', "dustRedstone", 'c', FramezBlocks.motorcore));
     }
 
     @Override

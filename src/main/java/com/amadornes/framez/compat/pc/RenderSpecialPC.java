@@ -90,7 +90,7 @@ public class RenderSpecialPC implements IRenderMotorSpecial {
         GL11.glColor4d(1, 0, 0, 1);
 
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 20, 20);
-        renderPressureGauge(false, 0);
+        renderPressureGauge(false, 1);
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 

@@ -30,13 +30,13 @@ public class Recipes {
             // Frame cross
             GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 5, 0), "s s", " s ", "s s", 's', "stickWood"));
             // Frame side
-            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 1, 1), " s ", "scs", " s ", 's', "stickWood", 'c',
-                    new ItemStack(FramezItems.framepart, 1, 0)));
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 1, 1), " s ", "scs", " s ", 's', "stickWood",
+                    'c', new ItemStack(FramezItems.framepart, 1, 0)));
             // Frame
             {
                 ItemStack side = new ItemStack(FramezItems.framepart, 1, 1);
-                GameRegistry.addRecipe(new ShapelessOreRecipe(FramezApi.inst().getModifierRegistry().getFrameStack(8), side, side, side, side, side,
-                        side));
+                GameRegistry.addRecipe(new ShapelessOreRecipe(FramezApi.inst().getModifierRegistry().getFrameStack(8), side, side, side,
+                        side, side, side));
             }
         }
 
@@ -45,19 +45,31 @@ public class Recipes {
             // Frame cross
             GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 5, 2), "s s", " s ", "s s", 's', "stickIron"));
             // Frame side
-            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 1, 3), " s ", "scs", " s ", 's', "stickIron", 'c',
-                    new ItemStack(FramezItems.framepart, 1, 2)));
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.framepart, 1, 3), " s ", "scs", " s ", 's', "stickIron",
+                    'c', new ItemStack(FramezItems.framepart, 1, 2)));
             // Frame
             {
                 ItemStack side = new ItemStack(FramezItems.framepart, 1, 3);
-                GameRegistry.addRecipe(new ShapelessOreRecipe(FramezApi.inst().getModifierRegistry().getFrameStack(8, References.Modifiers.IRON),
-                        side, side, side, side, side, side));
+                GameRegistry.addRecipe(new ShapelessOreRecipe(FramezApi.inst().getModifierRegistry()
+                        .getFrameStack(8, References.Modifiers.IRON), side, side, side, side, side, side));
             }
         }
 
         // Iron stick
         if (FramezItems.ironstick != null)
             GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.ironstick, 4), "i", "i", 'i', "ingotIron"));
+
+        // Motor core
+        {
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezBlocks.motorcore), "rsr", "sRs", "rsr", 'r', "dustRedstone",
+                    'R', "blockRedstone", 's', "stone"));
+        }
+
+        // Wrench
+        {
+            GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FramezItems.wrench), " i ", " si", "s  ", 's', "stickWood", 'i',
+                    "stickIron"));
+        }
 
         Framez.log.info("Starting to generate recipes!");
         generateFrameRecipes();

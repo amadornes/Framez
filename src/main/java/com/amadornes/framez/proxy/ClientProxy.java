@@ -18,6 +18,7 @@ import com.amadornes.framez.client.render.RenderMotor;
 import com.amadornes.framez.client.render.RenderMotorPlacement;
 import com.amadornes.framez.client.render.RenderMoving;
 import com.amadornes.framez.compat.CompatibilityUtils;
+import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
@@ -44,15 +45,16 @@ public class ClientProxy extends CommonProxy {
 
         CompatibilityUtils.registerRenders();
 
-        RenderMotor render = new RenderMotor();
+        RenderMotor motorRenderer = new RenderMotor();
 
-        RenderingRegistry.registerBlockHandler(render);
+        RenderingRegistry.registerBlockHandler(motorRenderer);
         for (IMotorProvider m : FramezApi.inst().getMotorRegistry().getRegisteredMotors()) {
             Block b = GameRegistry.findBlock(ModInfo.MODID, References.Names.Registry.MOTOR + "." + m.getId());
             Item i = Item.getItemFromBlock(b);
-            MinecraftForgeClient.registerItemRenderer(i, render);
-            ClientRegistry.bindTileEntitySpecialRenderer(m.getTileClass(), render);
+            MinecraftForgeClient.registerItemRenderer(i, motorRenderer);
+            ClientRegistry.bindTileEntitySpecialRenderer(m.getTileClass(), motorRenderer);
         }
+        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(FramezBlocks.motorcore), motorRenderer);
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileMoving.class, new RenderMoving());
 

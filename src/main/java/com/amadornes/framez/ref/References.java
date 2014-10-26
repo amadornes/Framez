@@ -21,6 +21,7 @@ public class References {
         public static class Unlocalized {
 
             public static final String MOTOR = ModInfo.MODID + ":motor";
+            public static final String MOTORCORE = ModInfo.MODID + ":motorcore";
             public static final String FRAME = ModInfo.MODID + ":frame";
             public static final String WRENCH = ModInfo.MODID + ":wrench";
             public static final String IRON_STICK = ModInfo.MODID + ":stickiron";
@@ -36,6 +37,7 @@ public class References {
 
             public static final String FRAME = "frame";
             public static final String MOTOR = "motor";
+            public static final String MOTORCORE = "motorcore";
             public static final String MOVING = "moving";
             public static final String WRENCH = "wrench";
             public static final String FRAME_PART = "framepart";

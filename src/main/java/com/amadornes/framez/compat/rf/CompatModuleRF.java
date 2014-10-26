@@ -5,6 +5,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatModule;
+import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 
@@ -35,9 +36,9 @@ public class CompatModuleRF extends CompatModule {
     @Override
     public void init(FMLInitializationEvent ev) {
 
-        GameRegistry.addRecipe(new ShapedOreRecipe(GameRegistry.findBlock(ModInfo.MODID,
-                References.Names.Registry.MOTOR + "." + MotorProviderRF.inst.getId()), "rrr", "rsr", "rrr", 'm', Blocks.stone, 'r',
-                Blocks.redstone_block));
+        GameRegistry.addRecipe(new ShapedOreRecipe(GameRegistry.findBlock(ModInfo.MODID, References.Names.Registry.MOTOR + "."
+                + MotorProviderRF.inst.getId()), "rir", "ici", "rir", 'c', FramezBlocks.motorcore, 'r', Blocks.redstone_block, 'i',
+                "ingotIron"));
     }
 
     @Override
