@@ -40,4 +40,9 @@ public class CommonProxy {
 
     }
 
+    public boolean isGamePaused() {
+
+        return false;
+    }
+
 }

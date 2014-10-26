@@ -299,4 +299,21 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0 || worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
     }
 
+    @Override
+    public void invalidate() {
+
+        super.invalidate();
+
+        onUnload();
+    }
+
+    public void onUnload() {
+
+        if (structure != null) {
+            System.out.println("Unloaded!");
+            structure.finishMoving();
+            StructureTickHandler.INST.removeStructure(structure);
+        }
+    }
+
 }

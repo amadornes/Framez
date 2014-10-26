@@ -101,4 +101,10 @@ public class ClientProxy extends CommonProxy {
         this.frame = frame;
     }
 
+    @Override
+    public boolean isGamePaused() {
+
+        return Minecraft.getMinecraft().isGamePaused();
+    }
+
 }

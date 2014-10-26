@@ -34,8 +34,8 @@ public class MovementUtils {
         return blocks;
     }
 
-    private static final void addBlockAndNeighbors(World w, BlockCoord block, List<BlockCoord> blocks, ForgeDirection face, ForgeDirection direction,
-            int[] moved) {
+    private static final void addBlockAndNeighbors(World w, BlockCoord block, List<BlockCoord> blocks, ForgeDirection face,
+            ForgeDirection direction, int[] moved) {
 
         if (blocks.contains(block))
             return;
@@ -80,8 +80,9 @@ public class MovementUtils {
             BlockCoord r = getRelative(b, direction);
 
             for (MovingStructure ms : StructureTickHandler.INST.getStructures())
-                if (ms.getBlock(b.x, b.y, b.z) != null || ms.getBlock(r.x, r.y, r.z) != null
-                || ms.getBlock(r.x - ms.getDirection().offsetX, r.y - ms.getDirection().offsetY, r.z - ms.getDirection().offsetZ) != null)
+                if (ms.getWorld() == world
+                && (ms.getBlock(b.x, b.y, b.z) != null || ms.getBlock(r.x, r.y, r.z) != null || ms.getBlock(r.x
+                        - ms.getDirection().offsetX, r.y - ms.getDirection().offsetY, r.z - ms.getDirection().offsetZ) != null))
                     return false;
 
             if (blocks.contains(r))
