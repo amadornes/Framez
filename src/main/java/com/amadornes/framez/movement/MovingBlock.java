@@ -175,7 +175,9 @@ public class MovingBlock implements IMovingBlock {
             if (invalidate)
                 te.invalidate();
 
-            BlockUtils.setBlockSneaky(getWorld(), x, y, z, Blocks.air);
+        }
+        BlockUtils.setBlockSneaky(getWorld(), x, y, z, Blocks.air);
+        if (te != null) {
             BlockUtils.removeTileEntity(getWorld(), x, y, z);
 
             te.setWorldObj(getWorldWrapper());
