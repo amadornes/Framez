@@ -147,7 +147,7 @@ public class MovingBlock implements IMovingBlock {
     public void remove() {
 
         if (!MovementApi.INST.handleRemoval(this))
-            remove_do(false, false);
+            remove_do(true, true);
 
         isStored = true;
     }
@@ -155,7 +155,7 @@ public class MovingBlock implements IMovingBlock {
     public void place() {
 
         if (!MovementApi.INST.handlePlacement(this))
-            place_do(false, false);
+            place_do(true, true);
 
         isStored = false;
     }
@@ -168,15 +168,15 @@ public class MovingBlock implements IMovingBlock {
         int z = getZ();
         TileEntity te = getTileEntity();
 
-        BlockUtils.removeTileEntity(getWorld(), x, y, z);
-        BlockUtils.setBlockSneaky(getWorld(), x, y, z, Blocks.air);
-
         if (te != null) {
             if (te instanceof TileMultipart && !getWorld().isRemote)
                 for (TMultiPart p : ((TileMultipart) te).jPartList())
                     p.onWorldSeparate();
             if (invalidate)
                 te.invalidate();
+
+            BlockUtils.setBlockSneaky(getWorld(), x, y, z, Blocks.air);
+            BlockUtils.removeTileEntity(getWorld(), x, y, z);
 
             te.setWorldObj(getWorldWrapper());
 
