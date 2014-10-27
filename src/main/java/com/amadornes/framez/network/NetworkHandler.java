@@ -3,6 +3,7 @@ package com.amadornes.framez.network;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 
+import com.amadornes.framez.network.packet.PacketBlockSide;
 import com.amadornes.framez.network.packet.PacketModifierList;
 import com.amadornes.framez.network.packet.PacketRequestModifierList;
 import com.amadornes.framez.network.packet.PacketStartMoving;
@@ -23,6 +24,7 @@ public class NetworkHandler {
         registerPacket(PacketStartMoving.class, Side.CLIENT);
         registerPacket(PacketModifierList.class, Side.SERVER);
         registerPacket(PacketRequestModifierList.class, Side.CLIENT);
+        registerPacket(PacketBlockSide.class, Side.SERVER);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

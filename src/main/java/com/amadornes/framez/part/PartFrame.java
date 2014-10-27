@@ -26,8 +26,12 @@ import codechicken.lib.raytracer.IndexedCuboid6;
 import codechicken.lib.render.EntityDigIconFX;
 import codechicken.lib.render.RenderUtils;
 import codechicken.lib.vec.Cuboid6;
+import codechicken.lib.vec.Rotation;
 import codechicken.lib.vec.Vector3;
+import codechicken.microblock.FaceMicroblock;
 import codechicken.microblock.HollowMicroblock;
+import codechicken.microblock.Microblock;
+import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TNormalOcclusion;
 
@@ -35,10 +39,12 @@ import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.api.IFrame;
 import com.amadornes.framez.api.IFrameModifier;
 import com.amadornes.framez.api.IFrameModifierProvider;
+import com.amadornes.framez.api.IFramezWrench;
 import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.client.render.RenderFrame;
-import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.modifier.ModifierRegistry;
+import com.amadornes.framez.network.NetworkHandler;
+import com.amadornes.framez.network.packet.PacketBlockSide;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.util.Utils;
@@ -75,7 +81,8 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         Object ob = getConnection(b);
 
         if (face == ForgeDirection.UNKNOWN) {
-            return !(oa != null || ob != null) || ((oa == null || !(oa instanceof PartFrame)) && (ob == null || !(ob instanceof PartFrame)));
+            return !(oa != null || ob != null)
+                    || ((oa == null || !(oa instanceof PartFrame)) && (ob == null || !(ob instanceof PartFrame)));
         } else {
             if (oa != null && ob != null && oa instanceof PartFrame && ob instanceof PartFrame && ((PartFrame) oa).isConnected(b))
                 return false;
@@ -113,6 +120,12 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
         if (npart instanceof PartFrame)
             return false;
+
+        if (npart instanceof Microblock) {
+            if (npart instanceof FaceMicroblock || npart instanceof HollowMicroblock)
+                return ((Microblock) npart).getSize() < 3;
+            return false;
+        }
 
         return true;
     }
@@ -184,7 +197,8 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         for (int i = 0; i < 6; i++) {
             IIcon icon = ModifierRegistry.INST.getCrossTexture(Arrays.asList(getModifiers()), ForgeDirection.getOrientation(hit.sideHit));
             if (icon == null)
-                icon = isSideBlocked(ForgeDirection.getOrientation(hit.sideHit)) ? IconProvider.iconFrameCrossBlocked : IconProvider.iconFrameCross;
+                icon = isSideBlocked(ForgeDirection.getOrientation(hit.sideHit)) ? IconProvider.iconFrameCrossBlocked
+                        : IconProvider.iconFrameCross;
             if (icon == null)
                 icon = IconProvider.iconNothing;
             icons[i] = icon;
@@ -199,8 +213,10 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
         IIcon icon = ModifierRegistry.INST.getCrossTexture(Arrays.asList(getModifiers()), ForgeDirection.getOrientation(hit.sideHit));
         if (icon == null)
-            icon = isSideBlocked(ForgeDirection.getOrientation(hit.sideHit)) ? IconProvider.iconFrameCrossBlocked : IconProvider.iconFrameCross;
-        EntityDigIconFX.addBlockHitEffects(world(), Cuboid6.full.copy().add(Vector3.fromTileEntity(tile())), hit.sideHit, icon, effectRenderer);
+            icon = isSideBlocked(ForgeDirection.getOrientation(hit.sideHit)) ? IconProvider.iconFrameCrossBlocked
+                    : IconProvider.iconFrameCross;
+        EntityDigIconFX.addBlockHitEffects(world(), Cuboid6.full.copy().add(Vector3.fromTileEntity(tile())), hit.sideHit, icon,
+                effectRenderer);
     }
 
     @Override
@@ -453,26 +469,32 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
                 || (hasModifier("connected") && !isConnected(ForgeDirection.NORTH) && !isConnected(ForgeDirection.DOWN));
         render[2] = !hasModifier("connected")
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.EAST));
-        render[3] = !hasModifier("connected") || (hasModifier("connected") && !isConnected(ForgeDirection.EAST) && !isConnected(ForgeDirection.DOWN));
+        render[3] = !hasModifier("connected")
+                || (hasModifier("connected") && !isConnected(ForgeDirection.EAST) && !isConnected(ForgeDirection.DOWN));
         render[4] = !hasModifier("connected")
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.EAST));
         render[5] = !hasModifier("connected")
                 || (hasModifier("connected") && !isConnected(ForgeDirection.SOUTH) && !isConnected(ForgeDirection.DOWN));
         render[6] = !hasModifier("connected")
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.WEST));
-        render[7] = !hasModifier("connected") || (hasModifier("connected") && !isConnected(ForgeDirection.WEST) && !isConnected(ForgeDirection.DOWN));
+        render[7] = !hasModifier("connected")
+                || (hasModifier("connected") && !isConnected(ForgeDirection.WEST) && !isConnected(ForgeDirection.DOWN));
         render[8] = !hasModifier("connected")
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.WEST));
-        render[9] = !hasModifier("connected") || (hasModifier("connected") && !isConnected(ForgeDirection.NORTH) && !isConnected(ForgeDirection.UP));
+        render[9] = !hasModifier("connected")
+                || (hasModifier("connected") && !isConnected(ForgeDirection.NORTH) && !isConnected(ForgeDirection.UP));
         render[10] = !hasModifier("connected")
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.EAST));
-        render[11] = !hasModifier("connected") || (hasModifier("connected") && !isConnected(ForgeDirection.EAST) && !isConnected(ForgeDirection.UP));
+        render[11] = !hasModifier("connected")
+                || (hasModifier("connected") && !isConnected(ForgeDirection.EAST) && !isConnected(ForgeDirection.UP));
         render[12] = !hasModifier("connected")
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UP, ForgeDirection.SOUTH, ForgeDirection.EAST));
-        render[13] = !hasModifier("connected") || (hasModifier("connected") && !isConnected(ForgeDirection.SOUTH) && !isConnected(ForgeDirection.UP));
+        render[13] = !hasModifier("connected")
+                || (hasModifier("connected") && !isConnected(ForgeDirection.SOUTH) && !isConnected(ForgeDirection.UP));
         render[14] = !hasModifier("connected")
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UP, ForgeDirection.SOUTH, ForgeDirection.WEST));
-        render[15] = !hasModifier("connected") || (hasModifier("connected") && !isConnected(ForgeDirection.WEST) && !isConnected(ForgeDirection.UP));
+        render[15] = !hasModifier("connected")
+                || (hasModifier("connected") && !isConnected(ForgeDirection.WEST) && !isConnected(ForgeDirection.UP));
         render[16] = !hasModifier("connected")
                 || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UNKNOWN, ForgeDirection.NORTH, ForgeDirection.WEST));
         render[17] = !hasModifier("connected")
@@ -631,36 +653,60 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     @Override
     public boolean toggleBlock(ForgeDirection side) {
 
-        for (IFrameModifier m : modifiers)
-            if (!m.canBlockSide(side))
-                return false;
-
-        // if (world().isRemote) {
-        // if (!isSideBlocked(side)) {
-        // for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-        // if (d != side && d != side.getOpposite()) {
-        // if (Utils.occlusionTest(tile(), d) && Utils.getMicroblockSize(tile(), d) == 0)
-        // return false;
-        // }
-        // }
-        // }
-        // }
-        //
         if (!world().isRemote) {
             blocked[side.ordinal()] = !isSideBlocked(side);
             sendDescUpdate();
+            return true;
         }
 
-        return false;// true
+        return false;
     }
 
     @Override
     public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
 
-        if (item == null || item.getItem() != FramezItems.wrench)
+        if (!world().isRemote)
             return false;
 
-        return toggleBlock(ForgeDirection.getOrientation(player.isSneaking() ? hit.sideHit ^ 1 : hit.sideHit));
+        if (item == null || !(item.getItem() instanceof IFramezWrench))
+            return false;
+
+        List<TMultiPart> parts = new ArrayList<TMultiPart>();
+        for (TMultiPart p : tile().jPartList()) {
+            if (!(p instanceof Microblock) && p != this) {
+                parts.add(p);
+            }
+        }
+
+        int side = hit.sideHit;
+        if (org.lwjgl.input.Keyboard.isKeyDown(org.lwjgl.input.Keyboard.KEY_LCONTROL))
+            side = side ^ 1;
+
+        NormallyOccludedPart nop = new NormallyOccludedPart(new Cuboid6(0, 0, 0, 1, 2 / 16D, 1).apply(Rotation.sideRotations[side]
+                .at(Vector3.center)));
+
+        boolean can = false;
+
+        for (TMultiPart p : parts) {
+            if (!p.occlusionTest(nop) || !nop.occlusionTest(p)) {
+                can = true;
+                break;
+            }
+        }
+
+        if (can)
+            NetworkHandler.sendToServer(new PacketBlockSide(x(), y(), z(), ForgeDirection.getOrientation(side)));
+
+        return can;
+
+        // for (IFrameModifier m : modifiers)
+        // if (!m.canBlockSide(side))
+        // return false;
+
+        // if (item == null || !(item.getItem() instanceof IFramezWrench))
+        // return false;
+        //
+        // return toggleBlock(ForgeDirection.getOrientation(player.isSneaking() ? hit.sideHit ^ 1 : hit.sideHit));
     }
 
     @Override
