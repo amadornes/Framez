@@ -4,7 +4,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
-import WayofTime.alchemicalWizardry.api.items.ShapedBloodOrbRecipe;
 
 import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatModule;
@@ -42,15 +41,20 @@ public class CompatModuleBM extends CompatModule {
     @Override
     public void init(FMLInitializationEvent ev) {
 
-        GameRegistry.addRecipe(new ShapedBloodOrbRecipe(GameRegistry.findBlock(ModInfo.MODID, References.Names.Registry.MOTOR + "."
-                + MotorProviderBM.inst.getId()), "rsr", "scs", "ror", 'r', Blocks.redstone_block, 's',
-                Dependencies.BM + ":reinforcedSlate", 'c', FramezBlocks.motorcore, 'o', new ItemStack(GameRegistry.findItem(
-                        Dependencies.BM, "apprenticeBloodOrb"), 1, OreDictionary.WILDCARD_VALUE)));
     }
 
     @Override
     public void postInit(FMLPostInitializationEvent ev) {
 
+        Item orbItem = GameRegistry.findItem(Dependencies.BM, "apprenticeBloodOrb");
+        ItemStack orb = new ItemStack(orbItem, 1, OreDictionary.WILDCARD_VALUE);
+        if (orbItem == null)
+            System.exit(-1);
+
+        GameRegistry.addRecipe(
+                new ItemStack(GameRegistry.findBlock(ModInfo.MODID, References.Names.Registry.MOTOR + "." + MotorProviderBM.inst.getId()),
+                        1), "rsr", "scs", "ror", 'r', Blocks.redstone_block, 's',
+                        GameRegistry.findItem(Dependencies.BM, "reinforcedSlate"), 'c', FramezBlocks.motorcore, 'o', orb);
     }
 
     @Override

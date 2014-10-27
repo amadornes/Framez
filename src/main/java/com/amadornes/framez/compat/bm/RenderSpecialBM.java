@@ -66,9 +66,9 @@ public class RenderSpecialBM implements IRenderMotorSpecial {
         GL11.glColor4d(1, 0, 0, 1);
 
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, brightness, brightness);
-        renderLightningBolt(false, powerPercentage);
+        renderBloodOrb(false, powerPercentage);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 20, 20);
-        renderLightningBolt(false, -powerPercentage);
+        renderBloodOrb(false, -powerPercentage);
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 
@@ -93,16 +93,16 @@ public class RenderSpecialBM implements IRenderMotorSpecial {
         GL11.glColor4d(1, 0, 0, 1);
 
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 20, 20);
-        renderLightningBolt(false, 0);
+        renderBloodOrb(false, 0);
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastx, lasty);
     }
 
-    public void renderLightningBolt(boolean inverted, double powerPercentage) {
+    public void renderBloodOrb(boolean inverted, double powerPercentage) {
 
-        double p = Math.abs(powerPercentage) * 1.001;
+        double p = (Math.abs(powerPercentage) * 1.05) - 0.025;
 
         GL11.glTranslated(p, 0, 0);
         if (powerPercentage > 0) {
