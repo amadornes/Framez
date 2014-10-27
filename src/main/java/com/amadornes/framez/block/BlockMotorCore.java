@@ -26,6 +26,12 @@ public class BlockMotorCore extends Block {
     }
 
     @Override
+    public String getUnlocalizedName() {
+
+        return "tile." + References.Names.Unlocalized.MOTORCORE;
+    }
+
+    @Override
     public boolean isNormalCube() {
 
         return false;
