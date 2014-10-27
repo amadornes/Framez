@@ -233,6 +233,9 @@ public class MovingBlock implements IMovingBlock {
 
     public void removePlaceholder() {
 
+        if (placeholder == null)
+            return;
+
         placeholder.setBlockA(null);
         MovingBlock b = structure.getBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
         if (b != null) {

@@ -310,7 +310,6 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     public void onUnload() {
 
         if (structure != null) {
-            System.out.println("Unloaded!");
             structure.finishMoving();
             StructureTickHandler.INST.removeStructure(structure);
         }

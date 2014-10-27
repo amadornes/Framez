@@ -103,6 +103,7 @@ public class StructureTickHandler {
         }
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event) {
 
@@ -114,11 +115,14 @@ public class StructureTickHandler {
 
         boolean found = false;
 
-        for (Object o : world.loadedTileEntityList) {
+        List<TileMotor> unloaded = new ArrayList<TileMotor>();
+
+        for (Object o : new ArrayList(world.loadedTileEntityList)) {
             TileEntity te = (TileEntity) o;
-            if (te instanceof TileMotor) {
+            if (te instanceof TileMotor && !unloaded.contains(te)) {
                 ((TileMotor) te).onUnload();
                 found = true;
+                unloaded.add((TileMotor) te);
             }
         }
 
