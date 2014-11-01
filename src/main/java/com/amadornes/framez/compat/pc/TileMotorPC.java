@@ -80,7 +80,7 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
     @Override
     public boolean isConnectedTo(ForgeDirection dir) {
 
-        return true;
+        return getFace() != dir;
     }
 
     @Override

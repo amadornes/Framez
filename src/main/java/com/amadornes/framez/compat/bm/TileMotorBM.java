@@ -14,11 +14,6 @@ public class TileMotorBM extends TileMotor {
 
     private ItemStack item = new ItemStack(CompatModuleBM.item);
 
-    private void setupItem() {
-
-        SoulNetworkHandler.checkAndSetItemOwner(item, getPlacer());
-    }
-
     @Override
     public boolean shouldMove() {
 
@@ -47,8 +42,8 @@ public class TileMotorBM extends TileMotor {
     public void consumePower(double power) {
 
         setupItem();
-        SoulNetworkHandler.syphonAndDamageFromNetwork(item, MinecraftServer.getServer().getConfigurationManager().func_152612_a(getPlacer()),
-                (int) power);
+        SoulNetworkHandler.syphonAndDamageFromNetwork(item, MinecraftServer.getServer().getConfigurationManager()
+                .func_152612_a(getPlacer()), (int) power);
 
         sendUpdatePacket();
     }
@@ -59,6 +54,11 @@ public class TileMotorBM extends TileMotor {
 
         double lp = SoulNetworkHandler.getCurrentEssence(getPlacer());
         return new AbstractMap.SimpleEntry(Math.max(lp, 1), lp);
+    }
+
+    private void setupItem() {
+
+        SoulNetworkHandler.checkAndSetItemOwner(item, getPlacer());
     }
 
 }

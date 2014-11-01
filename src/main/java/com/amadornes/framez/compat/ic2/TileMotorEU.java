@@ -91,7 +91,7 @@ public class TileMotorEU extends TileMotor implements IEnergySink {
     @Override
     public boolean acceptsEnergyFrom(TileEntity emitter, ForgeDirection direction) {
 
-        return true;
+        return direction != getFace();
     }
 
     @Override
