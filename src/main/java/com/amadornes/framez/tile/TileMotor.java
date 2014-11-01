@@ -19,7 +19,7 @@ import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.network.NetworkHandler;
 import com.amadornes.framez.network.packet.PacketStartMoving;
 import com.amadornes.framez.util.PowerHelper.PowerUnit;
-import com.amadornes.framez.world.WorldWrapperServer;
+import com.amadornes.framez.world.WorldWrapperProvider;
 
 public abstract class TileMotor extends TileEntity implements IFrameMove {
 
@@ -177,12 +177,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
             }
         }
 
-        if (ticks > 500) {
-            if (shouldMove())
-                move();
-        } else {
-            ticks++;
-        }
+        if (shouldMove())
+            move();
 
         if (structure != null && structure.getMoved() >= 1)
             structure = null;
@@ -247,7 +243,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         canMove = false;
         movedBlocks = null;
 
-        if (worldObj instanceof WorldWrapperServer)
+        if (worldObj == WorldWrapperProvider.getWrapper(worldObj.provider.dimensionId))
             return;
 
         if (worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air) {

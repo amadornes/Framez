@@ -18,6 +18,7 @@ import com.amadornes.framez.tile.TileMotor;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 public class StructureTickHandler {
@@ -72,7 +73,8 @@ public class StructureTickHandler {
             return;
 
         // Tick the moved block handler
-        MovedBlockHandler.worldTick(world);
+        if (phase == Phase.START)
+            MovedBlockHandler.worldTick(world);
 
         // Tick structures
 

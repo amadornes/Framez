@@ -23,6 +23,7 @@ import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.raytracer.ExtendedMOP;
 import codechicken.lib.raytracer.IndexedCuboid6;
+import codechicken.lib.raytracer.RayTracer;
 import codechicken.lib.render.EntityDigIconFX;
 import codechicken.lib.render.RenderUtils;
 import codechicken.lib.vec.Cuboid6;
@@ -30,6 +31,7 @@ import codechicken.lib.vec.Rotation;
 import codechicken.lib.vec.Vector3;
 import codechicken.microblock.FaceMicroblock;
 import codechicken.microblock.HollowMicroblock;
+import codechicken.microblock.ItemMicroPart;
 import codechicken.microblock.Microblock;
 import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
@@ -258,22 +260,45 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
         ExtendedMOP mop = super.collisionRayTrace(start, end);
 
+        boolean center = false;
+        EntityPlayer player = null;
+
+        for (Object o : world().playerEntities) {
+            EntityPlayer p = (EntityPlayer) o;
+            if (RayTracer.getEndVec(p).distanceTo(end) == 0) {
+                player = p;
+                break;
+            }
+        }
+
+        if (player != null) {
+            ItemStack item = player.getCurrentEquippedItem();
+            if (item != null && item.getItem() instanceof ItemMicroPart)
+                center = true;
+        }
+
         if (mop != null) {
             Vec3 click = mop.hitVec.addVector(-mop.blockX, -mop.blockY, -mop.blockZ);
             ForgeDirection face = ForgeDirection.getOrientation(mop.sideHit);
             if (face == ForgeDirection.EAST || face == ForgeDirection.WEST) {
-                click.yCoord = 0.5;
-                click.zCoord = 0.5;
+                if (center) {
+                    click.yCoord = 0.5;
+                    click.zCoord = 0.5;
+                }
                 click.xCoord = (click.xCoord * 0.5) + 0.25;
             }
             if (face == ForgeDirection.UP || face == ForgeDirection.DOWN) {
-                click.xCoord = 0.5;
-                click.zCoord = 0.5;
+                if (center) {
+                    click.xCoord = 0.5;
+                    click.zCoord = 0.5;
+                }
                 click.yCoord = (click.yCoord * 0.5) + 0.25;
             }
             if (face == ForgeDirection.NORTH || face == ForgeDirection.SOUTH) {
-                click.xCoord = 0.5;
-                click.yCoord = 0.5;
+                if (center) {
+                    click.xCoord = 0.5;
+                    click.yCoord = 0.5;
+                }
                 click.zCoord = (click.zCoord * 0.5) + 0.25;
             }
 

@@ -228,7 +228,8 @@ public class MovingBlock implements IMovingBlock {
                 if (validate)
                     te.validate();
 
-                getWorld().setTileEntity(x, y, z, te);
+                if (getWorld().getTileEntity(x, y, z) != te)
+                    getWorld().setTileEntity(x, y, z, te);
             }
         }
 
