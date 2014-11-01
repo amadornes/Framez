@@ -24,9 +24,11 @@ import com.amadornes.framez.config.Config;
 import com.amadornes.framez.ref.Dependencies;
 
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.versioning.VersionParser;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -152,7 +154,9 @@ public class CompatibilityUtils {
         registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
         registerModule(Dependencies.WAILA, CompatModuleWaila.class, null);
         registerModule(Dependencies.OC, CompatModuleOC.class, null);
-        registerModule(Dependencies.BC, CompatModuleBC.class, null);
+        for (ModContainer mod : Loader.instance().getModList())
+            if (mod.getModId().equals(Dependencies.BC) && VersionParser.parseRange("[6.1.5,)").containsVersion(mod.getProcessedVersion()))
+                registerModule(Dependencies.BC, CompatModuleBC.class, null);
     }
 
 }
