@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.amadornes.framez.compat.ae2.CompatModuleAE2;
+import com.amadornes.framez.compat.bc.CompatModuleBC;
 import com.amadornes.framez.compat.bm.CompatModuleBM;
 import com.amadornes.framez.compat.cc.CompatModuleCC;
 import com.amadornes.framez.compat.hc.CompatModuleHC;
@@ -151,6 +152,7 @@ public class CompatibilityUtils {
         registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
         registerModule(Dependencies.WAILA, CompatModuleWaila.class, null);
         registerModule(Dependencies.OC, CompatModuleOC.class, null);
+        registerModule(Dependencies.BC, CompatModuleBC.class, null);
     }
 
 }
