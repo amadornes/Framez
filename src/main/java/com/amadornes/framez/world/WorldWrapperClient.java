@@ -35,7 +35,8 @@ public class WorldWrapperClient extends WorldClient {
     public WorldWrapperClient(MovingStructure structure) {
 
         super(new NetHandlerPlayClient(Minecraft.getMinecraft(), null, new NetworkManager(true)), new WorldSettings(structure.getWorld()
-                .getWorldInfo()), structure.getWorld().provider.dimensionId, structure.getWorld().difficultySetting, structure.getWorld().theProfiler);
+                .getWorldInfo()), structure.getWorld().provider.dimensionId, structure.getWorld().difficultySetting,
+                structure.getWorld().theProfiler);
 
         this.structure = structure;
     }
@@ -144,10 +145,9 @@ public class WorldWrapperClient extends WorldClient {
     @Override
     public void spawnParticle(String type, double x, double y, double z, double r, double g, double b) {
 
-        structure.getWorld()
-        .spawnParticle(type, x + (structure.getDirection().offsetX * structure.getMoved()),
-                y + (structure.getDirection().offsetY * structure.getMoved()), z + (structure.getDirection().offsetZ * structure.getMoved()),
-                r, g, b);
+        structure.getWorld().spawnParticle(type, x + (structure.getDirection().offsetX * structure.getMoved()),
+                y + (structure.getDirection().offsetY * structure.getMoved()),
+                z + (structure.getDirection().offsetZ * structure.getMoved()), r, g, b);
     }
 
     @Override
@@ -332,6 +332,22 @@ public class WorldWrapperClient extends WorldClient {
     public void markBlockForUpdate(int x, int y, int z) {
 
         toUpdate.add(new BlockCoord(x, y, z));
+    }
+
+    @Override
+    public long getWorldTime() {
+
+        return structure.getWorld().getWorldTime();
+    }
+
+    @Override
+    public long getTotalWorldTime() {
+
+        try {
+            return structure.getWorld().getTotalWorldTime();
+        } catch (Exception ex) {
+        }
+        return 0;
     }
 
 }

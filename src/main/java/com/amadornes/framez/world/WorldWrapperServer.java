@@ -178,8 +178,8 @@ public class WorldWrapperServer extends WorldServer {
         MovingStructure structure = StructureTickHandler.INST.tickingStructure;
         if (structure != null) {
             world.spawnParticle(type, x + (structure.getDirection().offsetX * structure.getMoved()), y
-                    + (structure.getDirection().offsetY * structure.getMoved()), z + (structure.getDirection().offsetZ * structure.getMoved()), r, g,
-                    b);
+                    + (structure.getDirection().offsetY * structure.getMoved()),
+                    z + (structure.getDirection().offsetZ * structure.getMoved()), r, g, b);
         } else {
             world.spawnParticle(type, x, y, z, r, g, b);
         }
@@ -438,6 +438,18 @@ public class WorldWrapperServer extends WorldServer {
     public World getRealWorld() {
 
         return world;
+    }
+
+    @Override
+    public long getWorldTime() {
+
+        return world.getWorldTime();
+    }
+
+    @Override
+    public long getTotalWorldTime() {
+
+        return world.getTotalWorldTime();
     }
 
     private static class NonSavingHandler implements ISaveHandler {
