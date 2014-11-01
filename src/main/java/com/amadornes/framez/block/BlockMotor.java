@@ -89,9 +89,18 @@ public class BlockMotor extends BlockContainer implements IMotor {
         if (!world.isRemote) {
             TileMotor te = (TileMotor) world.getTileEntity(x, y, z);
 
-            te.setFace(te.getFace().getRotation(axis));
-            te.setDirection(te.getDirection().getRotation(axis));
-            te.sendUpdatePacket();
+            ForgeDirection oldFace = te.getFace();
+            ForgeDirection oldDirection = te.getDirection();
+            ForgeDirection face = te.getFace().getRotation(axis);
+            ForgeDirection direction = te.getDirection().getRotation(axis);
+
+            te.setFace(face, true);
+            te.setDirection(direction, true);
+            if (te.setFace(face) && te.setDirection(direction))
+                return true;
+
+            te.setFace(oldFace, true);
+            te.setDirection(oldDirection, true);
         }
 
         return false;
