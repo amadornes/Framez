@@ -162,8 +162,6 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
 
-    private int ticks = 0;
-
     @Override
     public void updateEntity() {
 
