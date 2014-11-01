@@ -77,6 +77,9 @@ public class MovementUtils {
     public static final boolean canMove(List<BlockCoord> blocks, World world, ForgeDirection direction) {
 
         for (BlockCoord b : blocks) {
+            if (!MovedBlockHandler.canMoveBlockAt(world, b))
+                return false;
+
             BlockCoord r = getRelative(b, direction);
 
             for (MovingStructure ms : StructureTickHandler.INST.getStructures())

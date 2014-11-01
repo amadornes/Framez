@@ -169,9 +169,12 @@ public class MovingBlock implements IMovingBlock {
         TileEntity te = getTileEntity();
 
         if (te != null) {
-            if (te instanceof TileMultipart && !getWorld().isRemote)
-                for (TMultiPart p : ((TileMultipart) te).jPartList())
-                    p.onWorldSeparate();
+            if (te instanceof TileMultipart) {
+                if (!getWorld().isRemote) {
+                    for (TMultiPart p : ((TileMultipart) te).jPartList())
+                        p.onWorldSeparate();
+                }
+            }
             if (invalidate)
                 te.invalidate();
 
@@ -182,7 +185,7 @@ public class MovingBlock implements IMovingBlock {
 
             te.setWorldObj(getWorldWrapper());
 
-            if (validate)
+            if (validate && !(te instanceof TileMultipart))
                 te.validate();
             if (te instanceof TileMultipart && !getWorld().isRemote)
                 for (TMultiPart p : ((TileMultipart) te).jPartList())
@@ -214,7 +217,7 @@ public class MovingBlock implements IMovingBlock {
                     }
                 }
             } else {
-                if (invalidate)
+                if (invalidate && !(te instanceof TileMultipart))
                     te.invalidate();
 
                 te.xCoord = x;

@@ -12,8 +12,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.world.WorldWrapperClient;
+import com.amadornes.framez.world.WorldWrapperProvider;
 import com.amadornes.framez.world.WorldWrapperServer;
-import com.amadornes.framez.world.WorldWrapperServerProvider;
 
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
@@ -48,7 +48,7 @@ public class MovingStructure {
 
     private void initServer() {
 
-        wrapper = WorldWrapperServerProvider.getWrapper(world);
+        wrapper = WorldWrapperProvider.getWrapper(world);
     }
 
     @SideOnly(Side.CLIENT)
@@ -206,6 +206,8 @@ public class MovingStructure {
 
         if (wrapper != null)
             wrapper.removeStructure(this);
+
+        MovedBlockHandler.onStructureFinishMoving(this);
     }
 
     public MovingBlock getBlock(int x, int y, int z) {

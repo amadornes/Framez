@@ -1,6 +1,5 @@
 package com.amadornes.framez.tile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.init.Blocks;
@@ -9,22 +8,18 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.api.movement.IFrameMove;
 import com.amadornes.framez.config.Config;
 import com.amadornes.framez.movement.MovementUtils;
-import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.network.NetworkHandler;
 import com.amadornes.framez.network.packet.PacketStartMoving;
 import com.amadornes.framez.util.PowerHelper.PowerUnit;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import com.amadornes.framez.world.WorldWrapperServer;
 
 public abstract class TileMotor extends TileEntity implements IFrameMove {
 
@@ -50,6 +45,10 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     private MovingStructure structure = null;
 
     private String placer = "";
+
+    private boolean canMove = false;
+    private List<BlockCoord> movedBlocks = null;
+    private int lastCheck = 0;
 
     public ForgeDirection getFace() {
 
@@ -163,13 +162,27 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
 
+    private int ticks = 0;
+
     @Override
     public void updateEntity() {
 
         super.updateEntity();
 
-        if (shouldMove())
-            move();
+        if (!worldObj.isRemote) {
+            lastCheck++;
+            if (lastCheck == 10) {
+                lastCheck = 0;
+                checkIfCanMove();
+            }
+        }
+
+        if (ticks > 500) {
+            if (shouldMove())
+                move();
+        } else {
+            ticks++;
+        }
 
         if (structure != null && structure.getMoved() >= 1)
             structure = null;
@@ -198,62 +211,58 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         if (structure != null)
             return false;
 
-        if (worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air) {
-            List<BlockCoord> blocks = MovementUtils.getMovedBlocks(this);
-            if (blocks.size() > 0 && MovementUtils.canMove(blocks, getWorldObj(), direction)) {
-                double power = 0;
-                power += Config.Power.getPowerUsedPerMove;
-                for (BlockCoord b : blocks) {
-                    power += Config.Power.getPowerUsedPerBlock;
-                    if (getWorldObj().getTileEntity(b.x, b.y, b.z) != null)
-                        power += Config.Power.getPowerUsedPerTileEntity;
-                }
-                if (getPowerUnit() != null) {
-                    power = (power / PowerUnit.RF.getPowerMultiplier()) * getPowerUnit().getPowerMultiplier();
-                }
-                if (hasEnoughPower(power)) {
-                    MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / (20D * 0.75D));
-                    structure.addBlocks(blocks);
+        if (lastCheck > 0)
+            checkIfCanMove();
+        if (canMove) {
+            List<BlockCoord> blocks = movedBlocks;
+            double power = 0;
+            power += Config.Power.getPowerUsedPerMove;
+            for (BlockCoord b : blocks) {
+                power += Config.Power.getPowerUsedPerBlock;
+                if (getWorldObj().getTileEntity(b.x, b.y, b.z) != null)
+                    power += Config.Power.getPowerUsedPerTileEntity;
+            }
+            if (getPowerUnit() != null) {
+                power = (power / PowerUnit.RF.getPowerMultiplier()) * getPowerUnit().getPowerMultiplier();
+            }
+            if (hasEnoughPower(power)) {
+                MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / (20D * 0.75D));
+                structure.addBlocks(blocks);
 
-                    this.structure = structure;
-                    StructureTickHandler.INST.addStructure(structure);
+                this.structure = structure;
+                StructureTickHandler.INST.addStructure(structure);
 
-                    NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
+                NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
 
-                    consumePower(power);
+                consumePower(power);
 
-                    return true;
-                }
+                return true;
             }
         }
         return false;
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getRenderBoundingBox() {
+    private void checkIfCanMove() {
 
-        if (structure != null) {
-            int x1 = xCoord, y1 = yCoord, z1 = zCoord, x2 = xCoord, y2 = yCoord, z2 = zCoord;
-            for (MovingBlock b : new ArrayList<MovingBlock>(structure.getBlocks())) {
-                x1 = Math.min(x1, b.getLocation().x);
-                y1 = Math.min(y1, b.getLocation().y);
-                z1 = Math.min(z1, b.getLocation().z);
-                x2 = Math.max(x2, b.getLocation().x);
-                y2 = Math.max(y2, b.getLocation().y);
-                z2 = Math.max(z2, b.getLocation().z);
+        canMove = false;
+        movedBlocks = null;
+
+        if (worldObj instanceof WorldWrapperServer)
+            return;
+
+        if (worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air) {
+            List<BlockCoord> blocks = movedBlocks = MovementUtils.getMovedBlocks(this);
+            if (blocks.size() > 0 && MovementUtils.canMove(blocks, getWorldObj(), direction)) {
+                canMove = true;
+                return;
             }
-            x1 -= getDirection().offsetX < 0 ? 1 : 0;
-            y1 -= getDirection().offsetY < 0 ? 1 : 0;
-            z1 -= getDirection().offsetZ < 0 ? 1 : 0;
-            x2 += getDirection().offsetX > 0 ? 1 : 0;
-            y2 += getDirection().offsetY > 0 ? 1 : 0;
-            z2 += getDirection().offsetZ > 0 ? 1 : 0;
-
-            return AxisAlignedBB.getBoundingBox(x1, y1, z1, x2, y2, z2);
         }
+        movedBlocks = null;
+    }
 
-        return super.getRenderBoundingBox();
+    public boolean canMove() {
+
+        return canMove;
     }
 
     public final int getColorMultiplier() {
@@ -312,6 +321,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         if (structure != null) {
             structure.finishMoving();
             StructureTickHandler.INST.removeStructure(structure);
+            structure = null;
         }
     }
 

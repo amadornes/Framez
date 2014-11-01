@@ -71,6 +71,11 @@ public class StructureTickHandler {
         if (world == null)
             return;
 
+        // Tick the moved block handler
+        MovedBlockHandler.worldTick(world);
+
+        // Tick structures
+
         List<MovingStructure> invalid = new ArrayList<MovingStructure>();
 
         for (MovingStructure s : new ArrayList<MovingStructure>(structures)) {
