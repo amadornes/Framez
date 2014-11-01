@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.amadornes.framez.compat.ae2.CompatModuleAE2;
 import com.amadornes.framez.compat.bm.CompatModuleBM;
 import com.amadornes.framez.compat.cc.CompatModuleCC;
 import com.amadornes.framez.compat.hc.CompatModuleHC;
@@ -143,6 +144,8 @@ public class CompatibilityUtils {
             registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleRF.class);
         if (Config.Motors.isBloodMagicMotorEnabled)
             registerModule(Dependencies.BM, CompatModuleBM.class, null);
+        if (Config.Motors.isAEMotorEnabled)
+            registerModule(Dependencies.AE2, CompatModuleAE2.class, null);
 
         registerModule(Dependencies.CC, CompatModuleCC.class, null);
         registerModule(Dependencies.NEI, CompatModuleNEI.class, null);

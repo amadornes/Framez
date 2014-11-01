@@ -10,5 +10,6 @@ public class Dependencies {
     public static final String NEI = "NotEnoughItems";
     public static final String BM = "AWWayofTime";
     public static final String OC = "OpenComputers";
+    public static final String AE2 = "appliedenergistics2";
 
 }

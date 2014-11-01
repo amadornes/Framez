@@ -1,5 +1,6 @@
 package com.amadornes.framez.util;
 
+
 public class PowerHelper {
 
     public double convert(double value, PowerUnit from, PowerUnit to) {
@@ -8,7 +9,7 @@ public class PowerHelper {
     }
 
     public static enum PowerUnit {
-        HC_PRESSURE(5), EU(2.5), PC_PRESSURE(0.005), RF(1), LP(1.75);
+        HC_PRESSURE(5), EU(2.5), PC_PRESSURE(0.005), RF(1), LP(1.75), AE2(2);
 
         private double powerMultiplier = 0;
 

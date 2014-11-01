@@ -30,9 +30,11 @@ public class ConfigurationHandler {
         // Motors
         {
             cfg.getCategory(CATEGORY_MOTORS).setComment("Enables/disables specific motors. Power ratio is not configurable as of now.");
-            Config.Motors.isRedstoneMotorEnabled = cfg.getBoolean("isRedstoneMotorEnabled", CATEGORY_MOTORS, Config.Motors.isRedstoneMotorEnabled,
+            Config.Motors.isRedstoneMotorEnabled = cfg.getBoolean("isRedstoneMotorEnabled", CATEGORY_MOTORS,
+                    Config.Motors.isRedstoneMotorEnabled,
                     "Enables/disables the redstone motor. This one doesn't use any power at all, it just requires a redstone signal");
-            Config.Motors.isHydCraftMotorEnabled = cfg.getBoolean("isHydCraftMotorEnabled", CATEGORY_MOTORS, Config.Motors.isHydCraftMotorEnabled,
+            Config.Motors.isHydCraftMotorEnabled = cfg.getBoolean("isHydCraftMotorEnabled", CATEGORY_MOTORS,
+                    Config.Motors.isHydCraftMotorEnabled,
                     "Enables/disables the HydrauliCraft motor. This one needs HC pressure to run and it also requires a redstone signal");
             Config.Motors.isIC2MotorEnabled = cfg.getBoolean("isIC2MotorEnabled", CATEGORY_MOTORS, Config.Motors.isIC2MotorEnabled,
                     "Enables/disables the IC2 motor. This one needs EU to run and it also requires a redstone signal");
@@ -45,6 +47,9 @@ public class ConfigurationHandler {
             Config.Motors.isBloodMagicMotorEnabled = cfg.getBoolean("isBloodMagicMotorEnabled", CATEGORY_MOTORS,
                     Config.Motors.isBloodMagicMotorEnabled,
                     "Enables/disables the Blood Magic motor. This one needs LP to run and it also requires a redstone signal");
+            Config.Motors.isAEMotorEnabled = cfg
+                    .getBoolean("isAEMotorEnabled", CATEGORY_MOTORS, Config.Motors.isAEMotorEnabled,
+                            "Enables/disables the Applied Energistics motor. This one needs AE power to run and it also requires a redstone signal");
         }
 
         // Power
@@ -53,13 +58,14 @@ public class ConfigurationHandler {
                     "Allows you to customize how much power motors use (based on RF). " + PowerUnit.RF.getPowerMultiplier() + "RF = "
                             + PowerUnit.EU.getPowerMultiplier() + "EU = " + PowerUnit.PC_PRESSURE.getPowerMultiplier() + " PC pressure = "
                             + PowerUnit.HC_PRESSURE.getPowerMultiplier() + " HC pressure");
-            Config.Power.getPowerUsedPerBlock = cfg.getFloat("getPowerUsedPerBlock", CATEGORY_POWER, (float) Config.Power.getPowerUsedPerBlock, 0,
-                    Float.MAX_VALUE, "Power that moving one block will use");
+            Config.Power.getPowerUsedPerBlock = cfg.getFloat("getPowerUsedPerBlock", CATEGORY_POWER,
+                    (float) Config.Power.getPowerUsedPerBlock, 0, Float.MAX_VALUE, "Power that moving one block will use");
             Config.Power.getPowerUsedPerTileEntity = cfg.getFloat("getPowerUsedPerTileEntity", CATEGORY_POWER,
                     (float) Config.Power.getPowerUsedPerTileEntity, 0, Float.MAX_VALUE,
                     "Power that moving one TileEntity will use. Will get added to the amount moving a block uses");
-            Config.Power.getPowerUsedPerMove = cfg.getFloat("getPowerUsedPerMove", CATEGORY_POWER, (float) Config.Power.getPowerUsedPerMove, 0,
-                    Float.MAX_VALUE, "Power that moving a structure will take (no matter how many blocks/how big)");
+            Config.Power.getPowerUsedPerMove = cfg.getFloat("getPowerUsedPerMove", CATEGORY_POWER,
+                    (float) Config.Power.getPowerUsedPerMove, 0, Float.MAX_VALUE,
+                    "Power that moving a structure will take (no matter how many blocks/how big)");
         }
 
         if (cfg.hasChanged()) {
