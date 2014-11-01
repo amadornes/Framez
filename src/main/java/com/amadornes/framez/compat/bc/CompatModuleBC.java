@@ -18,14 +18,14 @@ public class CompatModuleBC extends CompatModule {
     @Override
     public void init(FMLInitializationEvent ev) {
 
-        StatementManager.registerStatement(TriggerCanMove.INST);
-        StatementManager.registerStatement(TriggerIsMoving.INST);
-        StatementManager.registerTriggerProvider(new TriggerProvider());
     }
 
     @Override
     public void postInit(FMLPostInitializationEvent ev) {
 
+        StatementManager.registerStatement(TriggerCanMove.INST);
+        StatementManager.registerStatement(TriggerIsMoving.INST);
+        StatementManager.registerTriggerProvider(new TriggerProvider());
     }
 
     @Override

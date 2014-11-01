@@ -24,6 +24,7 @@ import com.amadornes.framez.config.Config;
 import com.amadornes.framez.ref.Dependencies;
 
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModAPIManager;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -154,9 +155,16 @@ public class CompatibilityUtils {
         registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
         registerModule(Dependencies.WAILA, CompatModuleWaila.class, null);
         registerModule(Dependencies.OC, CompatModuleOC.class, null);
-        for (ModContainer mod : Loader.instance().getModList())
-            if (mod.getModId().equals(Dependencies.BC) && VersionParser.parseRange("[6.1.5,)").containsVersion(mod.getProcessedVersion()))
-                registerModule(Dependencies.BC, CompatModuleBC.class, null);
+        // Only load BC compatibility if the version that's installed is 6.1.5 or higher (or a dev build/source) and the statements API is loaded
+        for (ModContainer mod : Loader.instance().getModList()) {
+            if (mod.getModId().equals(Dependencies.BC)) {
+                if (mod.getVersion().equals("@VERSION@") || VersionParser.parseRange("[6.1.5,)").containsVersion(mod.getProcessedVersion())
+                        && ModAPIManager.INSTANCE.hasAPI("BuildCraftAPI|statements")) {
+                    registerModule(Dependencies.BC, CompatModuleBC.class, null);
+                }
+                break;
+            }
+        }
     }
 
 }
