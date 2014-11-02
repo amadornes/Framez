@@ -165,7 +165,7 @@ uploadArchives {
 		mavenDeployer {
 			repository(url: "file:///var/www/maven/")
 			pom {
-				groupId = project.group
+				groupId = "framez"
 				version = project.version
 				artifactId = project.archivesBaseName
 				project {
