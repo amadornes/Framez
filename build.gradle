@@ -130,7 +130,7 @@ task deobfJar(type: Jar) {
     }
 }
 
-task sourceZip(type: Zip) {
+task sourceJar(type: Jar) {
     from (sourceSets.main.allSource) {
         appendix = "${project.ext.mcVersion}"
         classifier = "src"
@@ -154,48 +154,46 @@ task apiJar(type: Jar) {
 apiJar.mustRunAfter deobfJar
 
 artifacts {
-    archives sourceZip
+    archives sourceJar
     archives deobfJar
     archives javadocZip
     archives apiJar
 }
 
-if (System.getenv().BUILD_NUMBER != null) {
-	uploadArchives {
-		repositories {
-			mavenDeployer {
-				repository(url: "file:///var/www/maven/")
-				pom {
-					groupId = project.group
-					version = project.version
-					artifactId = project.archivesBaseName
-					project {
-						name project.archivesBaseName
-						packaging 'jar'
-						description 'Framez'
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			repository(url: "file:///var/www/maven/")
+			pom {
+				groupId = project.group
+				version = project.version
+				artifactId = project.archivesBaseName
+				project {
+					name project.archivesBaseName
+					packaging 'jar'
+					description 'Framez'
+					url 'https://github.com/amadornes/Framez'
+					scm {
 						url 'https://github.com/amadornes/Framez'
-						scm {
-							url 'https://github.com/amadornes/Framez'
-							connection 'scm:git:git@github.com:amadornes/Framez.git'
-							developerConnection 'scm:git:git@github.com:amadornes/Framez.git'
+						connection 'scm:git:git@github.com:amadornes/Framez.git'
+						developerConnection 'scm:git:git@github.com:amadornes/Framez.git'
+					}
+					issueManagement {
+						system 'github'
+						url 'https://github.com/amadornes/Framez/issues'
+					}
+					licenses {
+						license {
+							name 'GPLv3'
+							url 'https://github.com/amadornes/Framez/blob/master/LICENSE'
+							distribution 'repo'
 						}
-						issueManagement {
-							system 'github'
-							url 'https://github.com/amadornes/Framez/issues'
-						}
-						licenses {
-							license {
-								name 'GPLv3'
-								url 'https://github.com/amadornes/Framez/blob/master/LICENSE'
-								distribution 'repo'
-							}
-						}
-						developers {
-							developer {
-								id 'Amadornes'
-								name 'Amadornes'
-								roles { role 'developer' }
-							}
+					}
+					developers {
+						developer {
+							id 'Amadornes'
+							name 'Amadornes'
+							roles { role 'developer' }
 						}
 					}
 				}
