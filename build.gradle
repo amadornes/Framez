@@ -35,10 +35,11 @@ repositories {
 }
 
 apply plugin: 'forge'
+apply plugin: 'maven'
 
 project.ext {
     major = "0"
-    minor = "1"
+    minor = "2"
     mcVersion = "1.7.10"
 }
 
@@ -49,9 +50,9 @@ archivesBaseName = "Framez"
 
 
 if (System.getenv().BUILD_NUMBER != null) {
-    version += ".${System.getenv().BUILD_NUMBER}"
+    version += "-${System.getenv().BUILD_NUMBER}"
 } else {
-    version += " - err"
+    version += "-err"
 }
 
 def grabDep(url) {
@@ -83,8 +84,7 @@ minecraft {
     runDir = "eclipse/assets"
 
     // replacing stuff in the source
-    replace '@MAJOR@', project.major
-    replace '@MINOR@', project.minor
+    replace '@VERSION@', "${project.ext.major}.${project.minor}"
     replace '@MC_VERSION@', version
     if (System.getenv("BUILD_NUMBER") != null) {
         replace '@BUILD_NUMBER@', System.getenv("BUILD_NUMBER")
@@ -94,25 +94,27 @@ minecraft {
 
 }
 
-processResources
-        {
-            // this will ensure that this task is redone when the versions change.
-            inputs.property "version", project.version
-            inputs.property "mcversion", project.minecraft.version
+processResources{
+	// this will ensure that this task is redone when the versions change.
+	inputs.property "version", project.version
+	inputs.property "mcversion", project.minecraft.version
 
-            // replace stuff in mcmod.info, nothing else
-            from(sourceSets.main.resources.srcDirs) {
-                include '*.info'
+	// replace stuff in mcmod.info, nothing else
+	from(sourceSets.main.resources.srcDirs) {
+		include '*.info'
+		
+		// replace version and mcversion
+		expand 'version': project.version, 'mcversion': project.minecraft.version
+	}
 
-                // replace version and mcversion
-                expand 'version': project.version, 'mcversion': project.minecraft.version
-            }
+	// copy everything else, thats not the mcmod.info
+	from(sourceSets.main.resources.srcDirs) {
+		exclude 'mcmod.info'
+	}
 
-            // copy everything else, thats not the mcmod.info
-            from(sourceSets.main.resources.srcDirs) {
-                exclude 'mcmod.info'
-            }
-        }
+	//This makes sure that it gets run EVERY time
+	outputs.upToDateWhen {false}
+}
 
 
 jar {
@@ -127,22 +129,19 @@ task deobfJar(type: Jar) {
     }
 }
 
-// add a source jar
-task sourceJar(type: Jar) {
+task sourceZip(type: Zip) {
     from (sourceSets.main.allSource) {
         appendix = "${project.ext.mcVersion}"
         classifier = "src"
     }
 }
 
-// add a javadoc jar
 task javadocZip(type: Zip, dependsOn: javadoc) {
     appendix = "${project.ext.mcVersion}"
     classifier = "javadoc"
     from 'build/docs/javadoc'
 }
 
-// Create API library jar
 task apiJar(type: Jar) {
     from(sourceSets.main.java) {
         include 'com/framez/api/**'
@@ -154,8 +153,52 @@ task apiJar(type: Jar) {
 apiJar.mustRunAfter deobfJar
 
 artifacts {
-    archives sourceJar
+    archives sourceZip
     archives deobfJar
     archives javadocZip
     archives apiJar
+}
+
+if (System.getenv().BUILD_NUMBER != null) {
+	uploadArchives {
+		repositories {
+			mavenDeployer {
+				repository(url: "file:///var/www/maven/")
+				pom {
+					groupId = project.group
+					version = project.version
+					artifactId = project.archivesBaseName
+					project {
+						name project.archivesBaseName
+						packaging 'jar'
+						description 'Framez'
+						url 'https://github.com/amadornes/Framez'
+						scm {
+							url 'https://github.com/amadornes/Framez'
+							connection 'scm:git:git@github.com:amadornes/Framez.git'
+							developerConnection 'scm:git:git@github.com:amadornes/Framez.git'
+						}
+						issueManagement {
+							system 'github'
+							url 'https://github.com/amadornes/Framez/issues'
+						}
+						licenses {
+							license {
+								name 'GPLv3'
+								url 'https://github.com/amadornes/Framez/blob/master/LICENSE'
+								distribution 'repo'
+							}
+						}
+						developers {
+							developer {
+								id 'Amadornes'
+								name 'Amadornes'
+								roles { role 'developer' }
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
