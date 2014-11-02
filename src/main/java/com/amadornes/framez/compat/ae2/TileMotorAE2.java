@@ -92,9 +92,9 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
         double nodePower = 0;
 
         if (node != null) {
-            for (IGridNode node : node.getGrid().getNodes()) {
-                if (node != this.node) {
-                    IGridHost host = node.getGridBlock().getMachine();
+            for (IGridNode n : node.getGrid().getNodes()) {
+                if (n != node) {
+                    IGridHost host = n.getGridBlock().getMachine();
                     if (host instanceof IAEPowerStorage) {
                         IAEPowerStorage storage = (IAEPowerStorage) host;
                         if (storage.isAEPublicPowerStorage()
@@ -114,9 +114,9 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
         stored -= drainedFromThis;
 
         if (amt > 0) {
-            for (IGridNode node : node.getGrid().getNodes()) {
-                if (node != this.node) {
-                    IGridHost host = node.getGridBlock().getMachine();
+            for (IGridNode n : node.getGrid().getNodes()) {
+                if (n != node) {
+                    IGridHost host = n.getGridBlock().getMachine();
                     if (host instanceof IAEPowerStorage) {
                         IAEPowerStorage storage = (IAEPowerStorage) host;
                         if (storage.isAEPublicPowerStorage()
