@@ -14,6 +14,7 @@ import appeng.api.AEApi;
 import appeng.api.config.AccessRestriction;
 import appeng.api.config.Actionable;
 import appeng.api.config.PowerMultiplier;
+import appeng.api.config.PowerUnits;
 import appeng.api.networking.GridFlags;
 import appeng.api.networking.GridNotification;
 import appeng.api.networking.IGrid;
@@ -25,18 +26,21 @@ import appeng.api.util.AECableType;
 import appeng.api.util.AEColor;
 import appeng.api.util.DimensionalCoord;
 
+import com.amadornes.framez.config.Config;
 import com.amadornes.framez.ref.ModInfo;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMotor;
-import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHost, IGridBlock {
 
-    private double stored = 0;
-    private double maxStored = 10000;
     private IGridNode node = null;
+
+    private double getRatio() {
+
+        return PowerUnits.RF.convertTo(PowerUnits.AE, Config.PowerRatios.rf);
+    }
 
     @Override
     public boolean shouldMove() {
@@ -45,9 +49,9 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
     }
 
     @Override
-    public boolean hasEnoughPower(double power) {
+    public boolean hasEnoughFramezPower(double power) {
 
-        return stored >= power;
+        return getTotalStored() >= power;
     }
 
     @Override
@@ -57,16 +61,9 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
     }
 
     @Override
-    public PowerUnit getPowerUnit() {
-
-        return PowerUnit.AE2;
-    }
-
-    @Override
-    public void consumePower(double power) {
+    public void consumeFramezPower(double power) {
 
         drain(power);
-        sendUpdatePacket();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -113,6 +110,8 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
         double drainedFromThis = Math.min(amt, stored);
         stored -= drainedFromThis;
 
+        amt *= getRatio();
+
         if (amt > 0) {
             for (IGridNode n : node.getGrid().getNodes()) {
                 if (n != node) {
@@ -157,28 +156,30 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
     @Override
     public double injectAEPower(double amt, Actionable mode) {
 
-        int tot = (int) (stored + amt);
+        double ratio = getRatio();
+
+        int tot = (int) (stored + (amt / ratio));
         stored = Math.min(tot, maxStored);
         sendUpdatePacket();
-        return tot - stored;
+        return (tot - stored) * ratio;
     }
 
     @Override
     public double getAEMaxPower() {
 
-        return maxStored;
+        return maxStored * getRatio();
     }
 
     @Override
     public double getAECurrentPower() {
 
-        return stored;
+        return stored * getRatio();
     }
 
     @Override
     public boolean isAEPublicPowerStorage() {
 
-        return false;
+        return true;
     }
 
     @Override
@@ -282,7 +283,7 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
 
         super.writeUpdatePacket(tag);
 
-        tag.setDouble("power", getTotalStored());
+        tag.setDouble("stored", getTotalStored());
     }
 
     @Override
@@ -290,7 +291,7 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
 
         super.readUpdatePacket(tag);
 
-        stored = tag.getDouble("power");
+        stored = tag.getDouble("stored");
     }
 
     @Override
@@ -298,7 +299,7 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
 
         super.writeToNBT(tag);
 
-        tag.setDouble("power", stored);
+        tag.setDouble("stored", stored);
     }
 
     @Override
@@ -306,7 +307,7 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
 
         super.readFromNBT(tag);
 
-        stored = tag.getDouble("power");
+        stored = tag.getDouble("stored");
     }
 
 }

@@ -7,18 +7,14 @@ import ic2.api.energy.tile.IEnergySink;
 import java.util.AbstractMap;
 import java.util.Map.Entry;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.amadornes.framez.config.Config;
 import com.amadornes.framez.tile.TileMotor;
-import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorEU extends TileMotor implements IEnergySink {
-
-    private double stored = 0;
-    private double maxStored = 10000;
 
     @Override
     public boolean shouldMove() {
@@ -27,7 +23,7 @@ public class TileMotorEU extends TileMotor implements IEnergySink {
     }
 
     @Override
-    public boolean hasEnoughPower(double power) {
+    public boolean hasEnoughFramezPower(double power) {
 
         return stored >= power;
     }
@@ -36,19 +32,6 @@ public class TileMotorEU extends TileMotor implements IEnergySink {
     public double getMovementSpeed() {
 
         return 1;
-    }
-
-    @Override
-    public PowerUnit getPowerUnit() {
-
-        return PowerUnit.EU;
-    }
-
-    @Override
-    public void consumePower(double power) {
-
-        stored -= power;
-        sendUpdatePacket();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -97,7 +80,7 @@ public class TileMotorEU extends TileMotor implements IEnergySink {
     @Override
     public double getDemandedEnergy() {
 
-        return maxStored - stored;
+        return (maxStored - stored) * Config.PowerRatios.eu;
     }
 
     @Override
@@ -110,24 +93,9 @@ public class TileMotorEU extends TileMotor implements IEnergySink {
     public double injectEnergy(ForgeDirection directionFrom, double amount, double voltage) {
 
         double injected = Math.min(getDemandedEnergy(), amount);
-        stored += injected;
+        stored += injected / Config.PowerRatios.eu;
         sendUpdatePacket();
         return amount - injected;
-    }
-
-    @Override
-    public void writeUpdatePacket(NBTTagCompound tag) {
-
-        super.writeUpdatePacket(tag);
-
-        tag.setDouble("energy", stored);
-    }
-
-    @Override
-    public void readUpdatePacket(NBTTagCompound tag) {
-
-        super.readUpdatePacket(tag);
-        stored = tag.getDouble("energy");
     }
 
 }

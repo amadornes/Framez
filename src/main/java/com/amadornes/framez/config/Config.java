@@ -14,13 +14,25 @@ public class Config {
     }
 
     /**
-     * In RF
+     * In FPU
      */
-    public static class Power {
+    public static class PowerUsage {
 
         public static double getPowerUsedPerMove = 1000;
         public static double getPowerUsedPerBlock = 100;
-        public static double getPowerUsedPerTileEntity = 150; // 100 + 150 = 250
+        public static double getPowerUsedPerTileEntity = 250; // 100 + 150 = 250
+    }
+
+    /**
+     * Ratio of OriginalPower/FPU
+     */
+    public static class PowerRatios {
+
+        public static double bmLP = 1.75;
+        public static double hcPressure = 50;
+        public static double eu = 2.5;
+        public static double pcPressure = 0.001;
+        public static double rf = 1;
     }
 
 }

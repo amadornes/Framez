@@ -3,17 +3,13 @@ package com.amadornes.framez.compat.rf;
 import java.util.AbstractMap;
 import java.util.Map.Entry;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
-import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
 
+import com.amadornes.framez.config.Config;
 import com.amadornes.framez.tile.TileMotor;
-import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorRF extends TileMotor implements IEnergyHandler {
-
-    private EnergyStorage buffer = new EnergyStorage(100000, 500);
 
     @Override
     public boolean shouldMove() {
@@ -22,7 +18,7 @@ public class TileMotorRF extends TileMotor implements IEnergyHandler {
     }
 
     @Override
-    public boolean hasEnoughPower(double power) {
+    public boolean hasEnoughFramezPower(double power) {
 
         return getEnergyStored(null) >= power;
     }
@@ -31,19 +27,6 @@ public class TileMotorRF extends TileMotor implements IEnergyHandler {
     public double getMovementSpeed() {
 
         return 1;
-    }
-
-    @Override
-    public PowerUnit getPowerUnit() {
-
-        return PowerUnit.RF;
-    }
-
-    @Override
-    public void consumePower(double power) {
-
-        buffer.extractEnergy((int) power, false);
-        sendUpdatePacket();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -62,11 +45,14 @@ public class TileMotorRF extends TileMotor implements IEnergyHandler {
     @Override
     public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
 
-        int rec = buffer.receiveEnergy(maxReceive, simulate);
+        double rec = Math.min(maxReceive / Config.PowerRatios.rf, maxStored - stored);
+
+        if (!simulate)
+            stored += rec;
 
         sendUpdatePacket();
 
-        return rec;
+        return (int) Math.ceil(rec * Config.PowerRatios.rf);
     }
 
     @Override
@@ -78,27 +64,13 @@ public class TileMotorRF extends TileMotor implements IEnergyHandler {
     @Override
     public int getEnergyStored(ForgeDirection from) {
 
-        return buffer.getEnergyStored();
+        return (int) (stored * Config.PowerRatios.rf);
     }
 
     @Override
     public int getMaxEnergyStored(ForgeDirection from) {
 
-        return buffer.getMaxEnergyStored();
-    }
-
-    @Override
-    public void writeUpdatePacket(NBTTagCompound tag) {
-
-        super.writeUpdatePacket(tag);
-        buffer.writeToNBT(tag);
-    }
-
-    @Override
-    public void readUpdatePacket(NBTTagCompound tag) {
-
-        super.readUpdatePacket(tag);
-        buffer.readFromNBT(tag);
+        return (int) (maxStored * Config.PowerRatios.rf);
     }
 
 }

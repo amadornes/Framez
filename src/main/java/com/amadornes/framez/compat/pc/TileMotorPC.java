@@ -9,8 +9,8 @@ import pneumaticCraft.api.tileentity.AirHandlerSupplier;
 import pneumaticCraft.api.tileentity.IAirHandler;
 import pneumaticCraft.api.tileentity.IPneumaticMachine;
 
+import com.amadornes.framez.config.Config;
 import com.amadornes.framez.tile.TileMotor;
-import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorPC extends TileMotor implements IPneumaticMachine {
 
@@ -21,7 +21,7 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
     }
 
     @Override
-    public boolean hasEnoughPower(double power) {
+    public boolean hasEnoughFramezPower(double power) {
 
         return handler.getPressure(ForgeDirection.UNKNOWN) >= power;
     }
@@ -33,23 +33,18 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
     }
 
     @Override
-    public PowerUnit getPowerUnit() {
+    public void consumeFramezPower(double power) {
 
-        return PowerUnit.PC_PRESSURE;
-    }
-
-    @Override
-    public void consumePower(double power) {
-
-        handler.addAir(-(int) (power * 1000), ForgeDirection.UNKNOWN);
-        sendUpdatePacket();
+        getAirHandler().addAir(-(int) (power * Config.PowerRatios.pcPressure), ForgeDirection.UNKNOWN);
+        stored = (getAirHandler().getCurrentAir(ForgeDirection.UNKNOWN) / (double) getAirHandler().getMaxPressure()) * maxStored;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public Entry<Double, Double> getExtraInfo() {
 
-        return new AbstractMap.SimpleEntry((double) handler.getMaxPressure(), (double) handler.getPressure(ForgeDirection.UNKNOWN));
+        return new AbstractMap.SimpleEntry((double) getAirHandler().getMaxPressure(), (double) getAirHandler().getPressure(
+                ForgeDirection.UNKNOWN));
     }
 
     @Override
@@ -57,7 +52,7 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
 
         super.writeUpdatePacket(tag);
 
-        handler.writeToNBTI(tag);
+        getAirHandler().writeToNBTI(tag);
     }
 
     @Override
@@ -65,7 +60,7 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
 
         super.readUpdatePacket(tag);
 
-        handler.readFromNBTI(tag);
+        getAirHandler().readFromNBTI(tag);
     }
 
     private IAirHandler handler;
@@ -83,33 +78,19 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
         return getFace() != dir;
     }
 
+    private double oldPower;
+
     @Override
     public void updateEntity() {
 
         super.updateEntity();
 
-        initializeAirHandlerIfNeeded();
-        handler.updateEntityI();
+        getAirHandler().updateEntityI();
 
-        sendUpdatePacket();
-    }
-
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-
-        super.writeToNBT(tag);
-
-        initializeAirHandlerIfNeeded();
-        handler.writeToNBTI(tag);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-
-        super.readFromNBT(tag);
-
-        initializeAirHandlerIfNeeded();
-        handler.readFromNBTI(tag);
+        oldPower = stored;
+        stored = (getAirHandler().getCurrentAir(ForgeDirection.UNKNOWN) / (double) getAirHandler().getMaxPressure()) * maxStored;
+        if (stored != oldPower)
+            sendUpdatePacket();
     }
 
     @Override
@@ -117,14 +98,14 @@ public class TileMotorPC extends TileMotor implements IPneumaticMachine {
 
         super.validate();
 
-        initializeAirHandlerIfNeeded();
-        handler.validateI(this);
+        getAirHandler().validateI(this);
     }
 
     private void initializeAirHandlerIfNeeded() {
 
-        if (handler == null)
+        if (handler == null) {
             handler = AirHandlerSupplier.getAirHandler(20, 25, 20000);
+        }
     }
 
 }

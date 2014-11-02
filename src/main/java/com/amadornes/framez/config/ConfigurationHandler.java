@@ -5,7 +5,6 @@ import java.io.File;
 import net.minecraftforge.common.config.Configuration;
 
 import com.amadornes.framez.ref.ModInfo;
-import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -15,7 +14,8 @@ public class ConfigurationHandler {
     public static Configuration cfg;
 
     public static final String CATEGORY_MOTORS = "motors";
-    public static final String CATEGORY_POWER = "power";
+    public static final String CATEGORY_POWER_USAGE = "power_usage";
+    public static final String CATEGORY_POWER_RATIOS = "power_ratios";
 
     public static void init(File configFile) {
 
@@ -52,20 +52,34 @@ public class ConfigurationHandler {
                             "Enables/disables the Applied Energistics motor. This one needs AE power to run and it also requires a redstone signal");
         }
 
-        // Power
+        // Power Usage
         {
-            cfg.getCategory(CATEGORY_POWER).setComment(
-                    "Allows you to customize how much power motors use (based on RF). " + PowerUnit.RF.getPowerMultiplier() + "RF = "
-                            + PowerUnit.EU.getPowerMultiplier() + "EU = " + PowerUnit.PC_PRESSURE.getPowerMultiplier() + " PC pressure = "
-                            + PowerUnit.HC_PRESSURE.getPowerMultiplier() + " HC pressure");
-            Config.Power.getPowerUsedPerBlock = cfg.getFloat("getPowerUsedPerBlock", CATEGORY_POWER,
-                    (float) Config.Power.getPowerUsedPerBlock, 0, Float.MAX_VALUE, "Power that moving one block will use");
-            Config.Power.getPowerUsedPerTileEntity = cfg.getFloat("getPowerUsedPerTileEntity", CATEGORY_POWER,
-                    (float) Config.Power.getPowerUsedPerTileEntity, 0, Float.MAX_VALUE,
+            cfg.getCategory(CATEGORY_POWER_USAGE).setComment("Allows you to customize how much power motors use in Framez Power Units.");
+            Config.PowerUsage.getPowerUsedPerBlock = cfg.getFloat("getPowerUsedPerBlock", CATEGORY_POWER_USAGE,
+                    (float) Config.PowerUsage.getPowerUsedPerBlock, 0, Float.MAX_VALUE, "Power that moving one block will use");
+            Config.PowerUsage.getPowerUsedPerTileEntity = cfg.getFloat("getPowerUsedPerTileEntity", CATEGORY_POWER_USAGE,
+                    (float) Config.PowerUsage.getPowerUsedPerTileEntity, 0, Float.MAX_VALUE,
                     "Power that moving one TileEntity will use. Will get added to the amount moving a block uses");
-            Config.Power.getPowerUsedPerMove = cfg.getFloat("getPowerUsedPerMove", CATEGORY_POWER,
-                    (float) Config.Power.getPowerUsedPerMove, 0, Float.MAX_VALUE,
+            Config.PowerUsage.getPowerUsedPerMove = cfg.getFloat("getPowerUsedPerMove", CATEGORY_POWER_USAGE,
+                    (float) Config.PowerUsage.getPowerUsedPerMove, 0, Float.MAX_VALUE,
                     "Power that moving a structure will take (no matter how many blocks/how big)");
+        }
+
+        // Power Ratios
+        {
+            cfg.getCategory(CATEGORY_POWER_RATIOS).setComment(
+                    "Allows you to customize the power ratios for all the power systems supported by Framez itself.");
+            Config.PowerRatios.hcPressure = cfg.getFloat("hcPressure", CATEGORY_POWER_RATIOS, (float) Config.PowerRatios.hcPressure, 1,
+                    Float.MAX_VALUE, "Ratio from HC pressure to FPUs (default is 5:1)");
+            Config.PowerRatios.eu = cfg.getFloat("eu", CATEGORY_POWER_RATIOS, (float) Config.PowerRatios.eu, 1, Float.MAX_VALUE,
+                    "Ratio from EUs to FPUs (default is 1:5)");
+            Config.PowerRatios.pcPressure = cfg.getFloat("pcPressure", CATEGORY_POWER_RATIOS, (float) Config.PowerRatios.pcPressure, 1,
+                    Float.MAX_VALUE, "Ratio from PC pressure to FPUs (default is 1:1000)");
+            Config.PowerRatios.rf = cfg.getFloat("rf", CATEGORY_POWER_RATIOS, (float) Config.PowerRatios.rf, 1, Float.MAX_VALUE,
+                    "Ratio from RF to FPUs (default is 1:1)");
+            Config.PowerRatios.bmLP = cfg.getFloat("bmLP", CATEGORY_POWER_RATIOS, (float) Config.PowerRatios.bmLP, 1, Float.MAX_VALUE,
+                    "Ratio from BloodMagic LPs to FPUs (default is 7:4)");
+
         }
 
         if (cfg.hasChanged()) {

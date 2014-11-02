@@ -18,20 +18,23 @@ import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.network.NetworkHandler;
 import com.amadornes.framez.network.packet.PacketStartMoving;
-import com.amadornes.framez.util.PowerHelper.PowerUnit;
 import com.amadornes.framez.world.WorldWrapperProvider;
 
 public abstract class TileMotor extends TileEntity implements IFrameMove {
 
     public abstract boolean shouldMove();
 
-    public abstract boolean hasEnoughPower(double power);
-
     public abstract double getMovementSpeed();
 
-    public abstract PowerUnit getPowerUnit();
+    public void consumeFramezPower(double power) {
 
-    public abstract void consumePower(double power);
+        stored -= power;
+    }
+
+    public boolean hasEnoughFramezPower(double power) {
+
+        return stored >= power;
+    }
 
     public Object getExtraInfo() {
 
@@ -49,6 +52,9 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     private boolean canMove = false;
     private List<BlockCoord> movedBlocks = null;
     private int lastCheck = 0;
+
+    protected double stored = 0;
+    protected double maxStored = 100000;
 
     public ForgeDirection getFace() {
 
@@ -131,6 +137,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         tag.setInteger("direction", getDirection().ordinal());
 
         tag.setString("placer", placer);
+
+        tag.setDouble("stored", stored);
     }
 
     public void readUpdatePacket(NBTTagCompound tag) {
@@ -139,6 +147,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         direction = ForgeDirection.getOrientation(tag.getInteger("direction"));
 
         placer = tag.getString("placer");
+
+        stored = tag.getDouble("stored");
     }
 
     @Override
@@ -210,16 +220,13 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         if (canMove) {
             List<BlockCoord> blocks = movedBlocks;
             double power = 0;
-            power += Config.Power.getPowerUsedPerMove;
+            power += Config.PowerUsage.getPowerUsedPerMove;
             for (BlockCoord b : blocks) {
-                power += Config.Power.getPowerUsedPerBlock;
+                power += Config.PowerUsage.getPowerUsedPerBlock;
                 if (getWorldObj().getTileEntity(b.x, b.y, b.z) != null)
-                    power += Config.Power.getPowerUsedPerTileEntity;
+                    power += Config.PowerUsage.getPowerUsedPerTileEntity;
             }
-            if (getPowerUnit() != null) {
-                power = (power / PowerUnit.RF.getPowerMultiplier()) * getPowerUnit().getPowerMultiplier();
-            }
-            if (hasEnoughPower(power)) {
+            if (hasEnoughFramezPower(power)) {
                 MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / (20D * 0.75D));
                 structure.addBlocks(blocks);
 
@@ -228,7 +235,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
                 NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
 
-                consumePower(power);
+                consumeFramezPower(power);
+                sendUpdatePacket();
 
                 return true;
             }

@@ -10,8 +10,8 @@ import k4unl.minecraft.Hydraulicraft.api.PressureTier;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.amadornes.framez.config.Config;
 import com.amadornes.framez.tile.TileMotor;
-import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
 
@@ -22,9 +22,9 @@ public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
     }
 
     @Override
-    public boolean hasEnoughPower(double power) {
+    public boolean hasEnoughFramezPower(double power) {
 
-        return c.getStored() >= power;
+        return c.getPressure(ForgeDirection.UP) >= power;
     }
 
     @Override
@@ -34,23 +34,18 @@ public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
     }
 
     @Override
-    public PowerUnit getPowerUnit() {
+    public void consumeFramezPower(double power) {
 
-        return PowerUnit.HC_PRESSURE;
-    }
-
-    @Override
-    public void consumePower(double power) {
-
-        c.setStored((int) Math.round(c.getStored() - power), true, true);
-        sendUpdatePacket();
+        int pow = c.getStored() - (int) (power * Config.PowerRatios.hcPressure);
+        c.setPressure(pow, ForgeDirection.UP);
+        stored = (pow / (double) c.getMaxStorage()) * maxStored;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public Entry<Double, Double> getExtraInfo() {
 
-        return new AbstractMap.SimpleEntry((double) c.getMaxStorage(), (double) c.getStored());
+        return new AbstractMap.SimpleEntry(maxStored, stored);
     }
 
     @Override
@@ -59,7 +54,7 @@ public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
         return true;
     }
 
-    private IBaseClass c = HydraulicBaseClassSupplier.getBaseClass(this, PressureTier.HIGHPRESSURE, 10);
+    private IBaseClass c = HydraulicBaseClassSupplier.getBaseClass(this, PressureTier.HIGHPRESSURE, 250);
 
     @Override
     public IBaseClass getHandler() {
@@ -85,28 +80,19 @@ public class TileMotorHC extends TileMotor implements IHydraulicConsumer {
         return 0;
     }
 
+    private double oldPower = 0;
+
     @Override
     public void updateEntity() {
 
         super.updateEntity();
 
         c.updateEntityI();
-    }
 
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-
-        super.writeToNBT(tag);
-
-        c.writeToNBTI(tag);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-
-        super.readFromNBT(tag);
-
-        c.readFromNBTI(tag);
+        oldPower = stored;
+        stored = (c.getPressure(ForgeDirection.UP) / (double) c.getMaxPressure(true, ForgeDirection.UP)) * maxStored;
+        if (stored != oldPower)
+            sendUpdatePacket();
     }
 
     @Override

@@ -28,10 +28,10 @@ public class GuiConfigFramez extends GuiConfig {
 
         List<GuiConfigFramez> motors = new ConfigElement(ConfigurationHandler.cfg.getCategory(ConfigurationHandler.CATEGORY_MOTORS))
         .getChildElements();
-        List<GuiConfigFramez> power = new ConfigElement(ConfigurationHandler.cfg.getCategory(ConfigurationHandler.CATEGORY_POWER)).getChildElements();
+        List<GuiConfigFramez> power = new ConfigElement(ConfigurationHandler.cfg.getCategory(ConfigurationHandler.CATEGORY_POWER_USAGE)).getChildElements();
 
         list.add(new DummyConfigElement.DummyCategoryElement("Motors", ModInfo.MODID + ".cfg." + ConfigurationHandler.CATEGORY_MOTORS, motors));
-        list.add(new DummyConfigElement.DummyCategoryElement("Power", ModInfo.MODID + ".cfg." + ConfigurationHandler.CATEGORY_POWER, power));
+        list.add(new DummyConfigElement.DummyCategoryElement("Power", ModInfo.MODID + ".cfg." + ConfigurationHandler.CATEGORY_POWER_USAGE, power));
 
         return list;
     }

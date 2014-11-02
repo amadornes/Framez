@@ -7,8 +7,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import WayofTime.alchemicalWizardry.api.soulNetwork.SoulNetworkHandler;
 
+import com.amadornes.framez.config.Config;
 import com.amadornes.framez.tile.TileMotor;
-import com.amadornes.framez.util.PowerHelper.PowerUnit;
 
 public class TileMotorBM extends TileMotor {
 
@@ -21,7 +21,7 @@ public class TileMotorBM extends TileMotor {
     }
 
     @Override
-    public boolean hasEnoughPower(double power) {
+    public boolean hasEnoughFramezPower(double power) {
 
         return SoulNetworkHandler.getCurrentEssence(getPlacer()) >= power;
     }
@@ -33,19 +33,11 @@ public class TileMotorBM extends TileMotor {
     }
 
     @Override
-    public PowerUnit getPowerUnit() {
-
-        return PowerUnit.LP;
-    }
-
-    @Override
-    public void consumePower(double power) {
+    public void consumeFramezPower(double power) {
 
         setupItem();
         SoulNetworkHandler.syphonAndDamageFromNetwork(item, MinecraftServer.getServer().getConfigurationManager()
-                .func_152612_a(getPlacer()), (int) power);
-
-        sendUpdatePacket();
+                .func_152612_a(getPlacer()), (int) (power * Config.PowerRatios.bmLP));
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
