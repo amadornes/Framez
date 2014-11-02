@@ -36,6 +36,7 @@ repositories {
 
 apply plugin: 'forge'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 project.ext {
     major = "0"
