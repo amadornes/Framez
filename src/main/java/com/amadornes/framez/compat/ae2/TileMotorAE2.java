@@ -73,6 +73,8 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
         return new AbstractMap.SimpleEntry(maxStored, stored);
     }
 
+    private double oldPower = 0;
+
     @Override
     public void updateEntity() {
 
@@ -82,6 +84,11 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
             node = AEApi.instance().createGridNode(this);
             node.updateState();
         }
+
+        double pow = getTotalStored();
+        if (pow != oldPower)
+            sendUpdatePacket();
+        oldPower = pow;
     }
 
     public double getTotalStored() {
