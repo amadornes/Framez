@@ -85,6 +85,12 @@ public class RenderFrame implements IItemRenderer {
 
     private static final void renderStandardBlock(int x, int y, int z) {
 
+        double sep = -0.001;
+
+        rb.setRenderBounds(rb.renderMinX == 0 ? -sep : rb.renderMinX, rb.renderMinY == 0 ? -sep : rb.renderMinY, rb.renderMinZ == 0 ? -sep
+                : rb.renderMinZ, rb.renderMaxX == 1 ? 1 + sep : rb.renderMaxX, rb.renderMaxY == 1 ? 1 + sep : rb.renderMaxY,
+                        rb.renderMaxZ == 1 ? 1 + sep : rb.renderMaxZ);
+
         if (!itemRenderer) {
             rb.renderStandardBlock(blockFake, x, y, z);
         } else {
@@ -103,18 +109,11 @@ public class RenderFrame implements IItemRenderer {
         }
     }
 
-    private static final void renderBox(PartFrame frame, int minx, int miny, int minz, int maxx, int maxy, int maxz, boolean up, boolean down,
-            boolean east, boolean west, boolean south, boolean north, int x, int y, int z) {
-
-        double sep = 0.001;
+    private static final void renderBox(PartFrame frame, int minx, int miny, int minz, int maxx, int maxy, int maxz, boolean up,
+            boolean down, boolean east, boolean west, boolean south, boolean north, int x, int y, int z) {
 
         rb.setRenderFromInside(false);
-        rb.setRenderBounds(minx / 16D + (minx == 0 && frame.getConnections()[ForgeDirection.WEST.ordinal()] == null ? sep : 0), miny / 16D
-                + (miny == 0 && frame.getConnections()[ForgeDirection.DOWN.ordinal()] == null ? sep : 0),
-                minz / 16D + (minz == 0 && frame.getConnections()[ForgeDirection.NORTH.ordinal()] == null ? sep : 0), maxx / 16D
-                - (maxx == 16 && frame.getConnections()[ForgeDirection.EAST.ordinal()] == null ? sep : 0),
-                maxy / 16D - (maxy == 16 && frame.getConnections()[ForgeDirection.UP.ordinal()] == null ? sep : 0),
-                maxz / 16D - (maxz == 16 && frame.getConnections()[ForgeDirection.SOUTH.ordinal()] == null ? sep : 0));
+        rb.setRenderBounds(minx / 16D, miny / 16D, minz / 16D, maxx / 16D, maxy / 16D, maxz / 16D);
 
         renderFace[ForgeDirection.UP.ordinal()] = up;
         renderFace[ForgeDirection.DOWN.ordinal()] = down;
@@ -147,8 +146,8 @@ public class RenderFrame implements IItemRenderer {
             {
                 // North-west
                 if (frame.getRender()[0])
-                    renderBox(frame, 0, 0, 0, 1, 1, 1, !frame.getRender()[16], renderDown, !frame.getRender()[1], renderWest, !frame.getRender()[7],
-                            renderNorth, x, y, z);
+                    renderBox(frame, 0, 0, 0, 1, 1, 1, !frame.getRender()[16], renderDown, !frame.getRender()[1], renderWest,
+                            !frame.getRender()[7], renderNorth, x, y, z);
                 // North
                 if (frame.getRender()[1])
                     renderBox(frame, 1, 0, 0, 15, 1, 1, true, renderDown, false, false, true, renderNorth, x, y, z);
@@ -161,15 +160,15 @@ public class RenderFrame implements IItemRenderer {
                     renderBox(frame, 15, 0, 1, 16, 1, 15, true, renderDown, renderEast, true, false, false, x, y, z);
                 // South-east
                 if (frame.getRender()[4])
-                    renderBox(frame, 15, 0, 15, 16, 1, 16, !frame.getRender()[18], renderDown, renderEast, !frame.getRender()[5], renderSouth,
-                            !frame.getRender()[3], x, y, z);
+                    renderBox(frame, 15, 0, 15, 16, 1, 16, !frame.getRender()[18], renderDown, renderEast, !frame.getRender()[5],
+                            renderSouth, !frame.getRender()[3], x, y, z);
                 // South
                 if (frame.getRender()[5])
                     renderBox(frame, 1, 0, 15, 15, 1, 16, true, renderDown, false, false, renderSouth, true, x, y, z);
                 // South-west
                 if (frame.getRender()[6])
-                    renderBox(frame, 0, 0, 15, 1, 1, 16, !frame.getRender()[19], renderDown, !frame.getRender()[5], renderWest, renderSouth,
-                            !frame.getRender()[7], x, y, z);
+                    renderBox(frame, 0, 0, 15, 1, 1, 16, !frame.getRender()[19], renderDown, !frame.getRender()[5], renderWest,
+                            renderSouth, !frame.getRender()[7], x, y, z);
                 // West
                 if (frame.getRender()[7])
                     renderBox(frame, 0, 0, 1, 1, 1, 15, true, renderDown, true, renderWest, false, false, x, y, z);
@@ -179,8 +178,8 @@ public class RenderFrame implements IItemRenderer {
             {
                 // North-west
                 if (frame.getRender()[8])
-                    renderBox(frame, 0, 15, 0, 1, 16, 1, renderUp, !frame.getRender()[16], !frame.getRender()[9], renderWest, !frame.getRender()[15],
-                            renderNorth, x, y, z);
+                    renderBox(frame, 0, 15, 0, 1, 16, 1, renderUp, !frame.getRender()[16], !frame.getRender()[9], renderWest,
+                            !frame.getRender()[15], renderNorth, x, y, z);
                 // North
                 if (frame.getRender()[9])
                     renderBox(frame, 1, 15, 0, 15, 16, 1, renderUp, true, false, false, true, renderNorth, x, y, z);
@@ -193,15 +192,15 @@ public class RenderFrame implements IItemRenderer {
                     renderBox(frame, 15, 15, 1, 16, 16, 15, renderUp, true, renderEast, true, false, false, x, y, z);
                 // South-east
                 if (frame.getRender()[12])
-                    renderBox(frame, 15, 15, 15, 16, 16, 16, renderUp, !frame.getRender()[18], renderEast, !frame.getRender()[13], renderSouth,
-                            !frame.getRender()[11], x, y, z);
+                    renderBox(frame, 15, 15, 15, 16, 16, 16, renderUp, !frame.getRender()[18], renderEast, !frame.getRender()[13],
+                            renderSouth, !frame.getRender()[11], x, y, z);
                 // South
                 if (frame.getRender()[13])
                     renderBox(frame, 1, 15, 15, 15, 16, 16, renderUp, true, false, false, renderSouth, true, x, y, z);
                 // South-west
                 if (frame.getRender()[14])
-                    renderBox(frame, 0, 15, 15, 1, 16, 16, renderUp, !frame.getRender()[19], !frame.getRender()[13], renderWest, renderSouth,
-                            !frame.getRender()[15], x, y, z);
+                    renderBox(frame, 0, 15, 15, 1, 16, 16, renderUp, !frame.getRender()[19], !frame.getRender()[13], renderWest,
+                            renderSouth, !frame.getRender()[15], x, y, z);
                 // West
                 if (frame.getRender()[15])
                     renderBox(frame, 0, 15, 1, 1, 16, 15, renderUp, true, true, renderWest, false, false, x, y, z);
@@ -237,9 +236,10 @@ public class RenderFrame implements IItemRenderer {
             renderFace[ForgeDirection.UP.ordinal()] = true;
             renderFace[ForgeDirection.DOWN.ordinal()] = true;
 
-            rb.setRenderBounds(0 + (frame.getConnection(ForgeDirection.WEST) == null ? sep : 0), 1 - depth, 0 + (frame
-                    .getConnection(ForgeDirection.NORTH) == null ? sep : 0), 1 - (frame.getConnection(ForgeDirection.EAST) == null ? sep : 0),
-                    1 - depth, 1 - (frame.getConnection(ForgeDirection.SOUTH) == null ? sep : 0));
+            rb.setRenderBounds(0 + (frame.getConnection(ForgeDirection.WEST) == null ? sep : 0), 1 - depth,
+                    0 + (frame.getConnection(ForgeDirection.NORTH) == null ? sep : 0),
+                    1 - (frame.getConnection(ForgeDirection.EAST) == null ? sep : 0), 1 - depth,
+                    1 - (frame.getConnection(ForgeDirection.SOUTH) == null ? sep : 0));
             if (frame.getConnection(ForgeDirection.UP) == null || frame.isSideBlocked(ForgeDirection.UP)
                     || !frame.hasModifier(References.Modifiers.CONNECTED)) {
                 face = ForgeDirection.UP;
@@ -264,7 +264,8 @@ public class RenderFrame implements IItemRenderer {
             }
             rb.setRenderBounds(0 + depth, 0 + (frame.getConnection(ForgeDirection.DOWN) == null ? sep : 0), 0 + (frame
                     .getConnection(ForgeDirection.NORTH) == null ? sep : 0), 0 + depth,
-                    1 - (frame.getConnection(ForgeDirection.UP) == null ? sep : 0), 1 - (frame.getConnection(ForgeDirection.SOUTH) == null ? sep : 0));
+                    1 - (frame.getConnection(ForgeDirection.UP) == null ? sep : 0),
+                    1 - (frame.getConnection(ForgeDirection.SOUTH) == null ? sep : 0));
             if (frame.getConnection(ForgeDirection.WEST) == null || frame.isSideBlocked(ForgeDirection.WEST)
                     || !frame.hasModifier(References.Modifiers.CONNECTED)) {
                 face = ForgeDirection.WEST;
@@ -275,10 +276,10 @@ public class RenderFrame implements IItemRenderer {
             renderFace[ForgeDirection.SOUTH.ordinal()] = true;
             renderFace[ForgeDirection.NORTH.ordinal()] = true;
 
-            rb.setRenderBounds(0 + (frame.getConnection(ForgeDirection.WEST) == null ? sep : 0),
-                    0 + (frame.getConnection(ForgeDirection.DOWN) == null ? sep : 0), 1 - depth,
-                    1 - (frame.getConnection(ForgeDirection.EAST) == null ? sep : 0), 1 - (frame.getConnection(ForgeDirection.UP) == null ? sep : 0),
-                    1 - depth);
+            rb.setRenderBounds(0 + (frame.getConnection(ForgeDirection.WEST) == null ? sep : 0), 0 + (frame
+                    .getConnection(ForgeDirection.DOWN) == null ? sep : 0), 1 - depth,
+                    1 - (frame.getConnection(ForgeDirection.EAST) == null ? sep : 0),
+                    1 - (frame.getConnection(ForgeDirection.UP) == null ? sep : 0), 1 - depth);
             if (frame.getConnection(ForgeDirection.SOUTH) == null || frame.isSideBlocked(ForgeDirection.SOUTH)
                     || !frame.hasModifier(References.Modifiers.CONNECTED)) {
                 face = ForgeDirection.SOUTH;
