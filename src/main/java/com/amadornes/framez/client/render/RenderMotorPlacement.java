@@ -35,6 +35,8 @@ public class RenderMotorPlacement {
             return;
         if (!(item.getItem() instanceof ItemBlock) || !(Block.getBlockFromItem(item.getItem()) instanceof BlockMotor))
             return;
+        if (Minecraft.getMinecraft().gameSettings.hideGUI && Minecraft.getMinecraft().currentScreen == null)
+            return;
 
         MovingObjectPosition mop = player.rayTrace(player.capabilities.isCreativeMode ? 5 : 4, 0);
         if (mop == null || mop.typeOfHit != MovingObjectType.BLOCK)
