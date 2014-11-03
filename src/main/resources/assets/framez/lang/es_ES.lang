@@ -5,6 +5,7 @@ tile.framez:motor.electric.name=Motor Eléctrico
 tile.framez:motor.hydraulic.name=Motor Hidráulico
 tile.framez:motor.rf.name=Motor de Redstone Flux
 tile.framez:motor.blood.name=Motor de Sangre
+tile.framez:motor.applied.name=Motor de AppliedEnergistics
 
 item.framez:frame.name=Frame
 
