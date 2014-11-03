@@ -10,7 +10,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Rotation;
 import codechicken.lib.vec.Vector3;
+import codechicken.microblock.CommonMicroblock;
 import codechicken.microblock.FaceMicroblock;
+import codechicken.microblock.HollowMicroblock;
 import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
@@ -55,7 +57,8 @@ public class Utils {
         if (tile != null) {
             TileMultipart te = tile;
             NormallyOccludedPart box = new NormallyOccludedPart(
-                    new Cuboid6(3 / 16D, 0, 3 / 16D, 12 / 16D, 3 / 16D, 12 / 16D).apply(Rotation.sideRotations[face.ordinal()].at(Vector3.center)));
+                    new Cuboid6(3 / 16D, 0, 3 / 16D, 12 / 16D, 3 / 16D, 12 / 16D).apply(Rotation.sideRotations[face.ordinal()]
+                            .at(Vector3.center)));
             for (TMultiPart p : te.jPartList()) {
                 if (p instanceof PartFrame)
                     continue;
@@ -76,9 +79,9 @@ public class Utils {
             for (TMultiPart p : te.jPartList()) {
                 if (p instanceof PartFrame)
                     continue;
-                if (p instanceof FaceMicroblock)
-                    if (((FaceMicroblock) p).getSlot() == face.ordinal())
-                        return ((FaceMicroblock) p).getSize();
+                if (p instanceof FaceMicroblock || p instanceof HollowMicroblock)
+                    if (((CommonMicroblock) p).getSlot() == face.ordinal())
+                        return ((CommonMicroblock) p).getSize();
             }
 
             return 0;

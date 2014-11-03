@@ -21,6 +21,7 @@ import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.modifier.ModifierRegistry;
 import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.ref.References;
+import com.amadornes.framez.util.Utils;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -240,14 +241,14 @@ public class RenderFrame implements IItemRenderer {
                     0 + (frame.getConnection(ForgeDirection.NORTH) == null ? sep : 0),
                     1 - (frame.getConnection(ForgeDirection.EAST) == null ? sep : 0), 1 - depth,
                     1 - (frame.getConnection(ForgeDirection.SOUTH) == null ? sep : 0));
-            if (frame.getConnection(ForgeDirection.UP) == null || frame.isSideBlocked(ForgeDirection.UP)
-                    || !frame.hasModifier(References.Modifiers.CONNECTED)) {
+            if ((frame.getConnection(ForgeDirection.UP) == null || frame.isSideBlocked(ForgeDirection.UP) || !frame
+                    .hasModifier(References.Modifiers.CONNECTED)) && Utils.getMicroblockSize(frame.tile(), ForgeDirection.UP) == 0) {
                 face = ForgeDirection.UP;
                 renderStandardBlock(x, y, z);
             }
             rb.setRenderBounds(0 + sep, 0 + depth, 0 + sep, 1 - sep, 0 + depth, 1 - sep);
-            if (frame.getConnection(ForgeDirection.DOWN) == null || frame.isSideBlocked(ForgeDirection.DOWN)
-                    || !frame.hasModifier(References.Modifiers.CONNECTED)) {
+            if ((frame.getConnection(ForgeDirection.DOWN) == null || frame.isSideBlocked(ForgeDirection.DOWN) || !frame
+                    .hasModifier(References.Modifiers.CONNECTED)) && Utils.getMicroblockSize(frame.tile(), ForgeDirection.DOWN) == 0) {
                 face = ForgeDirection.DOWN;
                 renderStandardBlock(x, y, z);
             }
@@ -257,8 +258,8 @@ public class RenderFrame implements IItemRenderer {
             renderFace[ForgeDirection.WEST.ordinal()] = true;
 
             rb.setRenderBounds(1 - depth, 0 + sep, 0 + sep, 1 - depth, 1 - sep, 1 - sep);
-            if (frame.getConnection(ForgeDirection.EAST) == null || frame.isSideBlocked(ForgeDirection.EAST)
-                    || !frame.hasModifier(References.Modifiers.CONNECTED)) {
+            if ((frame.getConnection(ForgeDirection.EAST) == null || frame.isSideBlocked(ForgeDirection.EAST) || !frame
+                    .hasModifier(References.Modifiers.CONNECTED)) && Utils.getMicroblockSize(frame.tile(), ForgeDirection.EAST) == 0) {
                 face = ForgeDirection.EAST;
                 renderStandardBlock(x, y, z);
             }
@@ -266,8 +267,8 @@ public class RenderFrame implements IItemRenderer {
                     .getConnection(ForgeDirection.NORTH) == null ? sep : 0), 0 + depth,
                     1 - (frame.getConnection(ForgeDirection.UP) == null ? sep : 0),
                     1 - (frame.getConnection(ForgeDirection.SOUTH) == null ? sep : 0));
-            if (frame.getConnection(ForgeDirection.WEST) == null || frame.isSideBlocked(ForgeDirection.WEST)
-                    || !frame.hasModifier(References.Modifiers.CONNECTED)) {
+            if ((frame.getConnection(ForgeDirection.WEST) == null || frame.isSideBlocked(ForgeDirection.WEST) || !frame
+                    .hasModifier(References.Modifiers.CONNECTED)) && Utils.getMicroblockSize(frame.tile(), ForgeDirection.WEST) == 0) {
                 face = ForgeDirection.WEST;
                 renderStandardBlock(x, y, z);
             }
@@ -280,14 +281,14 @@ public class RenderFrame implements IItemRenderer {
                     .getConnection(ForgeDirection.DOWN) == null ? sep : 0), 1 - depth,
                     1 - (frame.getConnection(ForgeDirection.EAST) == null ? sep : 0),
                     1 - (frame.getConnection(ForgeDirection.UP) == null ? sep : 0), 1 - depth);
-            if (frame.getConnection(ForgeDirection.SOUTH) == null || frame.isSideBlocked(ForgeDirection.SOUTH)
-                    || !frame.hasModifier(References.Modifiers.CONNECTED)) {
+            if ((frame.getConnection(ForgeDirection.SOUTH) == null || frame.isSideBlocked(ForgeDirection.SOUTH) || !frame
+                    .hasModifier(References.Modifiers.CONNECTED)) && Utils.getMicroblockSize(frame.tile(), ForgeDirection.SOUTH) == 0) {
                 face = ForgeDirection.SOUTH;
                 renderStandardBlock(x, y, z);
             }
             rb.setRenderBounds(0 + sep, 0 + sep, 0 + depth, 1 - sep, 1 - sep, 0 + depth);
-            if (frame.getConnection(ForgeDirection.NORTH) == null || frame.isSideBlocked(ForgeDirection.NORTH)
-                    || !frame.hasModifier(References.Modifiers.CONNECTED)) {
+            if ((frame.getConnection(ForgeDirection.NORTH) == null || frame.isSideBlocked(ForgeDirection.NORTH) || !frame
+                    .hasModifier(References.Modifiers.CONNECTED)) && Utils.getMicroblockSize(frame.tile(), ForgeDirection.NORTH) == 0) {
                 face = ForgeDirection.NORTH;
                 renderStandardBlock(x, y, z);
             }
