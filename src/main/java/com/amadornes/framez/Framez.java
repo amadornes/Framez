@@ -17,7 +17,11 @@ import com.amadornes.framez.modifier.connected.ModifierProviderConnected;
 import com.amadornes.framez.modifier.glass.ModifierProviderGlass;
 import com.amadornes.framez.modifier.glass.clear.ModifierProviderGlassClear;
 import com.amadornes.framez.modifier.iron.ModifierProviderIron;
+import com.amadornes.framez.movement.MovementApi;
 import com.amadornes.framez.movement.StructureTickHandler;
+import com.amadornes.framez.movement.handler.FluidHandler;
+import com.amadornes.framez.movement.handler.MotorHandler;
+import com.amadornes.framez.movement.handler.UnbreakableHandler;
 import com.amadornes.framez.network.NetworkHandler;
 import com.amadornes.framez.part.RegisterParts;
 import com.amadornes.framez.proxy.CommonProxy;
@@ -88,6 +92,11 @@ public class Framez {
 
         ModGuiHandler modGuiHandler = new ModGuiHandler();
         NetworkRegistry.INSTANCE.registerGuiHandler(inst, modGuiHandler);
+
+        // Register default movement handlers
+        MovementApi.INST.registerMovementHandler(new UnbreakableHandler());
+        MovementApi.INST.registerMovementHandler(new FluidHandler());
+        MovementApi.INST.registerMovementHandler(new MotorHandler());
     }
 
     @EventHandler

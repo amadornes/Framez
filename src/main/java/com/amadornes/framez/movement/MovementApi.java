@@ -16,21 +16,11 @@ import com.amadornes.framez.api.movement.IMovementApi;
 import com.amadornes.framez.api.movement.IMovementHandler;
 import com.amadornes.framez.api.movement.IMovingBlock;
 import com.amadornes.framez.movement.handler.BlockHandler;
-import com.amadornes.framez.movement.handler.FluidHandler;
-import com.amadornes.framez.movement.handler.MotorHandler;
-import com.amadornes.framez.movement.handler.UnbreakableHandler;
 import com.amadornes.framez.util.Utils;
 
 public class MovementApi implements IMovementApi {
 
     public static final MovementApi INST = new MovementApi();
-
-    // Init some basic blocks
-    static {
-        INST.registerMovementHandler(new UnbreakableHandler());
-        INST.registerMovementHandler(new FluidHandler());
-        INST.registerMovementHandler(new MotorHandler());
-    }
 
     private List<IMovementHandler> handlers = new ArrayList<IMovementHandler>();
 

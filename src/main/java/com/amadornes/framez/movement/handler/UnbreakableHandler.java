@@ -6,8 +6,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidBase;
 
 import com.amadornes.framez.api.movement.BlockMovementType;
-import com.amadornes.framez.api.movement.HandlingPriority;
-import com.amadornes.framez.api.movement.HandlingPriority.Priority;
 import com.amadornes.framez.api.movement.IMovementHandler;
 import com.amadornes.framez.api.movement.IMovingBlock;
 
@@ -26,7 +24,6 @@ public class UnbreakableHandler implements IMovementHandler {
     }
 
     @Override
-    @HandlingPriority(Priority.HIGH)
     public BlockMovementType getMovementType(World w, Integer x, Integer y, Integer z) {
 
         Block b = w.getBlock(x, y, z);

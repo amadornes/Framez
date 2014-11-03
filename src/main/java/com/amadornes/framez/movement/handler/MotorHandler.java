@@ -3,6 +3,8 @@ package com.amadornes.framez.movement.handler;
 import net.minecraft.world.World;
 
 import com.amadornes.framez.api.movement.BlockMovementType;
+import com.amadornes.framez.api.movement.HandlingPriority;
+import com.amadornes.framez.api.movement.HandlingPriority.Priority;
 import com.amadornes.framez.api.movement.IMovementHandler;
 import com.amadornes.framez.api.movement.IMovingBlock;
 import com.amadornes.framez.block.BlockMotor;
@@ -10,6 +12,7 @@ import com.amadornes.framez.block.BlockMotor;
 public class MotorHandler implements IMovementHandler {
 
     @Override
+    @HandlingPriority(Priority.HIGH)
     public boolean handleStartMoving(IMovingBlock block) {
 
         if (block.getBlock() instanceof BlockMotor) {
@@ -20,6 +23,7 @@ public class MotorHandler implements IMovementHandler {
     }
 
     @Override
+    @HandlingPriority(Priority.HIGH)
     public boolean handleFinishMoving(IMovingBlock block) {
 
         if (block.getBlock() instanceof BlockMotor) {
