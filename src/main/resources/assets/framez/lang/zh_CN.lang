@@ -12,9 +12,9 @@ item.framez:frame.name=框架
 item.framez:wrench.name=扳手
 item.framez:stickiron.name=铁棍
 
-item.framez:framepart.cross.name=木十字
+item.framez:framepart.cross.name=木支架
 item.framez:framepart.frame.name=木框架
-item.framez:framepart.cross.iron.name=铁十字
+item.framez:framepart.cross.iron.name=铁支架
 item.framez:framepart.frame.iron.name=铁框架
 
 framez.hud.modifiers=特性
