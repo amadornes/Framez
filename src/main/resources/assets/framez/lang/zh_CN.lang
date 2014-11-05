@@ -21,9 +21,9 @@ framez.hud.modifiers=特性
 framez.hud.modifiers.none=无
 framez.hud.maxmoved=最多移动方块数
 
-framez.modifier.connected=已连接
+framez.modifier.connected=连接材质
 framez.modifier.iron=铁
 framez.modifier.glass=玻璃
-framez.modifier.glass.clear=通透玻璃
+framez.modifier.glass.clear=通透玻璃璃
 
 itemGroup.framez=Framez
