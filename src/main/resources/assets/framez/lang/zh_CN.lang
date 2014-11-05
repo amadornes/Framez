@@ -2,7 +2,7 @@ tile.framez:motorcore.name=运载核心
 tile.framez:motor.dc.name=直流运载器
 tile.framez:motor.pneumatic.name=气动运载器
 tile.framez:motor.electric.name=电力运载器
-tile.framez:motor.hydraulic.name=水力运载器
+tile.framez:motor.hydraulic.name=液压运载器
 tile.framez:motor.rf.name=RF运载器
 tile.framez:motor.blood.name=血之运载器
 tile.framez:motor.applied.name=AE运载器
@@ -21,7 +21,7 @@ framez.hud.modifiers=特性
 framez.hud.modifiers.none=无
 framez.hud.maxmoved=最多移动方块数
 
-framez.modifier.connected=连接
+framez.modifier.connected=已连接
 framez.modifier.iron=铁
 framez.modifier.glass=玻璃
 framez.modifier.glass.clear=通透玻璃
