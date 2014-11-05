@@ -1,4 +1,4 @@
-tile.framez:motorcore.name=Motor core
+tile.framez:motorcore.name=Motor Core
 tile.framez:motor.dc.name=DC Motor
 tile.framez:motor.pneumatic.name=Pneumatic Motor
 tile.framez:motor.electric.name=Electric Motor
