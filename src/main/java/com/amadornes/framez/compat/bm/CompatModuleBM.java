@@ -49,7 +49,7 @@ public class CompatModuleBM extends CompatModule {
         Item orbItem = GameRegistry.findItem(Dependencies.BM, "apprenticeBloodOrb");
         ItemStack orb = new ItemStack(orbItem, 1, OreDictionary.WILDCARD_VALUE);
         if (orbItem == null)
-            System.exit(-1);
+            return;
 
         GameRegistry.addRecipe(
                 new ItemStack(GameRegistry.findBlock(ModInfo.MODID, References.Names.Registry.MOTOR + "." + MotorProviderBM.inst.getId()),
