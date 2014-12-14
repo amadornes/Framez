@@ -23,7 +23,7 @@ public class MovedBlockHandler {
 
     public static boolean canMoveBlockAt(World world, BlockCoord location) {
 
-        for (Entry<World, BlockCoord> e : blocks)
+        for (Entry<World, BlockCoord> e : new ArrayList<Entry<World, BlockCoord>>(blocks))
             if (e.getKey() == world && e.getValue().equals(location))
                 return false;
 
