@@ -233,12 +233,6 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
     }
 
     @Override
-    public boolean isWorldAccessable() {
-
-        return true;
-    }
-
-    @Override
     public DimensionalCoord getLocation() {
 
         return new DimensionalCoord(getWorldObj(), xCoord, yCoord, zCoord);
@@ -315,6 +309,12 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
         super.readFromNBT(tag);
 
         stored = tag.getDouble("stored");
+    }
+
+    @Override
+    public boolean isWorldAccessible() {
+
+        return true;
     }
 
 }
