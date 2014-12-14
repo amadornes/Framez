@@ -80,8 +80,9 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
 
         super.updateEntity();
 
-        if (node == null && !worldObj.isRemote) {
-            node = AEApi.instance().createGridNode(this);
+        if (!worldObj.isRemote) {
+            if (node == null)
+                node = AEApi.instance().createGridNode(this);
             node.updateState();
         }
 
