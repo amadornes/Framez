@@ -26,7 +26,6 @@ import com.amadornes.framez.movement.MovingBlock;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -346,17 +345,17 @@ public class TileMoving extends TileEntity {
                 tag.setString("block", ui.name);
                 tag.setInteger("meta", blockA.getMetadata());
             }
-            if (type.isTile() && blockA.getTileEntity() != null) {
-                Packet p = blockA.getTileEntity().getDescriptionPacket();
-                if (p != null && p instanceof S35PacketUpdateTileEntity) {
-                    try {
-                        NBTTagCompound t = ReflectionHelper.getPrivateValue(S35PacketUpdateTileEntity.class,
-                                ((S35PacketUpdateTileEntity) p), "field_148860_e");
-                        tag.setTag("tile", t);
-                    } catch (Exception ex) {
-                    }
-                }
-            }
+            // if (type.isTile() && blockA.getTileEntity() != null) {
+            // Packet p = blockA.getTileEntity().getDescriptionPacket();
+            // if (p != null && p instanceof S35PacketUpdateTileEntity) {
+            // try {
+            // NBTTagCompound t = ReflectionHelper.getPrivateValue(S35PacketUpdateTileEntity.class,
+            // ((S35PacketUpdateTileEntity) p), "field_148860_e");
+            // tag.setTag("tile", t);
+            // } catch (Exception ex) {
+            // }
+            // }
+            // }
         }
 
         return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
@@ -367,11 +366,11 @@ public class TileMoving extends TileEntity {
 
         NBTTagCompound tag = pkt.func_148857_g();
 
-        if (!tag.hasKey("block") && !tag.hasKey("tile")) {
-            if (blockA != null && blockA.getTileEntity() != null)
-                blockA.getTileEntity().onDataPacket(net, pkt);
-            return;
-        }
+        // if (!tag.hasKey("block") && !tag.hasKey("tile")) {
+        // if (blockA != null && blockA.getTileEntity() != null)
+        // blockA.getTileEntity().onDataPacket(net, pkt);
+        // return;
+        // }
 
         if (blockA == null)
             return;
@@ -385,11 +384,11 @@ public class TileMoving extends TileEntity {
                 blockA.setMetadata(meta);
             blockA.setRenderList(-1);
         }
-        if (tag.hasKey("tile") && blockA.getTileEntity() != null) {
-            S35PacketUpdateTileEntity p = new S35PacketUpdateTileEntity(blockA.getLocation().x, blockA.getLocation().y,
-                    blockA.getLocation().z, 0, tag.getCompoundTag("tile"));
-            blockA.getTileEntity().onDataPacket(net, p);
-        }
+        // if (tag.hasKey("tile") && blockA.getTileEntity() != null) {
+        // S35PacketUpdateTileEntity p = new S35PacketUpdateTileEntity(blockA.getLocation().x, blockA.getLocation().y,
+        // blockA.getLocation().z, 0, tag.getCompoundTag("tile"));
+        // blockA.getTileEntity().onDataPacket(net, p);
+        // }
     }
 
     @Override
