@@ -1,7 +1,7 @@
 package com.amadornes.framez.movement.handler;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidBase;
 
@@ -28,7 +28,7 @@ public class UnbreakableHandler implements IMovementHandler {
 
         Block b = w.getBlock(x, y, z);
 
-        if (b instanceof BlockFluidBase || b instanceof BlockDynamicLiquid)
+        if (b instanceof BlockFluidBase || b instanceof BlockLiquid)
             return null;
 
         return b.getBlockHardness(w, x, y, z) < 0 ? BlockMovementType.UNMOVABLE : null;

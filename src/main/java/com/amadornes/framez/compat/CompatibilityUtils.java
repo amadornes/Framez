@@ -11,11 +11,14 @@ import com.amadornes.framez.compat.ae2.CompatModuleAE2;
 import com.amadornes.framez.compat.bc.CompatModuleBC;
 import com.amadornes.framez.compat.bm.CompatModuleBM;
 import com.amadornes.framez.compat.cc.CompatModuleCC;
+import com.amadornes.framez.compat.da.CompatModuleDA;
+import com.amadornes.framez.compat.eio.CompatModuleEIO;
 import com.amadornes.framez.compat.hc.CompatModuleHC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
 import com.amadornes.framez.compat.nei.CompatModuleNEI;
 import com.amadornes.framez.compat.oc.CompatModuleOC;
 import com.amadornes.framez.compat.pc.CompatModulePC;
+import com.amadornes.framez.compat.rc.CompatModuleRC;
 import com.amadornes.framez.compat.rf.CompatModuleRF;
 import com.amadornes.framez.compat.rf.RFUtils;
 import com.amadornes.framez.compat.vanilla.CompatModuleVanilla;
@@ -165,6 +168,9 @@ public class CompatibilityUtils {
                 break;
             }
         }
+        registerModule(Dependencies.EIO, CompatModuleEIO.class, null);
+        registerModule(Dependencies.DA, CompatModuleDA.class, null);
+        registerModule(Dependencies.RC, CompatModuleRC.class, null);
     }
 
 }

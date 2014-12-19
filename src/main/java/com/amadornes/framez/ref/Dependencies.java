@@ -12,5 +12,8 @@ public class Dependencies {
     public static final String OC = "OpenComputers";
     public static final String AE2 = "appliedenergistics2";
     public static final String BC = "BuildCraft|Core";
+    public static final String EIO = "EnderIO";
+    public static final String DA = "DimensionalAnchors";
+    public static final String RC = "Railcraft";
 
 }
