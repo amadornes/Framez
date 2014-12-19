@@ -1,7 +1,7 @@
 package com.amadornes.framez.movement.handler;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidBase;
 
@@ -28,8 +28,16 @@ public class FluidHandler implements IMovementHandler {
 
         Block b = w.getBlock(x, y, z);
 
-        if (b instanceof BlockFluidBase || b instanceof BlockDynamicLiquid)
-            return BlockMovementType.SEMI_MOVABLE;
+        if (b instanceof BlockFluidBase) {
+            if (((BlockFluidBase) b).getFilledPercentage(w, x, y, z) == 1F)
+                return BlockMovementType.SEMI_MOVABLE;
+            return BlockMovementType.REPLACEABLE;
+        }
+        if (b instanceof BlockLiquid) {
+            if (BlockLiquid.getLiquidHeightPercent(w.getBlockMetadata(x, y, z)) == 1 / 9F)
+                return BlockMovementType.SEMI_MOVABLE;
+            return BlockMovementType.REPLACEABLE;
+        }
 
         return null;
     }
