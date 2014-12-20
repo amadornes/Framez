@@ -17,6 +17,8 @@ import com.amadornes.framez.tile.TileMotor;
 
 public class RenderSpecialRF implements IRenderMotorSpecial {
 
+    private int list;
+
     @Override
     public boolean shouldRender(TileMotor motor, ForgeDirection face) {
 
@@ -118,6 +120,25 @@ public class RenderSpecialRF implements IRenderMotorSpecial {
         GL11.glTranslated(-p, 0, 0);
 
         GL11.glEnable(GL11.GL_CLIP_PLANE0);
+
+        renderDecoration();
+
+        GL11.glDisable(GL11.GL_CLIP_PLANE0);
+    }
+
+    public void renderDecoration() {
+
+        if (list == 0) {
+            list = GL11.glGenLists(1);
+            GL11.glNewList(list, GL11.GL_COMPILE);
+            renderDecoration_do();
+            GL11.glEndList();
+        }
+
+        GL11.glCallList(list);
+    }
+
+    public void renderDecoration_do() {
 
         double depth = 1;
 
@@ -404,7 +425,5 @@ public class RenderSpecialRF implements IRenderMotorSpecial {
             }
         }
         GL11.glEnd();
-
-        GL11.glDisable(GL11.GL_CLIP_PLANE0);
     }
 }

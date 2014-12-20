@@ -16,6 +16,7 @@ import com.amadornes.framez.client.IconProvider;
 import com.amadornes.framez.client.render.RenderFrame;
 import com.amadornes.framez.client.render.RenderMotor;
 import com.amadornes.framez.client.render.RenderMotorPlacement;
+import com.amadornes.framez.client.render.RenderMovementBlocking;
 import com.amadornes.framez.client.render.RenderMoving;
 import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.init.FramezBlocks;
@@ -63,6 +64,9 @@ public class ClientProxy extends CommonProxy {
         RenderMotorPlacement renderMotorPlacement = new RenderMotorPlacement();
         FMLCommonHandler.instance().bus().register(renderMotorPlacement);
         MinecraftForge.EVENT_BUS.register(renderMotorPlacement);
+        RenderMovementBlocking renderMovementBlocking = new RenderMovementBlocking();
+        FMLCommonHandler.instance().bus().register(renderMovementBlocking);
+        MinecraftForge.EVENT_BUS.register(renderMovementBlocking);
     }
 
     @Override

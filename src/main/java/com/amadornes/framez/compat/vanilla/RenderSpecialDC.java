@@ -15,6 +15,8 @@ import com.amadornes.framez.tile.TileMotor;
 
 public class RenderSpecialDC implements IRenderMotorSpecial {
 
+    private int list;
+
     @Override
     public boolean shouldRender(TileMotor motor, ForgeDirection face) {
 
@@ -93,6 +95,18 @@ public class RenderSpecialDC implements IRenderMotorSpecial {
     }
 
     private void renderRedstone() {
+
+        if (list == 0) {
+            list = GL11.glGenLists(1);
+            GL11.glNewList(list, GL11.GL_COMPILE);
+            renderRedstone_do();
+            GL11.glEndList();
+        }
+
+        GL11.glCallList(list);
+    }
+
+    private void renderRedstone_do() {
 
         double depth = 1;
 

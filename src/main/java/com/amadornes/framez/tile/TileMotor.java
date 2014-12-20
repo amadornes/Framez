@@ -13,6 +13,7 @@ import codechicken.lib.vec.BlockCoord;
 
 import com.amadornes.framez.api.movement.IFrameMove;
 import com.amadornes.framez.config.Config;
+import com.amadornes.framez.movement.MotorCache;
 import com.amadornes.framez.movement.MovementUtils;
 import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.movement.StructureTickHandler;
@@ -21,6 +22,8 @@ import com.amadornes.framez.network.packet.PacketStartMoving;
 import com.amadornes.framez.world.WorldWrapperProvider;
 
 public abstract class TileMotor extends TileEntity implements IFrameMove {
+
+    public static TileMotor active = null;
 
     public abstract boolean shouldMove();
 
@@ -55,6 +58,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
     protected double stored = 0;
     protected double maxStored = 100000;
+
+    private BlockCoord blockingCoord = null;
 
     public ForgeDirection getFace() {
 
@@ -139,6 +144,12 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         tag.setString("placer", placer);
 
         tag.setDouble("stored", stored);
+
+        if (blockingCoord != null) {
+            tag.setInteger("blockingX", blockingCoord.x);
+            tag.setInteger("blockingY", blockingCoord.y);
+            tag.setInteger("blockingZ", blockingCoord.z);
+        }
     }
 
     public void readUpdatePacket(NBTTagCompound tag) {
@@ -149,6 +160,12 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         placer = tag.getString("placer");
 
         stored = tag.getDouble("stored");
+
+        if (tag.hasKey("blockingX")) {
+            blockingCoord = new BlockCoord(tag.getInteger("blockingX"), tag.getInteger("blockingY"), tag.getInteger("blockingZ"));
+        } else {
+            blockingCoord = null;
+        }
     }
 
     @Override
@@ -175,7 +192,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     @Override
     public void updateEntity() {
 
-        super.updateEntity();
+        MotorCache.loadMotor(this);
 
         if (!worldObj.isRemote) {
             lastCheck++;
@@ -227,7 +244,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
                     power += Config.PowerUsage.getPowerUsedPerTileEntity;
             }
             if (hasEnoughFramezPower(power)) {
-                MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / (20D * 0.75D));
+                MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 20D);
                 structure.addBlocks(blocks);
 
                 this.structure = structure;
@@ -246,6 +263,9 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
 
     private void checkIfCanMove() {
 
+        active = this;
+        setBlockingCoord(null);
+
         canMove = false;
         movedBlocks = null;
 
@@ -260,6 +280,8 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
             }
         }
         movedBlocks = null;
+
+        active = null;
     }
 
     public boolean canMove() {
@@ -316,6 +338,7 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
         super.invalidate();
 
         onUnload();
+        MotorCache.unloadMotor(this);
     }
 
     public void onUnload() {
@@ -325,6 +348,17 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
             StructureTickHandler.INST.removeStructure(structure);
             structure = null;
         }
+    }
+
+    public BlockCoord getBlockingCoord() {
+
+        return blockingCoord;
+    }
+
+    public void setBlockingCoord(BlockCoord blockingCoord) {
+
+        this.blockingCoord = blockingCoord;
+        sendUpdatePacket();
     }
 
 }

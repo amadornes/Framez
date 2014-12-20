@@ -3,6 +3,7 @@ package com.amadornes.framez;
 import net.minecraft.world.World;
 
 import com.amadornes.framez.api.IFrame;
+import com.amadornes.framez.api.IFrameProvider;
 import com.amadornes.framez.api.IFramezApi;
 import com.amadornes.framez.api.IModifierRegistry;
 import com.amadornes.framez.api.IMotorRegistry;
@@ -39,6 +40,12 @@ public class FramezApiImpl implements IFramezApi {
     public IFrame getFrame(World world, int x, int y, int z) {
 
         return Utils.getFrame(world, x, y, z);
+    }
+
+    @Override
+    public void registerFrameProvider(IFrameProvider provider) {
+
+        Utils.providers.add(provider);
     }
 
 }

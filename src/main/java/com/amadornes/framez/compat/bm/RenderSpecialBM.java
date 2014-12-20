@@ -17,6 +17,8 @@ import com.amadornes.framez.tile.TileMotor;
 
 public class RenderSpecialBM implements IRenderMotorSpecial {
 
+    private int list;
+
     @Override
     public boolean shouldRender(TileMotor motor, ForgeDirection face) {
 
@@ -113,6 +115,25 @@ public class RenderSpecialBM implements IRenderMotorSpecial {
         GL11.glTranslated(-p, 0, 0);
 
         GL11.glEnable(GL11.GL_CLIP_PLANE0);
+
+        renderBloodOrb();
+
+        GL11.glDisable(GL11.GL_CLIP_PLANE0);
+    }
+
+    private void renderBloodOrb() {
+
+        if (list == 0) {
+            list = GL11.glGenLists(1);
+            GL11.glNewList(list, GL11.GL_COMPILE);
+            renderBloodOrb_do();
+            GL11.glEndList();
+        }
+
+        GL11.glCallList(list);
+    }
+
+    private void renderBloodOrb_do() {
 
         double depth = 1;
 
@@ -459,7 +480,5 @@ public class RenderSpecialBM implements IRenderMotorSpecial {
         }
 
         GL11.glEnd();
-
-        GL11.glDisable(GL11.GL_CLIP_PLANE0);
     }
 }

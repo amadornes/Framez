@@ -11,6 +11,7 @@ import codechicken.lib.vec.BlockCoord;
 import codechicken.multipart.TileMultipart;
 
 import com.amadornes.framez.api.IFrame;
+import com.amadornes.framez.api.IFrameIgnoreMicroblocks;
 import com.amadornes.framez.api.movement.IFrameMove;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.tile.TileMotor;
@@ -56,14 +57,27 @@ public class MovementUtils {
                 if (frame.isSideBlocked(d))
                     continue;
 
-                TileMultipart tmp = Utils.getMultipartTile(w, block.x, block.y, block.z);
-                if (tmp != null && Utils.getMicroblockSize(tmp, d) == 1)
-                    continue;
-
                 BlockCoord bl = getRelative(block, d);
-                TileMultipart tmp2 = Utils.getMultipartTile(w, bl.x, bl.y, bl.z);
-                if (tmp2 != null && Utils.getMicroblockSize(tmp2, d.getOpposite()) == 1)
-                    continue;
+
+                boolean checkMicroblocks = true;
+                if (frame instanceof IFrameIgnoreMicroblocks)
+                    checkMicroblocks = !((IFrameIgnoreMicroblocks) frame).shouldIgnoreMicroblocks(d);
+
+                if (checkMicroblocks) {
+                    TileMultipart tmp = Utils.getMultipartTile(w, block.x, block.y, block.z);
+                    if (tmp != null && Utils.getMicroblockSize(tmp, d) == 1)
+                        continue;
+
+                    checkMicroblocks = true;
+                    IFrame frame2 = Utils.getFrame(w, bl.x, bl.y, bl.z);
+                    if (frame2 != null && frame2 instanceof IFrameIgnoreMicroblocks)
+                        checkMicroblocks = !((IFrameIgnoreMicroblocks) frame2).shouldIgnoreMicroblocks(d.getOpposite());
+                    if (checkMicroblocks) {
+                        TileMultipart tmp2 = Utils.getMultipartTile(w, bl.x, bl.y, bl.z);
+                        if (tmp2 != null && Utils.getMicroblockSize(tmp2, d.getOpposite()) == 1)
+                            continue;
+                    }
+                }
 
                 addBlockAndNeighbors(w, bl, blocks, d.getOpposite(), direction, moved);
             }
@@ -77,8 +91,11 @@ public class MovementUtils {
     public static final boolean canMove(List<BlockCoord> blocks, World world, ForgeDirection direction) {
 
         for (BlockCoord b : blocks) {
-            if (!MovedBlockHandler.canMoveBlockAt(world, b))
+            if (!MovedBlockHandler.canMoveBlockAt(world, b)) {
+                if (TileMotor.active != null)
+                    TileMotor.active.setBlockingCoord(b);
                 return false;
+            }
 
             BlockCoord r = getRelative(b, direction);
 
@@ -94,7 +111,15 @@ public class MovementUtils {
                 continue;
             if (world.getBlock(r.x, r.y, r.z).canBeReplacedByLeaves(world, r.x, r.y, r.z))
                 continue;
-            return MovementApi.INST.getMovementType(world, r.x, r.y, r.z).isReplaceable();
+            if (MovementApi.INST.getMovementType(world, r.x, r.y, r.z).isReplaceable()) {
+                if (TileMotor.active != null)
+                    TileMotor.active.setBlockingCoord(b);
+                return true;
+            } else {
+                if (TileMotor.active != null)
+                    TileMotor.active.setBlockingCoord(b.copy().add(direction.offsetX, direction.offsetY, direction.offsetZ));
+                return false;
+            }
         }
         return true;
     }

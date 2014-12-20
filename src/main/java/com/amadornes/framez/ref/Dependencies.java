@@ -15,5 +15,6 @@ public class Dependencies {
     public static final String EIO = "EnderIO";
     public static final String DA = "DimensionalAnchors";
     public static final String RC = "Railcraft";
+    public static final String FL = "funkylocomotion";
 
 }

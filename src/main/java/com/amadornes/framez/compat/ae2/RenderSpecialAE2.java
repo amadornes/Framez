@@ -17,6 +17,8 @@ import com.amadornes.framez.tile.TileMotor;
 
 public class RenderSpecialAE2 implements IRenderMotorSpecial {
 
+    private int list;
+
     @Override
     public boolean shouldRender(TileMotor motor, ForgeDirection face) {
 
@@ -127,6 +129,25 @@ public class RenderSpecialAE2 implements IRenderMotorSpecial {
         GL11.glTranslated(((16 - 13) / 16D) / 2D, 0, ((16 - 14) / 16D) / 2D);
 
         GL11.glEnable(GL11.GL_CLIP_PLANE0);
+
+        renderCertusQuartz();
+
+        GL11.glDisable(GL11.GL_CLIP_PLANE0);
+    }
+
+    private void renderCertusQuartz() {
+
+        if (list == 0) {
+            list = GL11.glGenLists(1);
+            GL11.glNewList(list, GL11.GL_COMPILE);
+            renderCertusQuartz_do();
+            GL11.glEndList();
+        }
+
+        GL11.glCallList(list);
+    }
+
+    private void renderCertusQuartz_do() {
 
         double depth = 1;
 
@@ -428,7 +449,5 @@ public class RenderSpecialAE2 implements IRenderMotorSpecial {
         }
 
         GL11.glEnd();
-
-        GL11.glDisable(GL11.GL_CLIP_PLANE0);
     }
 }

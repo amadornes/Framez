@@ -14,4 +14,6 @@ public interface IFramezApi {
 
     public IFrame getFrame(World world, int x, int y, int z);
 
+    public void registerFrameProvider(IFrameProvider provider);
+
 }

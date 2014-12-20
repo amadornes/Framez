@@ -18,22 +18,34 @@ import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TileMultipart;
 
 import com.amadornes.framez.api.IFrame;
+import com.amadornes.framez.api.IFrameProvider;
 import com.amadornes.framez.api.movement.HandlingPriority;
 import com.amadornes.framez.api.movement.HandlingPriority.Priority;
 import com.amadornes.framez.part.PartFrame;
 
 public class Utils {
 
+    public static List<IFrameProvider> providers = new ArrayList<IFrameProvider>();
+
     public static IFrame getFrame(World world, int x, int y, int z) {
 
         TileEntity te = world.getTileEntity(x, y, z);
         if (te != null && te instanceof TileMultipart) {
-            return getFrame((TileMultipart) te);
+            IFrame f = getFrame((TileMultipart) te);
+            if (f != null)
+                return f;
         }
+
+        for (IFrameProvider p : providers) {
+            IFrame f = p.getFrameAt(world, x, y, z);
+            if (f != null)
+                return f;
+        }
+
         return null;
     }
 
-    public static IFrame getFrame(TileMultipart te) {
+    private static IFrame getFrame(TileMultipart te) {
 
         for (TMultiPart p : te.jPartList()) {
             if (p instanceof PartFrame) {

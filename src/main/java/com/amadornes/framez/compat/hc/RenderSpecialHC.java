@@ -17,6 +17,8 @@ import com.amadornes.framez.tile.TileMotor;
 
 public class RenderSpecialHC implements IRenderMotorSpecial {
 
+    private int list;
+
     @Override
     public boolean shouldRender(TileMotor motor, ForgeDirection face) {
 
@@ -114,6 +116,23 @@ public class RenderSpecialHC implements IRenderMotorSpecial {
         GL11.glTranslated(-p, 0, 0);
 
         GL11.glEnable(GL11.GL_CLIP_PLANE0);
+        renderGauge();
+        GL11.glDisable(GL11.GL_CLIP_PLANE0);
+    }
+
+    private void renderGauge() {
+
+        if (list == 0) {
+            list = GL11.glGenLists(1);
+            GL11.glNewList(list, GL11.GL_COMPILE);
+            renderGauge_do();
+            GL11.glEndList();
+        }
+
+        GL11.glCallList(list);
+    }
+
+    private void renderGauge_do() {
 
         double depth = 1;
 
@@ -162,7 +181,5 @@ public class RenderSpecialHC implements IRenderMotorSpecial {
         }
 
         GL11.glEnd();
-
-        GL11.glDisable(GL11.GL_CLIP_PLANE0);
     }
 }
