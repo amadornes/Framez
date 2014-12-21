@@ -12,13 +12,22 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.ForgeDirection;
 
+import org.lwjgl.opengl.GL11;
+
+import com.amadornes.framez.Framez;
+import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.ref.References;
 import com.amadornes.framez.tile.TileMoving;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -32,6 +41,8 @@ public class BlockMoving extends BlockContainer {
 
         setHardness(-1);
         setResistance(-1);
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override
@@ -174,6 +185,65 @@ public class BlockMoving extends BlockContainer {
     @Override
     public void registerBlockIcons(IIconRegister p_149651_1_) {
 
+    }
+
+    private boolean drawingHighlight = false;
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public void onDrawHighlight(DrawBlockHighlightEvent event) {
+
+        if (event == null || event.context == null || event.currentItem == null || event.player == null || event.target == null
+                || event.target.typeOfHit != MovingObjectType.BLOCK)
+            return;
+
+        if (drawingHighlight)
+            return;
+
+        drawingHighlight = true;
+
+        TileMoving te = get(event.player.worldObj, event.target.blockX, event.target.blockY, event.target.blockZ);
+        if (te != null) {
+            MovingObjectPosition mop = te.rayTrace(event.player);
+
+            if (mop != null && mop.typeOfHit == MovingObjectType.BLOCK) {
+                DrawBlockHighlightEvent ev = new DrawBlockHighlightEvent(event.context, event.player, mop, mop.subHit, event.currentItem,
+                        event.partialTicks);
+                World world = event.player.worldObj;
+                World w = null;
+                double moved = 0;
+                ForgeDirection dir = null;
+                MovingBlock a = te.getBlockA();
+                MovingBlock b = te.getBlockB();
+                if (a != null) {
+                    w = a.getWorldWrapper();
+                    moved = (a.getMoved() - a.getSpeed() * (1 - Framez.proxy.getFrame()));
+                    dir = a.getDirection();
+                } else if (b != null) {
+                    w = b.getWorldWrapper();
+                    moved = (b.getMoved() - b.getSpeed() * (1 - Framez.proxy.getFrame()));
+                    b.getDirection();
+                }
+
+                if (w != null) {
+                    event.player.worldObj = w;
+
+                    GL11.glPushMatrix();
+                    {
+                        GL11.glTranslated(dir.offsetX * moved, dir.offsetY * moved, dir.offsetZ * moved);
+                        MinecraftForge.EVENT_BUS.post(ev);
+                    }
+                    GL11.glPopMatrix();
+
+                    if (ev.isCanceled())
+                        event.setCanceled(true);
+
+                    event.player.worldObj = world;
+                }
+            }
+        }
+
+        drawingHighlight = false;
     }
 
 }

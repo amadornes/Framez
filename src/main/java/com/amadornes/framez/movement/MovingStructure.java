@@ -276,6 +276,9 @@ public class MovingStructure {
         }
 
         for (Entity e : entities) {
+            if (e instanceof EntityPlayer)
+                if (e.isSneaking())
+                    continue;
 
             if (direction.offsetY >= 0) {
                 try {
