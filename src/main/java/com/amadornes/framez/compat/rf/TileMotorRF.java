@@ -5,11 +5,12 @@ import java.util.Map.Entry;
 
 import net.minecraftforge.common.util.ForgeDirection;
 import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyReceiver;
 
 import com.amadornes.framez.config.Config;
 import com.amadornes.framez.tile.TileMotor;
 
-public class TileMotorRF extends TileMotor implements IEnergyHandler {
+public class TileMotorRF extends TileMotor implements IEnergyHandler, IEnergyReceiver {
 
     @Override
     public boolean shouldMove() {

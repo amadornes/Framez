@@ -63,6 +63,14 @@ public class TileMotorEU extends TileMotor implements IEnergySink {
     }
 
     @Override
+    public void validate() {
+
+        super.validate();
+
+        tick = 0;
+    }
+
+    @Override
     public void invalidate() {
 
         super.invalidate();

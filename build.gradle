@@ -36,6 +36,10 @@ repositories {
         name = "tterrag Repo"
         url = "http://maven.tterrag.com"
     }
+    maven {
+        name "FireBall API Depot"
+        url "http://dl.tsr.me/artifactory/libs-release-local"
+    }
 }
 
 apply plugin: 'forge'
@@ -81,8 +85,9 @@ dependencies {
     compile "mcp.mobius.waila:Waila:1.5.3a_1.7.10"
     compile "net.industrial-craft:industrialcraft-2:2.2.658-experimental:api"
     compile "com.enderio:EnderIO:1.7.10-2.0.185_beta"
+    compile(group: 'api', name: 'railcraft', version: "1")
+    compile(group: 'api', name: 'rf', version: "2")
 	grabDep("http://addons.cursecdn.com/files/2221/392/funky-locomotion-1.7.10-beta-3.jar");
-	grabDep("http://addons.cursecdn.com/files/2219/321/Railcraft_1.7.10-9.4.0.0.jar");
 	grabDep("http://immibis.com/mcmoddl/files/dimensional-anchor-59.0.2.jar");
     compile fileTree(dir: 'dep', include: '*.jar')
     println("  Finished adding dependencies!");
