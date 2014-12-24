@@ -18,7 +18,7 @@ buildscript {
 repositories {
     maven {
         name "Mobius Repo"
-        url "http://mobiusstrip.eu/maven"
+        url "http://mobiusstrip.eu/maven/"
     }
     maven {
         name 'CB Repo'
@@ -31,6 +31,10 @@ repositories {
     maven {
         name = "K4 maven"
         url = "http://maven.k-4u.nl/"
+    }
+	maven {
+        name = "tterrag Repo"
+        url = "http://maven.tterrag.com"
     }
 }
 
@@ -57,8 +61,7 @@ if (System.getenv().BUILD_NUMBER != null) {
 }
 
 def grabDep(url) {
-    ant.get(src: url, dest: 'dep')
-	compile files("dep/" + url.substring(url.lastIndexOf("/")));
+    ant.get(src: url, dest: 'dep');
 }
 
 dependencies {
@@ -76,8 +79,13 @@ dependencies {
     compile "codechicken:NotEnoughItems:1.7.10-1.0.2.26:dev"
     compile "codechicken:ForgeMultipart:1.7.10-1.1.0.297:dev"
     compile "mcp.mobius.waila:Waila:1.5.3a_1.7.10"
-    compile 'net.industrial-craft:industrialcraft-2:2.2.558-experimental:api'
-    println("  Finished adding dependencies!")
+    compile "net.industrial-craft:industrialcraft-2:2.2.658-experimental:api"
+    compile "com.enderio:EnderIO:1.7.10-2.0.185_beta"
+	grabDep("http://addons.cursecdn.com/files/2221/392/funky-locomotion-1.7.10-beta-3.jar");
+	grabDep("http://addons.cursecdn.com/files/2219/321/Railcraft_1.7.10-9.4.0.0.jar");
+	grabDep("http://immibis.com/mcmoddl/files/dimensional-anchor-59.0.2.jar");
+    compile fileTree(dir: 'dep', include: '*.jar')
+    println("  Finished adding dependencies!");
 }
 
 minecraft {
