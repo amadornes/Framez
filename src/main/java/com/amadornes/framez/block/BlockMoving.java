@@ -189,8 +189,8 @@ public class BlockMoving extends BlockContainer {
 
     private boolean drawingHighlight = false;
 
-    @SideOnly(Side.CLIENT)
     @SubscribeEvent
+    @SideOnly(Side.CLIENT)
     public void onDrawHighlight(DrawBlockHighlightEvent event) {
 
         if (event == null || event.context == null || event.currentItem == null || event.player == null || event.target == null
