@@ -41,8 +41,6 @@ public class BlockMoving extends BlockContainer {
 
         setHardness(-1);
         setResistance(-1);
-
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override
