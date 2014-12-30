@@ -183,6 +183,7 @@ public class BlockMoving extends BlockContainer {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerBlockIcons(IIconRegister p_149651_1_) {
 
     }
