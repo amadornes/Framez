@@ -39,7 +39,6 @@ public class ClientProxy extends CommonProxy {
     public void init() {
 
         MinecraftForge.EVENT_BUS.register(new IconProvider());
-        MinecraftForge.EVENT_BUS.register(FramezBlocks.moving);
     }
 
     @Override
