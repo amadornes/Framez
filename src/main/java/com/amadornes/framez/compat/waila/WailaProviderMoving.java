@@ -16,8 +16,11 @@ import mcp.mobius.waila.utils.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -87,9 +90,12 @@ public class WailaProviderMoving implements IWailaDataProvider {
                             currenttipBody.clear();
                             currenttipTail.clear();
 
-                            currenttipHead = handler.handleBlockTextData(targetStack, world, player, target, accessor, currenttipHead, Layout.HEADER);
-                            currenttipBody = handler.handleBlockTextData(targetStack, world, player, target, accessor, currenttipBody, Layout.BODY);
-                            currenttipTail = handler.handleBlockTextData(targetStack, world, player, target, accessor, currenttipTail, Layout.FOOTER);
+                            currenttipHead = handler.handleBlockTextData(targetStack, world, player, target, accessor, currenttipHead,
+                                    Layout.HEADER);
+                            currenttipBody = handler.handleBlockTextData(targetStack, world, player, target, accessor, currenttipBody,
+                                    Layout.BODY);
+                            currenttipTail = handler.handleBlockTextData(targetStack, world, player, target, accessor, currenttipTail,
+                                    Layout.FOOTER);
 
                             if (ConfigHandler.instance().getConfig(Configuration.CATEGORY_GENERAL, Constants.CFG_WAILA_SHIFTBLOCK, false)
                                     && currenttipBody.size() > 0 && !accessor.getPlayer().isSneaking()) {
@@ -152,6 +158,12 @@ public class WailaProviderMoving implements IWailaDataProvider {
     public ItemStack getWailaStack(IWailaDataAccessor acc, IWailaConfigHandler cfg) {
 
         return identifiedHighlight;
+    }
+
+    @Override
+    public NBTTagCompound getNBTData(EntityPlayerMP arg0, TileEntity arg1, NBTTagCompound arg2, World arg3, int arg4, int arg5, int arg6) {
+
+        return null;
     }
 
 }
