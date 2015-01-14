@@ -7,8 +7,9 @@ import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.impl.ConfigHandler;
-import mcp.mobius.waila.api.impl.DataAccessorBlock;
+import mcp.mobius.waila.api.impl.DataAccessorCommon;
 import mcp.mobius.waila.api.impl.MetaDataProvider;
+import mcp.mobius.waila.cbcore.Layout;
 import mcp.mobius.waila.client.KeyEvent;
 import mcp.mobius.waila.overlay.RayTracing;
 import mcp.mobius.waila.overlay.WailaTickHandler;
@@ -27,8 +28,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 
 import org.lwjgl.input.Keyboard;
-
-import codechicken.nei.api.ItemInfo.Layout;
 
 import com.amadornes.framez.block.BlockMoving;
 import com.amadornes.framez.movement.MovingBlock;
@@ -81,7 +80,7 @@ public class WailaProviderMoving implements IWailaDataProvider {
                         Minecraft.getMinecraft().thePlayer.worldObj = Minecraft.getMinecraft().theWorld = (WorldClient) b.getStructure()
                                 .getWorldWrapperClient();
 
-                        DataAccessorBlock accessor = DataAccessorBlock.instance;
+                        DataAccessorCommon accessor = DataAccessorCommon.instance;
                         accessor.set(world, player, target);
                         ItemStack targetStack = RayTracing.instance().getTargetStack(); // Here we get either the proper stack or the override
 

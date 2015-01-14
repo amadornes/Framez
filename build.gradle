@@ -82,7 +82,7 @@ dependencies {
     compile "codechicken:CodeChickenCore:1.7.10-1.0.2.11:dev"
     compile "codechicken:NotEnoughItems:1.7.10-1.0.2.26:dev"
     compile "codechicken:ForgeMultipart:1.7.10-1.1.0.297:dev"
-    compile "mcp.mobius.waila:Waila:1.5.7a_1.7.10"
+    compile "mcp.mobius.waila:Waila:1.5.8a_1.7.10"
     compile "net.industrial-craft:industrialcraft-2:2.2.658-experimental:api"
     compile "com.enderio:EnderIO:1.7.10-2.0.185_beta"
     compile(group: 'api', name: 'railcraft', version: "1")
