@@ -187,7 +187,7 @@ public class MovingBlock implements IMovingBlock {
 
             if (validate && !(te instanceof TileMultipart))
                 te.validate();
-            if (te instanceof TileMultipart)
+            if (te instanceof TileMultipart && !getWorld().isRemote)
                 for (TMultiPart p : ((TileMultipart) te).jPartList())
                     p.onMoved();
         }
@@ -206,28 +206,30 @@ public class MovingBlock implements IMovingBlock {
 
         if (te != null) {
             if (te instanceof TileMultipart) {
-                TileMultipart tmp = (TileMultipart) te;
-                for (TMultiPart p : tmp.jPartList())
-                    p.onWorldSeparate();
-            }
-            if (invalidate && !(te instanceof TileMultipart))
-                te.invalidate();
+                if (!getWorld().isRemote) {
+                    TileMultipart tmp = TileMultipart.getTile(getWorld(), new BlockCoord(x, y, z));
+                    if (tmp != null)
+                        tmp.clearParts();
+                    for (TMultiPart p : ((TileMultipart) te).jPartList()) {
+                        p.onWorldSeparate();
+                        TileMultipart.addPart(getWorld(), new BlockCoord(x, y, z), p);
+                        p.onMoved();
+                    }
+                }
+            } else {
+                if (invalidate && !(te instanceof TileMultipart))
+                    te.invalidate();
 
-            te.xCoord = x;
-            te.yCoord = y;
-            te.zCoord = z;
-            te.setWorldObj(getWorldWrapper());
+                te.xCoord = x;
+                te.yCoord = y;
+                te.zCoord = z;
+                te.setWorldObj(getWorldWrapper());
 
-            if (validate)
-                te.validate();
+                if (validate)
+                    te.validate();
 
-            if (getWorld().getTileEntity(x, y, z) != te)
-                getWorld().setTileEntity(x, y, z, te);
-
-            if (te instanceof TileMultipart) {
-                TileMultipart tmp = (TileMultipart) te;
-                for (TMultiPart p : tmp.jPartList())
-                    p.onMoved();
+                if (getWorld().getTileEntity(x, y, z) != te)
+                    getWorld().setTileEntity(x, y, z, te);
             }
         }
 
