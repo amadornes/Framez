@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import codechicken.lib.vec.BlockCoord;
 
@@ -40,13 +41,17 @@ public class PacketStartMoving extends LocatedPacket<PacketStartMoving> {
     @Override
     public void handleClientSide(PacketStartMoving message, EntityPlayer player) {
 
-        TileMotor motor = (TileMotor) player.worldObj.getTileEntity(x, y, z);
-        MovingStructure structure = new MovingStructure(player.worldObj, direction, speed);
-        structure.addBlocks(blocks);
-        if (motor != null)
-            motor.setStructure(structure);
-        StructureTickHandler.INST.addStructure(structure);
-        structure.tick(Phase.START);
+        TileEntity te = player.worldObj.getTileEntity(x, y, z);
+
+        if (te != null && te instanceof TileMotor) {
+            TileMotor motor = (TileMotor) te;
+            MovingStructure structure = new MovingStructure(player.worldObj, direction, speed);
+            structure.addBlocks(blocks);
+            if (motor != null)
+                motor.setStructure(structure);
+            StructureTickHandler.INST.addStructure(structure);
+            structure.tick(Phase.START);
+        }
     }
 
     @Override
