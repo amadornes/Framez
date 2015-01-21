@@ -2,7 +2,6 @@ package com.amadornes.framez.movement;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -187,8 +186,6 @@ public class MovingStructure {
             b.place();
         }
 
-        Random rnd = new Random();
-
         for (MovingBlock b : blocks) {
             if (!world.isRemote) {
                 world.markBlockForUpdate(b.getLocation().x, b.getLocation().y, b.getLocation().z);
@@ -200,7 +197,7 @@ public class MovingStructure {
             } else {
                 world.markBlockRangeForRenderUpdate(b.getLocation().x + getDirection().offsetX, b.getLocation().y + getDirection().offsetY,
                         b.getLocation().z + getDirection().offsetZ, b.getLocation().x + getDirection().offsetX, b.getLocation().y
-                                + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
+                        + getDirection().offsetY, b.getLocation().z + getDirection().offsetZ);
             }
         }
 
@@ -319,7 +316,7 @@ public class MovingStructure {
 
                 for (d9 = 0.05D; movedX != 0.0D
                         && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, 0.0D))
-                                .isEmpty(); d6 = movedX) {
+                        .isEmpty(); d6 = movedX) {
                     if (movedX < d9 && movedX >= -d9) {
                         movedX = 0.0D;
                     } else if (movedX > 0.0D) {
@@ -331,7 +328,7 @@ public class MovingStructure {
 
                 for (; movedZ != 0.0D
                         && entity.worldObj.getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(0.0D, -1.0D, movedZ))
-                                .isEmpty(); d8 = movedZ) {
+                        .isEmpty(); d8 = movedZ) {
                     if (movedZ < d9 && movedZ >= -d9) {
                         movedZ = 0.0D;
                     } else if (movedZ > 0.0D) {
@@ -344,8 +341,8 @@ public class MovingStructure {
                 while (movedX != 0.0D
                         && movedZ != 0.0D
                         && entity.worldObj
-                                .getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, movedZ))
-                                .isEmpty()) {
+                        .getCollidingBoundingBoxes(entity, entity.boundingBox.getOffsetBoundingBox(movedX, -1.0D, movedZ))
+                        .isEmpty()) {
                     if (movedX < d9 && movedX >= -d9) {
                         movedX = 0.0D;
                     } else if (movedX > 0.0D) {
