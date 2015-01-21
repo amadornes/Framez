@@ -318,4 +318,9 @@ public class TileMotorAE2 extends TileMotor implements IAEPowerStorage, IGridHos
         return true;
     }
 
+    public boolean isWorldAccessable() {
+
+        return true;
+    }
+
 }
