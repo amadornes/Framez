@@ -203,45 +203,48 @@ public class BlockMoving extends BlockContainer {
 
         drawingHighlight = true;
 
-        TileMoving te = get(event.player.worldObj, event.target.blockX, event.target.blockY, event.target.blockZ);
-        if (te != null) {
-            MovingObjectPosition mop = te.rayTrace(event.player);
+        try {
+            TileMoving te = get(event.player.worldObj, event.target.blockX, event.target.blockY, event.target.blockZ);
+            if (te != null) {
+                MovingObjectPosition mop = te.rayTrace(event.player);
 
-            if (mop != null && mop.typeOfHit == MovingObjectType.BLOCK) {
-                DrawBlockHighlightEvent ev = new DrawBlockHighlightEvent(event.context, event.player, mop, mop.subHit, event.currentItem,
-                        event.partialTicks);
-                World world = event.player.worldObj;
-                World w = null;
-                double moved = 0;
-                ForgeDirection dir = null;
-                MovingBlock a = te.getBlockA();
-                MovingBlock b = te.getBlockB();
-                if (a != null) {
-                    w = a.getWorldWrapper();
-                    moved = (a.getMoved() - a.getSpeed() * (1 - Framez.proxy.getFrame()));
-                    dir = a.getDirection();
-                } else if (b != null) {
-                    w = b.getWorldWrapper();
-                    moved = (b.getMoved() - b.getSpeed() * (1 - Framez.proxy.getFrame()));
-                    b.getDirection();
-                }
-
-                if (w != null) {
-                    event.player.worldObj = w;
-
-                    GL11.glPushMatrix();
-                    {
-                        GL11.glTranslated(dir.offsetX * moved, dir.offsetY * moved, dir.offsetZ * moved);
-                        MinecraftForge.EVENT_BUS.post(ev);
+                if (mop != null && mop.typeOfHit == MovingObjectType.BLOCK) {
+                    DrawBlockHighlightEvent ev = new DrawBlockHighlightEvent(event.context, event.player, mop, mop.subHit,
+                            event.currentItem, event.partialTicks);
+                    World world = event.player.worldObj;
+                    World w = null;
+                    double moved = 0;
+                    ForgeDirection dir = null;
+                    MovingBlock a = te.getBlockA();
+                    MovingBlock b = te.getBlockB();
+                    if (a != null) {
+                        w = a.getWorldWrapper();
+                        moved = (a.getMoved() - a.getSpeed() * (1 - Framez.proxy.getFrame()));
+                        dir = a.getDirection();
+                    } else if (b != null) {
+                        w = b.getWorldWrapper();
+                        moved = (b.getMoved() - b.getSpeed() * (1 - Framez.proxy.getFrame()));
+                        b.getDirection();
                     }
-                    GL11.glPopMatrix();
 
-                    if (ev.isCanceled())
-                        event.setCanceled(true);
+                    if (w != null) {
+                        event.player.worldObj = w;
 
-                    event.player.worldObj = world;
+                        GL11.glPushMatrix();
+                        {
+                            GL11.glTranslated(dir.offsetX * moved, dir.offsetY * moved, dir.offsetZ * moved);
+                            MinecraftForge.EVENT_BUS.post(ev);
+                        }
+                        GL11.glPopMatrix();
+
+                        if (ev.isCanceled())
+                            event.setCanceled(true);
+
+                        event.player.worldObj = world;
+                    }
                 }
             }
+        } catch (Exception ex) {
         }
 
         drawingHighlight = false;
