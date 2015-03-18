@@ -5,35 +5,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-import com.amadornes.framez.compat.ae2.CompatModuleAE2;
-import com.amadornes.framez.compat.bc.CompatModuleBC;
-import com.amadornes.framez.compat.bm.CompatModuleBM;
+import net.minecraft.item.ItemStack;
+
+import com.amadornes.framez.api.IFramezWrench.WrenchAction;
 import com.amadornes.framez.compat.cc.CompatModuleCC;
-import com.amadornes.framez.compat.da.CompatModuleDA;
-import com.amadornes.framez.compat.eio.CompatModuleEIO;
-import com.amadornes.framez.compat.fl.CompatModuleFL;
-import com.amadornes.framez.compat.hc.CompatModuleHC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
-import com.amadornes.framez.compat.nei.CompatModuleNEI;
 import com.amadornes.framez.compat.oc.CompatModuleOC;
-import com.amadornes.framez.compat.pc.CompatModulePC;
-import com.amadornes.framez.compat.rc.CompatModuleRC;
 import com.amadornes.framez.compat.rf.CompatModuleRF;
-import com.amadornes.framez.compat.rf.RFUtils;
-import com.amadornes.framez.compat.vanilla.CompatModuleVanilla;
-import com.amadornes.framez.compat.waila.CompatModuleWaila;
-import com.amadornes.framez.config.Config;
 import com.amadornes.framez.ref.Dependencies;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModAPIManager;
-import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.versioning.VersionParser;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -63,7 +49,7 @@ public class CompatibilityUtils {
         if (modules.containsKey(module))
             return;
 
-        if (Loader.isModLoaded(modid)) {
+        if ((modid.startsWith("api:") && ModAPIManager.INSTANCE.hasAPI(modid.substring(4))) || Loader.isModLoaded(modid)) {
             try {
                 Class<?> c = Class.forName(module);
                 if (!CompatModule.class.isAssignableFrom(c))
@@ -136,43 +122,26 @@ public class CompatibilityUtils {
         }
     }
 
+    public static WrenchAction getWrenchAction(ItemStack stack) {
+
+        for (CompatModule m : getLoadedModules()) {
+            WrenchAction a = m.getWrenchAction(stack);
+            if (a != null)
+                return a;
+        }
+
+        return null;
+    }
+
     /**
      * Register modules here
      */
     static {
-        if (Config.Motors.isRedstoneMotorEnabled)
-            registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleVanilla.class);
-        if (Config.Motors.isIC2MotorEnabled)
-            registerModule(Dependencies.IC2, CompatModuleIC2.class, null);
-        if (Config.Motors.isPneumaticCraftMotorEnabled)
-            registerModule(Dependencies.PC, CompatModulePC.class, null);
-        if (Config.Motors.isHydCraftMotorEnabled)
-            registerModule(Dependencies.HC, CompatModuleHC.class, null);
-        if (RFUtils.isRFApiLoaded() && Config.Motors.isRedstoneFluxMotorEnabled)
-            registerModule(UUID.randomUUID().toString(), NoCompatModule.class, CompatModuleRF.class);
-        if (Config.Motors.isBloodMagicMotorEnabled)
-            registerModule(Dependencies.BM, CompatModuleBM.class, null);
-        if (Config.Motors.isAEMotorEnabled)
-            registerModule(Dependencies.AE2, CompatModuleAE2.class, null);
-
         registerModule(Dependencies.CC, CompatModuleCC.class, null);
-        registerModule(Dependencies.NEI, CompatModuleNEI.class, null);
-        registerModule(Dependencies.WAILA, CompatModuleWaila.class, null);
         registerModule(Dependencies.OC, CompatModuleOC.class, null);
-        // Only load BC compatibility if the version that's installed is 6.1.5 or higher (or a dev build/source) and the statements API is loaded
-        for (ModContainer mod : Loader.instance().getModList()) {
-            if (mod.getModId().equals(Dependencies.BC)) {
-                if (mod.getVersion().equals("@VERSION@") || VersionParser.parseRange("[6.1.5,)").containsVersion(mod.getProcessedVersion())
-                        && ModAPIManager.INSTANCE.hasAPI("BuildCraftAPI|statements")) {
-                    registerModule(Dependencies.BC, CompatModuleBC.class, null);
-                }
-                break;
-            }
-        }
-        registerModule(Dependencies.EIO, CompatModuleEIO.class, null);
-        registerModule(Dependencies.DA, CompatModuleDA.class, null);
-        registerModule(Dependencies.RC, CompatModuleRC.class, null);
-        registerModule(Dependencies.FL, CompatModuleFL.class, null);
+
+        registerModule("api:" + Dependencies.API_RF, CompatModuleRF.class, null);
+        registerModule(Dependencies.IC2, CompatModuleIC2.class, null);
     }
 
 }

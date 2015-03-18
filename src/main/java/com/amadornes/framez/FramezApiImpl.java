@@ -1,51 +1,31 @@
 package com.amadornes.framez;
 
-import net.minecraft.world.World;
+import com.amadornes.framez.api.IFramezAPI;
+import com.amadornes.framez.api.modifier.IFrameModifierRegistry;
+import com.amadornes.framez.api.modifier.IMotorModifierRegistry;
+import com.amadornes.framez.api.movement.IFrameMovementRegistry;
+import com.amadornes.framez.modifier.FrameModifierRegistry;
+import com.amadornes.framez.modifier.MotorModifierRegistry;
+import com.amadornes.framez.movement.FrameMovementRegistry;
 
-import com.amadornes.framez.api.IFrame;
-import com.amadornes.framez.api.IFrameProvider;
-import com.amadornes.framez.api.IFramezApi;
-import com.amadornes.framez.api.IModifierRegistry;
-import com.amadornes.framez.api.IMotorRegistry;
-import com.amadornes.framez.api.movement.IMovementApi;
-import com.amadornes.framez.modifier.ModifierRegistry;
-import com.amadornes.framez.movement.MovementApi;
-import com.amadornes.framez.util.Utils;
+public class FramezAPIImpl implements IFramezAPI {
 
-public class FramezApiImpl implements IFramezApi {
+    @Override
+    public IFrameModifierRegistry frameModifiers() {
 
-    protected FramezApiImpl() {
-
+        return FrameModifierRegistry.instance();
     }
 
     @Override
-    public IModifierRegistry getModifierRegistry() {
+    public IMotorModifierRegistry motorModifiers() {
 
-        return ModifierRegistry.INST;
+        return MotorModifierRegistry.instance();
     }
 
     @Override
-    public IMotorRegistry getMotorRegistry() {
+    public IFrameMovementRegistry movement() {
 
-        return MotorRegistry.INST;
-    }
-
-    @Override
-    public IMovementApi getMovementApi() {
-
-        return MovementApi.INST;
-    }
-
-    @Override
-    public IFrame getFrame(World world, int x, int y, int z) {
-
-        return Utils.getFrame(world, x, y, z);
-    }
-
-    @Override
-    public void registerFrameProvider(IFrameProvider provider) {
-
-        Utils.providers.add(provider);
+        return FrameMovementRegistry.instance();
     }
 
 }

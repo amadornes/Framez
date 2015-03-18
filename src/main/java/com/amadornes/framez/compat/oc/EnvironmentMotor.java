@@ -47,13 +47,13 @@ public final class EnvironmentMotor extends ManagedTileEntityEnvironment<TileMot
 
         if (args.count() == 0)
             throw new RuntimeException("At least 1 argument is required (direction)");
-        return new Object[] { te.setDirection(toFD(args.checkAny(0))) };
+        return new Object[] { /* te.setDirection(toFD(args.checkAny(0))) */};
     }
 
     @Callback(doc = "function():number -- Gets the direction the blocks will be moved in.")
     public Object[] getDirection(Context context, Arguments args) {
 
-        return new Object[] { te.getDirection().ordinal() };
+        return new Object[] { /* te.getDirection().ordinal() */};
     }
 
     @Callback(doc = "function(face, direction):boolean -- Sets the motor's face and direction. Returns true if it succeeded, false if it didn't.")
@@ -70,8 +70,8 @@ public final class EnvironmentMotor extends ManagedTileEntityEnvironment<TileMot
         if (face == direction || face == direction.getOpposite())
             throw new RuntimeException("Motors cannot push or pull blocks!");
 
-        te.setFace(face, true);
-        te.setDirection(direction, true);
+        // te.setFace(face, true);
+        // te.setDirection(direction, true);
 
         return new Object[] { true };
     }

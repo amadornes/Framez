@@ -1,29 +1,62 @@
-tile.framez:motorcore.name=Motor Core
-tile.framez:motor.dc.name=DC Motor
-tile.framez:motor.pneumatic.name=Pneumatic Motor
-tile.framez:motor.electric.name=Electric Motor
-tile.framez:motor.hydraulic.name=Hydraulic Motor
-tile.framez:motor.rf.name=Redstone Flux Motor
-tile.framez:motor.blood.name=Blood Motor
-tile.framez:motor.applied.name=AppliedEnergistics Motor
+// Motors
+tile.framez:motor.name=Slider DC Motor
 
-item.framez:frame.name=Frame
+// Wrench modes
+item.framez:wrench.normal.name=Wrench (Normal)
+item.framez:wrench.rotate.name=Wrench (Rotate)
+item.framez:wrench.debug.name=Wrench (Debug)
+item.framez:wrench.config.name=Wrench (Config & Management)
 
-item.framez:wrench.name=Wrench
-item.framez:stickiron.name=Iron Stick
+// Main settings GUI
+gui.framez:click_through_frames=Click-through Frames [WIP]
+gui.framez:simple_frames=Simple Frames (2D)
 
-item.framez:framepart.cross.name=Wooden Cross
-item.framez:framepart.frame.name=Wooden Frame
-item.framez:framepart.cross.iron.name=Iron Cross
-item.framez:framepart.frame.iron.name=Iron Frame
+// Motor settings GUI
+gui.framez:motor.redstone_pulse.0=Move whilst receiving a redstone signal
+gui.framez:motor.redstone_pulse.1=Move once per pulse
+gui.framez:motor.redstone_inverted.0=Normal redstone handling
+gui.framez:motor.redstone_inverted.1=Inverted redstone handling
+gui.framez:motor.solid.0=Not solid (no strong red. transmission)
+gui.framez:motor.solid.1=Solid (strong redstone transmission)
 
-framez.hud.modifiers=Modifiers
-framez.hud.modifiers.none=None
-framez.hud.maxmoved=Max. moved blocks
+// Frame items
+item.framez:frame.name=Support Frame
 
-framez.modifier.connected=Connected
-framez.modifier.iron=Iron
-framez.modifier.glass=Glass
-framez.modifier.glass.clear=Clear Glass
+item.framez:frame.wood.name=Wooden Frame
 
-itemGroup.framez=Framez
+item.framez:frame.iron.name=Iron Frame
+item.framez:frame.copper.name=Copper Frame
+item.framez:frame.tin.name=Tin Frame
+item.framez:frame.silver.name=Silver Frame
+
+item.framez:frame.gold.name=Gold Frame
+
+item.framez:frame.bronze.name=Bronze Frame
+item.framez:frame.invar.name=Invar Frame
+
+item.framez:frame.electrum.name=Electrum Frame
+
+item.framez:frame.enderium.name=Enderium Frame
+
+// Frame modifiers
+tooltip.framez:modifiers=Modifiers
+
+tooltip.framez:modifier.material=Material
+
+tooltip.framez:modifier.wood.name=Wooden
+
+tooltip.framez:modifier.iron.name=Iron
+tooltip.framez:modifier.copper.name=Copper
+tooltip.framez:modifier.tin.name=Tin
+tooltip.framez:modifier.silver.name=Silver
+
+tooltip.framez:modifier.gold.name=Gold
+
+tooltip.framez:modifier.bronze.name=Bronze
+tooltip.framez:modifier.invar.name=Invar
+
+tooltip.framez:modifier.electrum.name=Electrum
+
+tooltip.framez:modifier.enderium.name=Enderium
+
+tooltip.framez:modifier.simple.name=Simple (2D)

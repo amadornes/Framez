@@ -1,99 +1,50 @@
 package com.amadornes.framez.proxy;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
-import com.amadornes.framez.api.FramezApi;
-import com.amadornes.framez.api.IMotorProvider;
-import com.amadornes.framez.client.IconProvider;
-import com.amadornes.framez.client.render.RenderFrame;
-import com.amadornes.framez.client.render.RenderMotor;
-import com.amadornes.framez.client.render.RenderMotorPlacement;
-import com.amadornes.framez.client.render.RenderMovementBlocking;
-import com.amadornes.framez.client.render.RenderMoving;
-import com.amadornes.framez.compat.CompatibilityUtils;
+import com.amadornes.framez.client.IconSupplier;
+import com.amadornes.framez.client.RenderFrame;
+import com.amadornes.framez.client.RenderMotor;
+import com.amadornes.framez.client.RenderMovementBlocking;
+import com.amadornes.framez.client.RenderMoving;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
-import com.amadornes.framez.ref.ModInfo;
-import com.amadornes.framez.ref.References;
+import com.amadornes.framez.tile.TileMotor;
 import com.amadornes.framez.tile.TileMoving;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void init() {
+    public void registerRenderers() {
 
-        MinecraftForge.EVENT_BUS.register(new IconProvider());
-    }
-
-    @Override
-    public void registerRenders() {
-
-        CompatibilityUtils.registerRenders();
-
-        RenderMotor motorRenderer = new RenderMotor();
-
-        RenderingRegistry.registerBlockHandler(motorRenderer);
-        for (IMotorProvider m : FramezApi.inst().getMotorRegistry().getRegisteredMotors()) {
-            Block b = GameRegistry.findBlock(ModInfo.MODID, References.Names.Registry.MOTOR + "." + m.getId());
-            Item i = Item.getItemFromBlock(b);
-            MinecraftForgeClient.registerItemRenderer(i, motorRenderer);
-            ClientRegistry.bindTileEntitySpecialRenderer(m.getTileClass(), motorRenderer);
-        }
-        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(FramezBlocks.motorcore), motorRenderer);
+        MinecraftForge.EVENT_BUS.register(new IconSupplier());
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileMoving.class, new RenderMoving());
-
         MinecraftForgeClient.registerItemRenderer(FramezItems.frame, new RenderFrame());
 
-        RenderMotorPlacement renderMotorPlacement = new RenderMotorPlacement();
-        FMLCommonHandler.instance().bus().register(renderMotorPlacement);
-        MinecraftForge.EVENT_BUS.register(renderMotorPlacement);
-        RenderMovementBlocking renderMovementBlocking = new RenderMovementBlocking();
-        FMLCommonHandler.instance().bus().register(renderMovementBlocking);
-        MinecraftForge.EVENT_BUS.register(renderMovementBlocking);
+        RenderMotor motorRenderer = new RenderMotor();
+        ClientRegistry.bindTileEntitySpecialRenderer(TileMotor.class, motorRenderer);
+        RenderingRegistry.registerBlockHandler(motorRenderer);
+        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(FramezBlocks.motor), motorRenderer);
+
+        MinecraftForge.EVENT_BUS.register(new RenderMovementBlocking());
     }
 
-    @Override
-    public void setPlayer(EntityPlayer player) {
-
-        Minecraft.getMinecraft().thePlayer = (EntityClientPlayerMP) player;
-    }
-
-    @Override
-    public void setWorld(World world) {
-
-        Minecraft.getMinecraft().theWorld = (WorldClient) world;
-    }
+    private double frame;
 
     @Override
     public EntityPlayer getPlayer() {
 
         return Minecraft.getMinecraft().thePlayer;
     }
-
-    @Override
-    public World getWorld() {
-
-        return Minecraft.getMinecraft().theWorld;
-    }
-
-    private double frame = 0;
 
     @Override
     public double getFrame() {
@@ -108,9 +59,14 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public World getWorld() {
+
+        return Minecraft.getMinecraft().theWorld;
+    }
+
+    @Override
     public boolean isGamePaused() {
 
         return Minecraft.getMinecraft().isGamePaused();
     }
-
 }

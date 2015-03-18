@@ -1,7 +1,7 @@
 package com.amadornes.framez.compat.cc;
 
-import com.amadornes.framez.api.FramezApi;
 import com.amadornes.framez.compat.CompatModule;
+import com.amadornes.framez.movement.FrameMovementRegistry;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -20,7 +20,7 @@ public class CompatModuleCC extends CompatModule {
     @Override
     public void init(FMLInitializationEvent ev) {
 
-        FramezApi.inst().getMovementApi().registerMovementHandler(new MovementHandlerCC());
+        FrameMovementRegistry.instance().registerMovementHandler(new MovementHandlerCC());
 
         ComputerCraftAPI.registerPeripheralProvider(new PeripheralProviderFramez());
     }

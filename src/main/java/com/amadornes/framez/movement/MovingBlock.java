@@ -1,75 +1,84 @@
 package com.amadornes.framez.movement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import codechicken.lib.vec.BlockCoord;
-import codechicken.multipart.TMultiPart;
-import codechicken.multipart.TileMultipart;
+import uk.co.qmunity.lib.vec.Vec3i;
 
+import com.amadornes.framez.api.movement.IFrame;
+import com.amadornes.framez.api.movement.IMovable;
+import com.amadornes.framez.api.movement.IMovement.IMovementSlide;
 import com.amadornes.framez.api.movement.IMovingBlock;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.tile.TileMoving;
 import com.amadornes.framez.util.BlockUtils;
+import com.amadornes.framez.util.Graph.INode;
+import com.amadornes.framez.world.FakeWorld;
 
-public class MovingBlock implements IMovingBlock {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-    private World world;
-    private BlockCoord loc;
+public class MovingBlock implements IMovingBlock, INode {
 
-    private Block block;
-    private int meta;
-    private TileEntity te;
+    private Vec3i location;
 
     private MovingStructure structure;
 
-    private TileMoving placeholder = null;
+    private Block block = Blocks.air;
+    private int meta;
+    private TileEntity te;
+    private List<IMovable> movables = new ArrayList<IMovable>();
+    private List<IFrame> frames = null;
 
-    private boolean isStored = false;
+    private TileMoving placeholder;
 
-    public MovingBlock(BlockCoord location, World world, MovingStructure structure) {
+    public MovingBlock(Vec3i location, MovingStructure structure, List<IFrame> frames) {
 
-        loc = location;
-        this.world = world;
+        this.location = location;
+
         this.structure = structure;
-    }
 
-    public MovingBlock(int x, int y, int z, World world, MovingStructure structure) {
-
-        loc = new BlockCoord(x, y, z);
-        this.world = world;
-        this.structure = structure;
+        this.frames = frames;
     }
 
     @Override
     public World getWorld() {
 
-        return world;
+        return location.getWorld();
     }
 
     @Override
     public int getX() {
 
-        return getLocation().x;
+        return location.getX();
     }
 
     @Override
     public int getY() {
 
-        return getLocation().y;
+        return location.getY();
     }
 
     @Override
     public int getZ() {
 
-        return getLocation().z;
+        return location.getZ();
     }
 
-    public BlockCoord getLocation() {
+    @Override
+    public MovingStructure getStructure() {
 
-        return loc;
+        return structure;
+    }
+
+    public void setStructure(MovingStructure structure) {
+
+        this.structure = structure;
     }
 
     @Override
@@ -91,206 +100,258 @@ public class MovingBlock implements IMovingBlock {
     }
 
     @Override
-    public ForgeDirection getDirection() {
-
-        return structure.getDirection();
-    }
-
-    @Override
-    public double getMoved() {
-
-        return structure.getMoved();
-    }
-
-    @Override
-    public double getSpeed() {
-
-        return structure.getSpeed();
-    }
-
-    @Override
-    public World getWorldWrapper() {
-
-        return structure.getWorldWrapper();
-    }
-
-    public MovingStructure getStructure() {
-
-        return structure;
-    }
-
-    @Override
-    public void setBlock(Block block) {
+    public MovingBlock setBlock(Block block) {
 
         this.block = block;
+        return this;
     }
 
     @Override
-    public void setMetadata(int meta) {
+    public MovingBlock setMetadata(int metadata) {
 
-        this.meta = meta;
+        meta = metadata;
+        return this;
     }
 
     @Override
-    public void setTileEntity(TileEntity te) {
+    public MovingBlock setTileEntity(TileEntity tileentity) {
 
-        this.te = te;
-    }
-
-    public void storeData() {
-
-        te = world.getTileEntity(loc.x, loc.y, loc.z);
-        block = world.getBlock(loc.x, loc.y, loc.z);
-        meta = world.getBlockMetadata(loc.x, loc.y, loc.z);
-    }
-
-    public void remove() {
-
-        if (!MovementApi.INST.handleRemoval(this))
-            remove_do(true, true);
-
-        isStored = true;
-    }
-
-    public void place() {
-
-        if (!MovementApi.INST.handlePlacement(this))
-            place_do(true, true);
-
-        isStored = false;
+        te = tileentity;
+        return this;
     }
 
     @Override
-    public void remove_do(boolean invalidate, boolean validate) {
+    public MovingBlock snapshot() {
 
-        int x = getX();
-        int y = getY();
-        int z = getZ();
-        TileEntity te = getTileEntity();
+        block = location.getBlock();
+        meta = location.getBlockMeta();
+        te = location.getTileEntity();
+        movables = FrameMovementRegistry.instance().findMovables(getWorld(), getX(), getY(), getZ());
 
-        if (te != null) {
-            if (te instanceof TileMultipart) {
-                if (!getWorld().isRemote) {
-                    for (TMultiPart p : ((TileMultipart) te).jPartList())
-                        p.onWorldSeparate();
-                }
+        return this;
+    }
+
+    protected void remove() {
+
+        snapshot();
+
+        boolean handled = false;
+        for (IMovable movable : movables) {
+            if (movable.startMoving(this)) {
+                handled = true;
+                break;
             }
+        }
+
+        if (!handled)
+            startMoving(true, true);
+
+        // Place placeholder
+        if (getStructure().getMovement() instanceof IMovementSlide) {
+            ForgeDirection direction = ((IMovementSlide) getStructure().getMovement()).getDirection();
+
+            getWorld().setBlock(getX(), getY(), getZ(), FramezBlocks.moving, 0, 0);
+            TileMoving ph1 = null;
+            if (placeholder != null)
+                ph1 = placeholder;
+            else
+                ph1 = placeholder = new TileMoving();
+            ph1.setBlockA(this);
+            getWorld().setTileEntity(getX(), getY(), getZ(), ph1);
+
+            TileMoving ph2 = null;
+            MovingBlock b = structure.getBlock(getX() + direction.offsetX, getY() + direction.offsetY, getZ() + direction.offsetZ);
+            if (b != null) {
+                if (b.placeholder == null)
+                    ph2 = b.placeholder = new TileMoving();
+                else
+                    ph2 = b.placeholder;
+            } else {
+                getWorld().setBlock(getX() + direction.offsetX, getY() + direction.offsetY, getZ() + direction.offsetZ,
+                        FramezBlocks.moving, 0, 0);
+                getWorld().setTileEntity(getX() + direction.offsetX, getY() + direction.offsetY, getZ() + direction.offsetZ,
+                        ph2 = new TileMoving());
+            }
+            ph2.setBlockB(this);
+        }
+    }
+
+    @Override
+    public void startMoving(boolean invalidate, boolean validate) {
+
+        TileEntity te = getTileEntity();
+        if (te != null) {
             if (invalidate)
                 te.invalidate();
-
         }
-        BlockUtils.setBlockSneaky(getWorld(), x, y, z, Blocks.air);
-        if (te != null) {
-            BlockUtils.removeTileEntity(getWorld(), x, y, z);
 
-            te.setWorldObj(getWorldWrapper());
+        if (!getWorld().isRemote) {
+            BlockUtils.setBlockSneaky(getWorld(), getX(), getY(), getZ(), Blocks.air);
+            getWorld().setBlockMetadataWithNotify(getX(), getY(), getZ(), 0, 2);
+        }
 
-            if (validate && !(te instanceof TileMultipart))
-                te.validate();
-            if (te instanceof TileMultipart && !getWorld().isRemote)
-                for (TMultiPart p : ((TileMultipart) te).jPartList())
-                    p.onMoved();
+        if (te != null)
+            BlockUtils.removeTileEntity(getWorld(), getX(), getY(), getZ());
+
+        if (te != null && validate) {
+            te.setWorldObj(FakeWorld.getFakeWorld(this));
+            te.validate();
         }
     }
 
-    @Override
-    public void place_do(boolean invalidate, boolean validate) {
+    protected void notifyRemoval() {
 
-        int x = getX() + getDirection().offsetX;
-        int y = getY() + getDirection().offsetY;
-        int z = getZ() + getDirection().offsetZ;
-        TileEntity te = getTileEntity();
+        if (!getWorld().isRemote) {
+            getWorld().notifyBlocksOfNeighborChange(getX(), getY(), getZ(), getBlock());
+            FakeWorld.getFakeWorld(this).notifyBlockOfNeighborChange(getX(), getY(), getZ(), getBlock());
+        } else {
+            getWorld().func_147479_m(getX(), getY(), getZ());
+        }
+    }
 
-        BlockUtils.setBlockSneaky(world, x, y, z, getBlock());
-        BlockUtils.setBlockMetadataSneaky(world, x, y, z, getMetadata());
+    protected void place() {
 
-        if (te != null) {
-            if (te instanceof TileMultipart) {
-                if (!getWorld().isRemote) {
-                    TileMultipart tmp = TileMultipart.getTile(getWorld(), new BlockCoord(x, y, z));
-                    if (tmp != null)
-                        tmp.clearParts();
-                    for (TMultiPart p : ((TileMultipart) te).jPartList()) {
-                        p.onWorldSeparate();
-                        TileMultipart.addPart(getWorld(), new BlockCoord(x, y, z), p);
-                        p.onMoved();
-                    }
-                }
-            } else {
-                if (invalidate && !(te instanceof TileMultipart))
-                    te.invalidate();
+        // // Remove placeholder
+        // if (getStructure().getMovement() instanceof IMovementSlide) {
+        // ForgeDirection direction = ((IMovementSlide) getStructure().getMovement()).getDirection();
+        //
+        // if (placeholder != null) {
+        // placeholder.setBlockA(null);
+        // MovingBlock b = structure.getBlock(getX() + direction.offsetX, getY() + direction.offsetY, getZ() + direction.offsetZ);
+        // if (b != null)
+        // b.placeholder.setBlockB(null);
+        // }
+        // }
 
-                te.xCoord = x;
-                te.yCoord = y;
-                te.zCoord = z;
-                te.setWorldObj(getWorldWrapper());
-
-                if (validate)
-                    te.validate();
-
-                if (getWorld().getTileEntity(x, y, z) != te)
-                    getWorld().setTileEntity(x, y, z, te);
+        boolean handled = false;
+        for (IMovable movable : movables) {
+            if (movable.finishMoving(this)) {
+                handled = true;
+                break;
             }
         }
 
+        if (!handled)
+            finishMoving(true, true);
     }
 
-    public void removePlaceholder() {
+    @Override
+    public void finishMoving(boolean invalidate, boolean validate) {
 
-        if (placeholder == null)
-            return;
+        Vec3i newLocation = getStructure().getMovement().transform(new Vec3i(this));
+        TileEntity te = getTileEntity();
 
-        placeholder.setBlockA(null);
-        MovingBlock b = structure.getBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
-        if (b != null) {
-            b.placeholder.setBlockB(null);
-        }
-    }
+        if (te != null && invalidate)
+            te.invalidate();
 
-    public void placePlaceholder() {
-
-        world.setBlock(loc.x, loc.y, loc.z, FramezBlocks.moving, 0, 0);
-        TileMoving te = null;
-        if (placeholder != null)
-            te = placeholder;
-        else
-            te = placeholder = new TileMoving();
-        te.setBlockA(this);
-        world.setTileEntity(loc.x, loc.y, loc.z, te);
-
-        TileMoving te2 = null;
-        MovingBlock b = structure.getBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ);
-        if (b != null) {
-            if (b.placeholder == null)
-                te2 = b.placeholder = new TileMoving();
-            else
-                te2 = b.placeholder;
+        // if (!newLocation.getWorld().isRemote) {
+        if (getWorld().isRemote) {
+            newLocation.getWorld().setBlock(newLocation.getX(), newLocation.getY(), newLocation.getZ(), getBlock(), 0, 0);
         } else {
-            world.setBlock(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ,
-                    FramezBlocks.moving, 0, 0);
-            world.setTileEntity(loc.x + getDirection().offsetX, loc.y + getDirection().offsetY, loc.z + getDirection().offsetZ,
-                    te2 = new TileMoving());
+            BlockUtils.setBlockSneaky(newLocation.getWorld(), newLocation.getX(), newLocation.getY(), newLocation.getZ(), getBlock());
         }
-        te2.setBlockB(this);
+        newLocation.getWorld().setBlockMetadataWithNotify(newLocation.getX(), newLocation.getY(), newLocation.getZ(), getMetadata(), 2);
+        // }
+
+        if (te != null) {
+            te.setWorldObj(newLocation.getWorld());
+            te.xCoord = newLocation.getX();
+            te.yCoord = newLocation.getY();
+            te.zCoord = newLocation.getZ();
+
+            if (validate)
+                te.validate();
+            BlockUtils.setTileEntity(newLocation.getWorld(), newLocation.getX(), newLocation.getY(), newLocation.getZ(), te);
+        }
     }
 
-    public TileMoving getPlaceholder() {
+    protected void notifyPlacement() {
 
-        return placeholder;
+        Vec3i newLocation = getStructure().getMovement().transform(new Vec3i(this));
+        if (!newLocation.getWorld().isRemote) {
+            newLocation.getWorld().notifyBlocksOfNeighborChange(newLocation.getX(), newLocation.getY(), newLocation.getZ(), getBlock());
+            newLocation.getWorld().notifyBlockOfNeighborChange(newLocation.getX(), newLocation.getY(), newLocation.getZ(), getBlock());
+        }
+        newLocation.getWorld().markBlockRangeForRenderUpdate(newLocation.getX(), newLocation.getY(), newLocation.getZ(),
+                newLocation.getX(), newLocation.getY(), newLocation.getZ());
     }
 
-    public boolean isStored() {
+    @Override
+    public String toString() {
 
-        return isStored;
+        return "MovingBlock [location=" + location + ", block=" + block + ", meta=" + meta + ", te=" + te + "]";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj instanceof MovingBlock) {
+            MovingBlock b = (MovingBlock) obj;
+            return b.getX() == getX() && b.getY() == getY() && b.getZ() == getZ();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return getX() + getY() << 8 + getZ() << 16;
+    }
+
+    @Override
+    public int getMaxNeighbors() {
+
+        if (frames != null) {
+            int max = 0;
+            for (IFrame f : frames)
+                max = Math.max(max, f.getMaxMovedBlocks());
+            return max;
+        }
+
+        return 0;
+    }
+
+    public int getMaxMultiparts() {
+
+        if (frames != null) {
+            int max = 0;
+            for (IFrame f : frames)
+                max = Math.max(max, f.getMaxMultiparts());
+            return max;
+        }
+
+        return 0;
+    }
+
+    public int getMultiparts() {
+
+        if (frames != null) {
+            int max = 0;
+            for (IFrame f : frames)
+                max = Math.max(max, f.getMultiparts());
+            return max;
+        }
+
+        return 0;
+    }
+
+    // Clientside stuff (rendering, mostly)
 
     private int renderList = -1;
 
+    @SideOnly(Side.CLIENT)
+    public void scheduleReRender() {
+
+        renderList = -1;
+    }
+
+    @SideOnly(Side.CLIENT)
     public int getRenderList() {
 
         return renderList;
     }
 
+    @SideOnly(Side.CLIENT)
     public void setRenderList(int renderList) {
 
         this.renderList = renderList;

@@ -2,20 +2,11 @@ package com.amadornes.framez.api.movement;
 
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import uk.co.qmunity.lib.vec.IWorldLocation;
 
-public interface IMovingBlock {
+public interface IMovingBlock extends IWorldLocation {
 
-    public World getWorld();
-
-    public World getWorldWrapper();
-
-    public int getX();
-
-    public int getY();
-
-    public int getZ();
+    public IMovingStructure getStructure();
 
     public Block getBlock();
 
@@ -23,20 +14,16 @@ public interface IMovingBlock {
 
     public TileEntity getTileEntity();
 
-    public double getMoved();
+    public IMovingBlock setBlock(Block block);
 
-    public double getSpeed();
+    public IMovingBlock setMetadata(int metadata);
 
-    public ForgeDirection getDirection();
+    public IMovingBlock setTileEntity(TileEntity tileentity);
 
-    public void setBlock(Block block);
+    public IMovingBlock snapshot();
 
-    public void setMetadata(int metadata);
+    public void startMoving(boolean invalidate, boolean validate);
 
-    public void setTileEntity(TileEntity tileentity);
-
-    public void remove_do(boolean invalidate, boolean validate);
-
-    public void place_do(boolean invalidate, boolean validate);
+    public void finishMoving(boolean invalidate, boolean validate);
 
 }

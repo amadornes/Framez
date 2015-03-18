@@ -11,9 +11,6 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
 public class BlockUtils {
 
-    // public static final List<TileEntity> removedTEs = new ArrayList<TileEntity>();
-    // public static final List<TileEntity> addedTEs = new ArrayList<TileEntity>();
-
     @SuppressWarnings("rawtypes")
     public static void removeTileEntity(World world, int x, int y, int z, boolean removeFromChunk, boolean removeFromWorld) {
 
@@ -54,6 +51,7 @@ public class BlockUtils {
             if (chunk.chunkTileEntityMap.containsKey(pos))
                 ((TileEntity) chunk.chunkTileEntityMap.get(pos)).invalidate();
             chunk.chunkTileEntityMap.put(pos, te);
+            world.addTileEntity(te);
         }
     }
 

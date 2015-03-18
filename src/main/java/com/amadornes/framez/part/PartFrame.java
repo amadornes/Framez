@@ -2,102 +2,55 @@ package com.amadornes.framez.part;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import uk.co.qmunity.lib.client.render.RenderHelper;
+import uk.co.qmunity.lib.vec.Vec3d;
+import uk.co.qmunity.lib.vec.Vec3dCube;
 import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.raytracer.ExtendedMOP;
 import codechicken.lib.raytracer.IndexedCuboid6;
-import codechicken.lib.raytracer.RayTracer;
-import codechicken.lib.render.EntityDigIconFX;
 import codechicken.lib.render.RenderUtils;
 import codechicken.lib.vec.Cuboid6;
-import codechicken.lib.vec.Rotation;
 import codechicken.lib.vec.Vector3;
+import codechicken.microblock.CommonMicroblock;
 import codechicken.microblock.FaceMicroblock;
 import codechicken.microblock.HollowMicroblock;
-import codechicken.microblock.ItemMicroPart;
-import codechicken.microblock.Microblock;
-import codechicken.multipart.NormallyOccludedPart;
 import codechicken.multipart.TMultiPart;
 import codechicken.multipart.TNormalOcclusion;
 
-import com.amadornes.framez.api.FramezApi;
-import com.amadornes.framez.api.IFrame;
-import com.amadornes.framez.api.IFrameModifier;
-import com.amadornes.framez.api.IFrameModifierProvider;
-import com.amadornes.framez.api.IFramezWrench;
-import com.amadornes.framez.client.IconProvider;
-import com.amadornes.framez.client.render.RenderFrame;
-import com.amadornes.framez.modifier.ModifierRegistry;
-import com.amadornes.framez.network.NetworkHandler;
-import com.amadornes.framez.network.packet.PacketBlockSide;
-import com.amadornes.framez.ref.ModInfo;
+import com.amadornes.framez.Framez;
+import com.amadornes.framez.api.modifier.IFrameModifier;
+import com.amadornes.framez.api.movement.IFrame;
+import com.amadornes.framez.api.movement.IMovement;
+import com.amadornes.framez.client.RenderFrame;
+import com.amadornes.framez.config.Config;
+import com.amadornes.framez.init.FramezItems;
+import com.amadornes.framez.modifier.FrameFactory;
 import com.amadornes.framez.ref.References;
-import com.amadornes.framez.util.Utils;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
-    private static final Cuboid6[] subParts = new Cuboid6[] { null, null, null, null, null, null };
-
-    private Object[] connections = new Object[] { null, null, null, null, null, null };
-
     private List<IFrameModifier> modifiers = new ArrayList<IFrameModifier>();
-
-    private boolean[] render = new boolean[20];
-
-    private boolean[] blocked = new boolean[6];
-
-    private boolean isConnected(ForgeDirection dir) {
-
-        return getConnection(dir) != null && getConnection(dir) instanceof IFrame;
-    }
-
-    public Object getConnection(ForgeDirection dir) {
-
-        return connections[dir.ordinal()];
-    }
-
-    private boolean shouldRenderCorner(ForgeDirection face, ForgeDirection a, ForgeDirection b) {
-
-        Object of = face != ForgeDirection.UNKNOWN ? getConnection(face) : null;
-        Object oa = getConnection(a);
-        Object ob = getConnection(b);
-
-        if (face == ForgeDirection.UNKNOWN) {
-            return !(oa != null || ob != null)
-                    || ((oa == null || !(oa instanceof PartFrame)) && (ob == null || !(ob instanceof PartFrame)));
-        } else {
-            if (oa != null && ob != null && oa instanceof PartFrame && ob instanceof PartFrame && ((PartFrame) oa).isConnected(b))
-                return false;
-
-            if (oa != null && of != null && oa instanceof PartFrame && of instanceof PartFrame && ((PartFrame) oa).isConnected(face))
-                return false;
-
-            if (ob != null && of != null && ob instanceof PartFrame && of instanceof PartFrame && ((PartFrame) ob).isConnected(face))
-                return false;
-        }
-
-        return true;
-    }
+    private boolean[] hidden = new boolean[6];
 
     public PartFrame() {
 
@@ -106,83 +59,43 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     @Override
     public String getType() {
 
-        return ModInfo.MODID + "." + References.Names.Registry.FRAME;
+        return FrameFactory.getIdentifier(References.FRAME_PART_ID, getModifiers());
     }
 
     @Override
-    public Iterable<Cuboid6> getOcclusionBoxes() {
+    public World getWorld() {
 
-        List<Cuboid6> boxes = new ArrayList<Cuboid6>();
+        if (tile() == null)
+            return null;
 
-        return boxes;
+        return world();
     }
 
     @Override
-    public boolean occlusionTest(TMultiPart npart) {
+    public int getX() {
 
-        if (npart instanceof PartFrame)
-            return false;
+        if (tile() == null)
+            return 0;
 
-        if (npart instanceof Microblock) {
-            if (npart instanceof FaceMicroblock || npart instanceof HollowMicroblock)
-                return ((Microblock) npart).getSize() < 3;
-            return false;
-        }
-
-        return true;
+        return x();
     }
 
     @Override
-    public Iterable<Cuboid6> getCollisionBoxes() {
+    public int getY() {
 
-        return Arrays.asList(new Cuboid6[] { new Cuboid6(0, 0, 0, 1, 1, 1) });
+        if (tile() == null)
+            return 0;
+
+        return y();
     }
 
     @Override
-    public Iterable<IndexedCuboid6> getSubParts() {
+    public int getZ() {
 
-        List<IndexedCuboid6> boxes = new ArrayList<IndexedCuboid6>();
+        if (tile() == null)
+            return 0;
 
-        double translation = 0.0001;
-        double t = 0.001;
-
-        subParts[0] = new Cuboid6(0, 0 + t, 0, 1, translation + t, 1); // DOWN (-Y)
-        subParts[1] = new Cuboid6(0, 1 - translation - t, 0, 1, 1 - t, 1); // UP (+Y)
-        subParts[2] = new Cuboid6(0, 0, 0 + t, 1, 1, translation + t); // WEST (-Z)
-        subParts[3] = new Cuboid6(0, 0, 1 - translation - t, 1, 1, 1 - t); // EAST (+Z)
-        subParts[4] = new Cuboid6(0 + t, 0, 0, translation + t, 1, 1); // NORTH (-X)
-        subParts[5] = new Cuboid6(1 - translation - t, 0, 0, 1 - t, 1, 1); // SOUTH (+X)
-
-        if (tile() != null) {
-            List<TMultiPart> parts = tile().jPartList();
-            for (int i = 0; i < 6; i++) {
-                IndexedCuboid6 c = new IndexedCuboid6(0, subParts[i]);
-                boolean skip = false;
-                for (TMultiPart p : parts) {
-                    if (p instanceof HollowMicroblock && ((HollowMicroblock) p).getSlot() == i) {
-                        skip = true;
-                        break;
-                    }
-                }
-                if (skip)
-                    continue;
-                boxes.add(c);
-            }
-        }
-
-        return boxes;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean renderStatic(Vector3 pos, int pass) {
-
-        if (pass != 0)
-            return false;
-
-        RenderFrame.render(this, x(), y(), z());
-
-        return true;
+        return z();
     }
 
     @Override
@@ -191,131 +104,19 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         return false;
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addDestroyEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
+    public ItemStack getItem() {
 
-        IIcon[] icons = new IIcon[6];
-        for (int i = 0; i < 6; i++) {
-            IIcon icon = ModifierRegistry.INST.getCrossTexture(Arrays.asList(getModifiers()), ForgeDirection.getOrientation(hit.sideHit));
-            if (icon == null)
-                icon = isSideBlocked(ForgeDirection.getOrientation(hit.sideHit)) ? IconProvider.iconFrameCrossBlocked
-                        : IconProvider.iconFrameCross;
-            if (icon == null)
-                icon = IconProvider.iconNothing;
-            icons[i] = icon;
-        }
-        EntityDigIconFX.addBlockDestroyEffects(world(), Cuboid6.full.copy().add(Vector3.fromTileEntity(tile())), icons, effectRenderer);
+        NBTTagList tagList = new NBTTagList();
+        for (IFrameModifier mod : getModifiers())
+            tagList.appendTag(new NBTTagString(mod.getType()));
 
-    }
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setTag("modifiers", tagList);
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addHitEffects(MovingObjectPosition hit, EffectRenderer effectRenderer) {
+        ItemStack is = new ItemStack(FramezItems.frame);
+        is.setTagCompound(tag);
 
-        IIcon icon = ModifierRegistry.INST.getCrossTexture(Arrays.asList(getModifiers()), ForgeDirection.getOrientation(hit.sideHit));
-        if (icon == null)
-            icon = isSideBlocked(ForgeDirection.getOrientation(hit.sideHit)) ? IconProvider.iconFrameCrossBlocked
-                    : IconProvider.iconFrameCross;
-        EntityDigIconFX.addBlockHitEffects(world(), Cuboid6.full.copy().add(Vector3.fromTileEntity(tile())), hit.sideHit, icon,
-                effectRenderer);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void drawBreaking(RenderBlocks renderBlocks) {
-
-        RenderBlocks rb2 = RenderFrame.rb;
-        RenderFrame.rb = renderBlocks;
-        renderStatic(new Vector3(), 0);
-        RenderFrame.rb = rb2;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean drawHighlight(MovingObjectPosition hit, EntityPlayer player, float frame) {
-
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glColor4f(0, 0, 0, 0.4F);
-        GL11.glLineWidth(2);
-        GL11.glDepthMask(true);
-        GL11.glPushMatrix();
-        RenderUtils.translateToWorldCoords(player, frame);
-        GL11.glTranslated(x(), y(), z());
-
-        RenderUtils.drawCuboidOutline(new Cuboid6(0, 0, 0, 1, 1, 1).expand(0.001));
-
-        GL11.glPopMatrix();
-        GL11.glDepthMask(false);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
-
-        return true;
-    }
-
-    @Override
-    public ExtendedMOP collisionRayTrace(Vec3 start, Vec3 end) {
-
-        ExtendedMOP mop = super.collisionRayTrace(start, end);
-
-        boolean center = false;
-        EntityPlayer player = null;
-
-        for (Object o : world().playerEntities) {
-            EntityPlayer p = (EntityPlayer) o;
-            if (RayTracer.getEndVec(p).distanceTo(end) == 0) {
-                player = p;
-                break;
-            }
-        }
-
-        if (player != null) {
-            ItemStack item = player.getCurrentEquippedItem();
-            if (item != null && item.getItem() instanceof ItemMicroPart)
-                center = true;
-        }
-
-        if (mop != null) {
-            Vec3 click = mop.hitVec.addVector(-mop.blockX, -mop.blockY, -mop.blockZ);
-            ForgeDirection face = ForgeDirection.getOrientation(mop.sideHit);
-            if (face == ForgeDirection.EAST || face == ForgeDirection.WEST) {
-                if (center) {
-                    click.yCoord = 0.5;
-                    click.zCoord = 0.5;
-                }
-                click.xCoord = (click.xCoord * 0.5) + 0.25;
-            }
-            if (face == ForgeDirection.UP || face == ForgeDirection.DOWN) {
-                if (center) {
-                    click.xCoord = 0.5;
-                    click.zCoord = 0.5;
-                }
-                click.yCoord = (click.yCoord * 0.5) + 0.25;
-            }
-            if (face == ForgeDirection.NORTH || face == ForgeDirection.SOUTH) {
-                if (center) {
-                    click.xCoord = 0.5;
-                    click.yCoord = 0.5;
-                }
-                click.zCoord = (click.zCoord * 0.5) + 0.25;
-            }
-
-            mop.hitVec = click.addVector(mop.blockX, mop.blockY, mop.blockZ);
-        }
-
-        return mop;
-    }
-
-    private ItemStack getItem() {
-
-        List<String> modifiers = new ArrayList<String>();
-
-        for (IFrameModifier m : this.modifiers)
-            modifiers.add(m.getIdentifier());
-
-        return FramezApi.inst().getModifierRegistry().getFrameStack(modifiers.toArray(new String[0]));
+        return is;
     }
 
     @Override
@@ -327,421 +128,359 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     @Override
     public Iterable<ItemStack> getDrops() {
 
-        onUpdate(1);
-
-        return Arrays.asList(new ItemStack[] { getItem() });
+        return Arrays.asList(getItem());
     }
 
     @Override
-    public void save(NBTTagCompound tag) {
+    public Iterable<Cuboid6> getCollisionBoxes() {
 
-        super.save(tag);
-
-        writeModifiersToNBT(tag);
-
-        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
-            tag.setBoolean("blocked_" + d.name().toLowerCase(), isSideBlocked(d));
+        return Arrays.asList(new Cuboid6(0, 0, 0, 1, 1, 1));
     }
 
     @Override
-    public void load(NBTTagCompound tag) {
+    public Iterable<IndexedCuboid6> getSubParts() {
 
-        super.load(tag);
+        List<IndexedCuboid6> l = new ArrayList<IndexedCuboid6>();
 
-        try {
-            readModifiersFromNBT(tag);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        Vec3dCube c1 = new Vec3dCube(0, 0, 0, 2 / 16D, 2 / 16D, 1);
+        Vec3dCube c2 = new Vec3dCube(0, 2 / 16D, 0, 2 / 16D, 14 / 16D, 2 / 16D);
+        Vec3dCube c3 = new Vec3dCube(0, 14 / 16D, 0, 2 / 16D, 1, 1);
+        for (int i = 0; i < 4; i++) {
+            l.add(new IndexedCuboid6(0, new Cuboid6(c1.clone().rotate(0, i * 90, 0, Vec3d.center).toAABB())));
+            l.add(new IndexedCuboid6(0, new Cuboid6(c2.clone().rotate(0, i * 90, 0, Vec3d.center).toAABB())));
+            l.add(new IndexedCuboid6(0, new Cuboid6(c3.clone().rotate(0, i * 90, 0, Vec3d.center).toAABB())));
+        }
+        if (getWorld() != null && (!getWorld().isRemote || !Config.click_through_frames))
+            if (is2D())
+                l.add(new IndexedCuboid6(0, new Cuboid6(0, 0, 0, 1, 1, 1).expand(-0.001)));
+            else
+                l.add(new IndexedCuboid6(0, new Cuboid6(1 / 16D, 1 / 16D, 1 / 16D, 15 / 16D, 15 / 16D, 15 / 16D)));
+
+        return l;
+    }
+
+    @Override
+    public ExtendedMOP collisionRayTrace(Vec3 start, Vec3 end) {
+
+        ExtendedMOP mop = super.collisionRayTrace(start, end);
+
+        double d = 0.001;
+
+        if (mop != null) {
+            if (mop.hitVec.xCoord % 1 == 0)
+                mop.hitVec.xCoord += ForgeDirection.getOrientation(mop.sideHit).offsetX * d;
+            if (mop.hitVec.yCoord % 1 == 0)
+                mop.hitVec.yCoord += ForgeDirection.getOrientation(mop.sideHit).offsetY * d;
+            if (mop.hitVec.zCoord % 1 == 0)
+                mop.hitVec.zCoord += ForgeDirection.getOrientation(mop.sideHit).offsetZ * d;
+
+            // mop.blockX = (int) Math.floor(mop.hitVec.xCoord);
+            // mop.blockY = (int) Math.floor(mop.hitVec.yCoord);
+            // mop.blockZ = (int) Math.floor(mop.hitVec.zCoord);
         }
 
-        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
-            blocked[d.ordinal()] = tag.getBoolean("blocked_" + d.name().toLowerCase());
+        return mop;
     }
 
     @Override
-    public void writeDesc(MCDataOutput packet) {
+    public Iterable<Cuboid6> getOcclusionBoxes() {
 
-        super.writeDesc(packet);
-
-        NBTTagCompound tag = new NBTTagCompound();
-
-        writeModifiersToNBT(tag);
-
-        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
-            tag.setBoolean("blocked_" + d.name().toLowerCase(), isSideBlocked(d));
-
-        packet.writeNBTTagCompound(tag);
+        return new ArrayList<Cuboid6>();
     }
 
     @Override
-    public void readDesc(MCDataInput packet) {
+    public boolean occlusionTest(TMultiPart part) {
 
-        super.readDesc(packet);
-
-        NBTTagCompound tag = packet.readNBTTagCompound();
-        try {
-            readModifiersFromNBT(tag);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (part instanceof CommonMicroblock) {
+            if (!(part instanceof FaceMicroblock) && !(part instanceof HollowMicroblock))
+                return false;
+            if (((CommonMicroblock) part).getSize() > 2)
+                return false;
         }
 
-        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
-            blocked[d.ordinal()] = tag.getBoolean("blocked_" + d.name().toLowerCase());
-
-        try {
-            onUpdate(2);
-        } catch (Exception ex) {
-            // Not initialized yet
-        }
+        return !(part instanceof PartFrame) && super.occlusionTest(part);
     }
 
     @Override
-    public float getStrength(MovingObjectPosition hit, EntityPlayer player) {
+    public Collection<IFrameModifier> getModifiers() {
 
-        ItemStack item = player.getCurrentEquippedItem();
-        double strength = 1;
-        if (item != null) {
-            Block b = null;
+        if (modifiers == null)
+            return modifiers = new ArrayList<IFrameModifier>();
 
-            for (IFrameModifier m : getModifiers()) {
-                Block mat = m.getMaterialType();
-                if (mat != null) {
-                    b = mat;
-                    break;
-                }
+        return modifiers;
+    }
+
+    @Override
+    public int getMaxMovedBlocks() {
+
+        return 6;
+    }
+
+    @Override
+    public int getMaxMultiparts() {
+
+        return 2;
+    }
+
+    @Override
+    public int getMultiparts() {
+
+        return tile().jPartList().size() - 1;
+    }
+
+    @Override
+    public boolean canRenderInPass(int pass) {
+
+        return is2D() ? pass == 0 || Config.click_through_frames : true;
+    }
+
+    @Override
+    public boolean drawHighlight(MovingObjectPosition hit, EntityPlayer player, float frame) {
+
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glColor4f(0, 0, 0, 0.4F);
+        GL11.glLineWidth(2);
+        GL11.glDepthMask(true);
+        GL11.glPushMatrix();
+        RenderUtils.translateToWorldCoords(player, frame);
+        GL11.glTranslated(x(), y(), z());
+        {
+            double d = 0.002;
+
+            if (!is2D()) {
+                RenderUtils.drawCuboidOutline(new Cuboid6(2 / 16D + d, isSideHidden(ForgeDirection.DOWN) ? d * 2 : -d * 2, 2 / 16D + d,
+                        14 / 16D - d, 1 + (isSideHidden(ForgeDirection.UP) ? -d * 2 : d * 2), 14 / 16D - d));
+                RenderUtils.drawCuboidOutline(new Cuboid6(isSideHidden(ForgeDirection.WEST) ? d * 2 : -d * 2, 2 / 16D + d, 2 / 16D + d,
+                        1 + (isSideHidden(ForgeDirection.EAST) ? -d * 2 : d * 2), 14 / 16D - d, 14 / 16D - d));
+                RenderUtils.drawCuboidOutline(new Cuboid6(2 / 16D + d, 2 / 16D + d, isSideHidden(ForgeDirection.NORTH) ? d : -d,
+                        14 / 16D - d, 14 / 16D - d, 1 + (isSideHidden(ForgeDirection.SOUTH) ? -d * 2 : d * 2)));
             }
 
-            if (b == null)
-                b = Blocks.planks;
-
-            strength = item.getItem().getDigSpeed(item, b, 0);
+            RenderUtils.drawCuboidOutline(new Cuboid6(0, 0, 0, 1, 1, 1).expand(d));
         }
+        GL11.glPopMatrix();
+        GL11.glDepthMask(false);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_BLEND);
 
-        for (IFrameModifier m : getModifiers())
-            strength /= m.getHardnessMultiplier();
-
-        return (float) strength;
+        return true;
     }
 
     @Override
-    public void onAdded() {
+    public boolean renderStatic(RenderHelper renderer, int pass) {
 
-        super.onAdded();
+        IIcon borderT = getBorderIcon();
+        IIcon borderPanelT = getBorderPanelIcon();
+        IIcon crossT = getCrossIcon();
+        IIcon simpleT = getSimpleIcon();
 
-        onUpdate(0);
-    }
+        IIcon[] border = new IIcon[] { borderT, borderT, borderT, borderT, borderT, borderT };
+        IIcon[] cross = new IIcon[] { crossT, crossT, crossT, crossT, crossT, crossT };
+        IIcon[] simple = new IIcon[] { simpleT, simpleT, simpleT, simpleT, simpleT, simpleT };
 
-    @Override
-    public void onWorldJoin() {
-
-        super.onWorldJoin();
-
-        onUpdate(0);
-    }
-
-    @Override
-    public void onRemoved() {
-
-        super.onRemoved();
-
-        onUpdate(1);
-    }
-
-    @Override
-    public void onNeighborChanged() {
-
-        super.onNeighborChanged();
-
-        onUpdate(2);
-
-        sendDescUpdate();
-    }
-
-    @Override
-    public void onPartChanged(TMultiPart part) {
-
-        super.onPartChanged(part);
-
-        onUpdate(3);
-    }
-
-    private void onUpdate(int mode) {
-
-        for (int i = 0; i < 6; i++) {
-            ForgeDirection face = ForgeDirection.getOrientation(i);
-            if (mode != 1)
-                connections[i] = getObjectOnSide(face);
-
-            if (mode != 2)
-                if (connections[i] != null && connections[i] instanceof PartFrame) {
-                    ((PartFrame) connections[i]).onUpdate(2);
-                    for (Object o : ((PartFrame) connections[i]).connections) {
-                        if (o != null && o instanceof PartFrame) {
-                            ((PartFrame) o).onUpdate(2);
-                        }
-                    }
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+            int mb = getMicroblock(d);
+            if (mb != 0) {
+                cross[d.ordinal()] = null;
+                if (mb == 2) {
+                    border[d.ordinal()] = borderPanelT;
+                    simple[d.ordinal()] = borderPanelT;
+                } else {
+                    simple[d.ordinal()] = borderT;
                 }
+            }
         }
 
-        updateRenderer();
+        if (hidden == null)
+            hidden = new boolean[6];
+
+        if (!is2D())
+            return RenderFrame.renderFrame3D(renderer, border, borderT, cross, simple, hidden, pass);
+        else
+            return RenderFrame.renderFrame2D(renderer, simple, hidden);
+
     }
 
-    private void updateRenderer() {
+    @Override
+    public boolean renderStatic(Vector3 pos, int pass) {
 
-        render[0] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.WEST));
-        render[1] = !hasModifier("connected")
-                || (hasModifier("connected") && !isConnected(ForgeDirection.NORTH) && !isConnected(ForgeDirection.DOWN));
-        render[2] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.EAST));
-        render[3] = !hasModifier("connected")
-                || (hasModifier("connected") && !isConnected(ForgeDirection.EAST) && !isConnected(ForgeDirection.DOWN));
-        render[4] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.EAST));
-        render[5] = !hasModifier("connected")
-                || (hasModifier("connected") && !isConnected(ForgeDirection.SOUTH) && !isConnected(ForgeDirection.DOWN));
-        render[6] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.WEST));
-        render[7] = !hasModifier("connected")
-                || (hasModifier("connected") && !isConnected(ForgeDirection.WEST) && !isConnected(ForgeDirection.DOWN));
-        render[8] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.WEST));
-        render[9] = !hasModifier("connected")
-                || (hasModifier("connected") && !isConnected(ForgeDirection.NORTH) && !isConnected(ForgeDirection.UP));
-        render[10] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.EAST));
-        render[11] = !hasModifier("connected")
-                || (hasModifier("connected") && !isConnected(ForgeDirection.EAST) && !isConnected(ForgeDirection.UP));
-        render[12] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UP, ForgeDirection.SOUTH, ForgeDirection.EAST));
-        render[13] = !hasModifier("connected")
-                || (hasModifier("connected") && !isConnected(ForgeDirection.SOUTH) && !isConnected(ForgeDirection.UP));
-        render[14] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UP, ForgeDirection.SOUTH, ForgeDirection.WEST));
-        render[15] = !hasModifier("connected")
-                || (hasModifier("connected") && !isConnected(ForgeDirection.WEST) && !isConnected(ForgeDirection.UP));
-        render[16] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UNKNOWN, ForgeDirection.NORTH, ForgeDirection.WEST));
-        render[17] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UNKNOWN, ForgeDirection.NORTH, ForgeDirection.EAST));
-        render[18] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UNKNOWN, ForgeDirection.SOUTH, ForgeDirection.EAST));
-        render[19] = !hasModifier("connected")
-                || (hasModifier("connected") && shouldRenderCorner(ForgeDirection.UNKNOWN, ForgeDirection.SOUTH, ForgeDirection.WEST));
+        if (!canRenderInPass(pass))
+            return false;
+
+        RenderHelper renderer = RenderHelper.instance;
+        renderer.reset();
+        renderer.setRenderCoords(getWorld(), (int) pos.x, (int) pos.y, (int) pos.z);
+
+        boolean result = renderStatic(renderer, pass);
+
+        renderer.fullReset();
+
+        return result;
     }
 
-    private Object getObjectOnSide(ForgeDirection face) {
+    @Override
+    public void renderDynamic(Vec3d pos, int pass, double frame) {
 
-        int x = x() + face.offsetX;
-        int y = y() + face.offsetY;
-        int z = z() + face.offsetZ;
+    }
 
-        int mbThis = Utils.getMicroblockSize(tile(), face);
-        if (mbThis > 0)
-            return mbThis;
+    @Override
+    public void renderItem(ItemStack item, ItemRenderType type) {
 
-        int mbOther = Utils.getMicroblockSize(Utils.getMultipartTile(world(), x, y, z), face.getOpposite());
-        if (mbOther > 0)
-            return mbOther;
+        Tessellator t = Tessellator.instance;
+        RenderHelper renderer = RenderHelper.instance;
+        renderer.fullReset();
 
-        IFrame f = Utils.getFrame(world(), x, y, z);
-        if (f != null)
-            return f;
+        GL11.glPushMatrix();
+        {
+            t.startDrawingQuads();
+            if (canRenderInPass(0))
+                renderStatic(renderer, 0);
+            if (canRenderInPass(1))
+                renderStatic(renderer, 1);
+            t.draw();
 
-        if (world().getBlock(x, y, z).isSideSolid(world(), x, y, z, face.getOpposite()))
-            return true;
+            if (canRenderInPass(0))
+                renderDynamic(new Vec3d(0, 0, 0), 0, Framez.proxy.getFrame());
+            if (canRenderInPass(1))
+                renderDynamic(new Vec3d(0, 0, 0), 1, Framez.proxy.getFrame());
+        }
+        GL11.glPopMatrix();
+
+        renderer.fullReset();
+    }
+
+    @Override
+    public void drawBreaking(RenderBlocks renderBlocks) {
+
+        RenderHelper.instance.setOverrideTexture(renderBlocks.overrideBlockTexture);
+        renderStatic(new Vector3(getX(), getY(), getZ()), 0);
+        RenderHelper.instance.fullReset();
+    }
+
+    @Override
+    public boolean isSideSticky(World world, int x, int y, int z, ForgeDirection side, IMovement movement) {
+
+        return true;
+    }
+
+    @Override
+    public int getMicroblock(ForgeDirection face) {
+
+        if (tile() != null) {
+            for (TMultiPart p : tile().jPartList()) {
+                if (p instanceof FaceMicroblock || p instanceof HollowMicroblock) {
+                    int pos = ((CommonMicroblock) p).getShape();
+                    if (pos != face.ordinal())
+                        continue;
+                    if (((CommonMicroblock) p).getSize() == 2)
+                        return 2;
+                    else
+                        return 1;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    public IIcon getBorderIcon() {
 
         return null;
     }
 
     @Override
-    public IFrameModifier[] getModifiers() {
+    public IIcon getBorderPanelIcon() {
 
-        return modifiers.toArray(new IFrameModifier[0]);
+        return null;
     }
 
     @Override
-    public void addModifier(IFrameModifier modifier) {
+    public IIcon getCrossIcon() {
 
-        if (modifier == null)
-            return;
-        for (IFrameModifier m : getModifiers())
-            if (m.getIdentifier().equals(modifier.getIdentifier()))
-                return;
-
-        modifiers.add(modifier);
+        return null;
     }
 
     @Override
-    public void addModifiers(IFrameModifier... modifiers) {
+    public IIcon getSimpleIcon() {
 
-        for (IFrameModifier m : modifiers)
-            addModifier(m);
+        return null;
     }
 
     @Override
-    public void removeModifier(String modifier) {
+    public boolean is2D() {
 
-        IFrameModifier mod = null;
-
-        for (IFrameModifier m : getModifiers())
-            if (m.getIdentifier().equals(modifier)) {
-                mod = m;
-                break;
-            }
-
-        if (mod != null)
-            modifiers.remove(mod);
+        return Config.simple_frames;
     }
 
     @Override
-    public boolean hasModifier(String modifier) {
+    public boolean isSideHidden(ForgeDirection side) {
 
-        for (IFrameModifier m : getModifiers())
-            if (m.getIdentifier().equals(modifier))
-                return true;
-        return false;
+        if (hidden == null)
+            hidden = new boolean[6];
+
+        return hidden[side.ordinal()];
     }
 
     @Override
-    public void readModifiersFromNBT(NBTTagCompound tag) {
+    public void setSideHidden(ForgeDirection side, boolean hidden) {
 
-        List<IFrameModifier> unedited = new ArrayList<IFrameModifier>();
-        unedited.addAll(Arrays.asList(getModifiers()));
+        if (this.hidden == null)
+            this.hidden = new boolean[6];
 
-        NBTTagList list = tag.getTagList("modifiers", 10);// List of tag compounds
+        this.hidden[side.ordinal()] = hidden;
 
-        for (int i = 0; i < list.tagCount(); i++) {
-            NBTTagCompound t = list.getCompoundTagAt(i);
-            String type = t.getString("__type");
-            IFrameModifier modifier = null;
-            for (IFrameModifier m : unedited) {
-                if (m == null)
-                    continue;
-                if (m.getIdentifier().equals(type)) {
-                    modifier = m;
-                    break;
-                }
-            }
-
-            if (modifier == null) {
-                for (IFrameModifierProvider p : FramezApi.inst().getModifierRegistry().getProviders()) {
-                    if (p.getIdentifier().equals(type)) {
-                        modifier = p.instantiate(this);
-                        break;
-                    }
-                }
-                addModifier(modifier);
-            } else {
-                unedited.remove(modifier);
-            }
-
-            modifier.readFromNBT(t);
-        }
-
-        modifiers.removeAll(unedited);
-        unedited.clear();
+        sendDescUpdate();
     }
 
     @Override
-    public void writeModifiersToNBT(NBTTagCompound tag) {
+    public void save(NBTTagCompound tag) {
 
-        NBTTagList list = new NBTTagList();
+        if (hidden == null)
+            hidden = new boolean[6];
 
-        for (IFrameModifier m : getModifiers()) {
-            NBTTagCompound t = new NBTTagCompound();
-            m.writeToNBT(t);
-            t.setString("__type", m.getIdentifier());
-            list.appendTag(t);
-        }
+        super.save(tag);
 
-        tag.setTag("modifiers", list);
+        for (int i = 0; i < 6; i++)
+            tag.setBoolean("hidden_" + i, hidden[i]);
     }
 
     @Override
-    public Object[] getConnections() {
+    public void load(NBTTagCompound tag) {
 
-        return connections;
-    }
+        if (hidden == null)
+            hidden = new boolean[6];
 
-    public boolean[] getRender() {
+        super.load(tag);
 
-        return render;
-    }
-
-    @Override
-    public boolean isSideBlocked(ForgeDirection side) {
-
-        return blocked[side.ordinal()];
+        for (int i = 0; i < 6; i++)
+            hidden[i] = tag.getBoolean("hidden_" + i);
     }
 
     @Override
-    public boolean toggleBlock(ForgeDirection side) {
+    public void writeDesc(MCDataOutput packet) {
 
-        if (!world().isRemote) {
-            blocked[side.ordinal()] = !isSideBlocked(side);
-            sendDescUpdate();
-            return true;
-        }
+        if (hidden == null)
+            hidden = new boolean[6];
 
-        return false;
+        super.writeDesc(packet);
+
+        for (int i = 0; i < 6; i++)
+            packet.writeBoolean(hidden[i]);
     }
 
     @Override
-    public boolean activate(EntityPlayer player, MovingObjectPosition hit, ItemStack item) {
+    public void readDesc(MCDataInput packet) {
 
-        if (!world().isRemote)
-            return false;
+        if (hidden == null)
+            hidden = new boolean[6];
 
-        if (item == null || !(item.getItem() instanceof IFramezWrench))
-            return false;
+        super.readDesc(packet);
 
-        List<TMultiPart> parts = new ArrayList<TMultiPart>();
-        for (TMultiPart p : tile().jPartList()) {
-            if (!(p instanceof Microblock) && p != this) {
-                parts.add(p);
-            }
-        }
-
-        int side = hit.sideHit;
-        if (org.lwjgl.input.Keyboard.isKeyDown(org.lwjgl.input.Keyboard.KEY_LCONTROL))
-            side = side ^ 1;
-
-        NormallyOccludedPart nop = new NormallyOccludedPart(new Cuboid6(0, 0, 0, 1, 2 / 16D, 1).apply(Rotation.sideRotations[side]
-                .at(Vector3.center)));
-
-        boolean can = false;
-
-        for (TMultiPart p : parts) {
-            if (!p.occlusionTest(nop) || !nop.occlusionTest(p)) {
-                can = true;
-                break;
-            }
-        }
-
-        if (can)
-            NetworkHandler.sendToServer(new PacketBlockSide(x(), y(), z(), ForgeDirection.getOrientation(side)));
-
-        return can;
-
-        // for (IFrameModifier m : modifiers)
-        // if (!m.canBlockSide(side))
-        // return false;
-
-        // if (item == null || !(item.getItem() instanceof IFramezWrench))
-        // return false;
-        //
-        // return toggleBlock(ForgeDirection.getOrientation(player.isSneaking() ? hit.sideHit ^ 1 : hit.sideHit));
+        for (int i = 0; i < 6; i++)
+            hidden[i] = packet.readBoolean();
     }
 
-    @Override
-    public int getMaxCarriedBlocks() {
-
-        int max = -1;
-
-        for (IFrameModifier m : getModifiers())
-            max = Math.max(max, m.getMaxCarriedBlocks());
-
-        return max == -1 ? 3 : max;
-    }
 }

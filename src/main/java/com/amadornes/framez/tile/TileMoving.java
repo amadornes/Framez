@@ -2,72 +2,68 @@ package com.amadornes.framez.tile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 
-import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import codechicken.lib.raytracer.RayTracer;
+import uk.co.qmunity.lib.misc.Pair;
+import uk.co.qmunity.lib.raytrace.RayTracer;
+import uk.co.qmunity.lib.vec.Vec3d;
+import uk.co.qmunity.lib.vec.Vec3i;
 
 import com.amadornes.framez.Framez;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.movement.MovingBlock;
+import com.amadornes.framez.util.Timing;
+import com.amadornes.framez.world.FakeWorld;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileMoving extends TileEntity {
 
-    private MovingBlock blockA;
-    private MovingBlock blockB;
-
-    private UpdateType type;
-
-    private boolean needsUpdate = false;;
+    private MovingBlock blockA = null, blockB = null;
 
     @Override
     public void updateEntity() {
 
         if (blockA != null) {
-            if (blockA.getTileEntity() != null)
+            if (blockA.getTileEntity() != null && blockA.getTileEntity().canUpdate())
                 blockA.getTileEntity().updateEntity();
-            if (blockA.getMoved() >= 1)
+            if (blockA.getStructure().getProgress() >= 1)
                 blockA = null;
         }
         if (blockB != null)
-            if (blockB.getMoved() >= 1)
+            if (blockB.getStructure().getProgress() >= 1)
                 blockB = null;
 
         if (blockA == null && blockB == null) {
-            if (worldObj.getBlock(xCoord, yCoord, zCoord) == FramezBlocks.moving)
+            if (worldObj.getBlock(xCoord, yCoord, zCoord) == FramezBlocks.moving) {
                 worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air, 0, 0);
+                worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, 0, 0);
+            }
             invalidate();
         }
 
-        if (needsUpdate) {
-            sendUpdatePacket(UpdateType.ALL);
-            needsUpdate = false;
-        }
+        // if (needsUpdate) {
+        // sendUpdatePacket(UpdateType.ALL);
+        // needsUpdate = false;
+        // }
     }
 
     public void setBlockA(MovingBlock blockA) {
 
         this.blockA = blockA;
 
-        needsUpdate = true;
+        // needsUpdate = true;
     }
 
     public void setBlockB(MovingBlock blockB) {
@@ -90,47 +86,77 @@ public class TileMoving extends TileEntity {
 
         if (blockA != null) {
             List lA = new ArrayList();
-            blockA.getBlock().addCollisionBoxesToList(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
-                    blockA.getLocation().z, aabb, lA, e);
+            blockA.getBlock().addCollisionBoxesToList(FakeWorld.getFakeWorld(blockA), blockA.getX(), blockA.getY(), blockA.getZ(), aabb,
+                    lA, e);
             for (Object o : lA) {
                 AxisAlignedBB b = ((AxisAlignedBB) o).copy();
-                b.minX += blockA.getDirection().offsetX * blockA.getMoved();
-                b.minY += blockA.getDirection().offsetY * blockA.getMoved();
-                b.minZ += blockA.getDirection().offsetZ * blockA.getMoved();
-                b.maxX += blockA.getDirection().offsetX * blockA.getMoved();
-                b.maxY += blockA.getDirection().offsetY * blockA.getMoved();
-                b.maxZ += blockA.getDirection().offsetZ * blockA.getMoved();
+
+                Vec3d min = blockA
+                        .getStructure()
+                        .getMovement()
+                        .transform(new Vec3d(b.minX, b.minY, b.minZ),
+                                blockA.getStructure().getInterpolatedProgress(Framez.proxy.getFrame() - 1.25));
+                Vec3d max = blockA
+                        .getStructure()
+                        .getMovement()
+                        .transform(new Vec3d(b.maxX, b.maxY, b.maxZ),
+                                blockA.getStructure().getInterpolatedProgress(Framez.proxy.getFrame() - 1.25));
+
+                b.minX = min.getX();
+                b.minY = min.getY();
+                b.minZ = min.getZ();
+                b.maxX = max.getX();
+                b.maxY = max.getY();
+                b.maxZ = max.getZ();
 
                 if (aabb.intersectsWith(b))
                     l.add(b);
             }
         }
 
-        if (blockB != null) {
-            AxisAlignedBB aabb2 = aabb.copy();
-            aabb2.minX -= blockB.getDirection().offsetX;
-            aabb2.minY -= blockB.getDirection().offsetY;
-            aabb2.minZ -= blockB.getDirection().offsetZ;
-            aabb2.maxX -= blockB.getDirection().offsetX;
-            aabb2.maxY -= blockB.getDirection().offsetY;
-            aabb2.maxZ -= blockB.getDirection().offsetZ;
-
-            List lB = new ArrayList();
-            blockB.getBlock().addCollisionBoxesToList(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
-                    blockB.getLocation().z, aabb2, lB, e);
-            for (Object o : lB) {
-                AxisAlignedBB b = ((AxisAlignedBB) o).copy();
-                b.minX -= (-blockB.getMoved() * blockB.getDirection().offsetX);
-                b.minY -= (-blockB.getMoved() * blockB.getDirection().offsetY);
-                b.minZ -= (-blockB.getMoved() * blockB.getDirection().offsetZ);
-                b.maxX -= (-blockB.getMoved() * blockB.getDirection().offsetX);
-                b.maxY -= (-blockB.getMoved() * blockB.getDirection().offsetY);
-                b.maxZ -= (-blockB.getMoved() * blockB.getDirection().offsetZ);
-
-                if (aabb.intersectsWith(b))
-                    l.add(b);
-            }
-        }
+        // FIXME Block "B" collision boxes
+        // if (blockB != null) {
+        // Vec3d minAABB = blockB
+        // .getStructure()
+        // .getMovement()
+        // .transform(new Vec3d(aabb.minX, aabb.minY, aabb.minZ),
+        // blockB.getStructure().getInterpolatedProgress(-Framez.proxy.getFrame()));
+        // Vec3d maxAABB = blockB
+        // .getStructure()
+        // .getMovement()
+        // .transform(new Vec3d(aabb.maxX, aabb.maxY, aabb.maxZ),
+        // blockB.getStructure().getInterpolatedProgress(-Framez.proxy.getFrame()));
+        // AxisAlignedBB aabb2 = AxisAlignedBB.getBoundingBox(minAABB.getX(), minAABB.getY(), minAABB.getZ(), maxAABB.getX(),
+        // maxAABB.getY(), maxAABB.getZ());
+        //
+        // List lB = new ArrayList();
+        // blockB.getBlock().addCollisionBoxesToList(FakeWorld.getFakeWorld(blockB), blockB.getX(), blockB.getY(), blockB.getZ(), aabb2,
+        // lB, e);
+        // for (Object o : lB) {
+        // AxisAlignedBB b = ((AxisAlignedBB) o).copy();
+        //
+        // Vec3d min = blockB
+        // .getStructure()
+        // .getMovement()
+        // .transform(new Vec3d(b.minX, b.minY, b.minZ),
+        // blockB.getStructure().getInterpolatedProgress(-Framez.proxy.getFrame()));
+        // Vec3d max = blockB
+        // .getStructure()
+        // .getMovement()
+        // .transform(new Vec3d(b.maxX, b.maxY, b.maxZ),
+        // blockB.getStructure().getInterpolatedProgress(-Framez.proxy.getFrame()));
+        //
+        // b.minX = min.getX();
+        // b.minY = min.getY();
+        // b.minZ = min.getZ();
+        // b.maxX = max.getX();
+        // b.maxY = max.getY();
+        // b.maxZ = max.getZ();
+        //
+        // // if (aabb2.intersectsWith(b))
+        // l.add(b);
+        // }
+        // }
     }
 
     @SideOnly(Side.CLIENT)
@@ -142,30 +168,41 @@ public class TileMoving extends TileEntity {
             if (blockA.getTileEntity() != null)
                 blockA.getTileEntity().setWorldObj(worldObj);
 
-            World w = Framez.proxy.getWorld();
-            Framez.proxy.getPlayer().worldObj = blockA.getWorldWrapper();
-            AxisAlignedBB b = blockA.getBlock().getSelectedBoundingBoxFromPool(blockA.getWorldWrapper(), blockA.getLocation().x,
-                    blockA.getLocation().y, blockA.getLocation().z);
+            World w = Minecraft.getMinecraft().theWorld;
+            Framez.proxy.getPlayer().worldObj = FakeWorld.getFakeWorld(blockA);
+            AxisAlignedBB b = blockA.getBlock().getSelectedBoundingBoxFromPool(FakeWorld.getFakeWorld(blockA), blockA.getX(),
+                    blockA.getY(), blockA.getZ());
             Framez.proxy.getPlayer().worldObj = w;
 
             if (b != null) {
                 b = b.copy();
 
-                b.minX += blockA.getDirection().offsetX * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.minY += blockA.getDirection().offsetY * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.minZ += blockA.getDirection().offsetZ * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.maxX += blockA.getDirection().offsetX * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.maxY += blockA.getDirection().offsetY * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.maxZ += blockA.getDirection().offsetZ * (blockA.getMoved() - blockA.getSpeed() * (1 - Framez.proxy.getFrame()));
+                Vec3d min = blockA
+                        .getStructure()
+                        .getMovement()
+                        .transform(new Vec3d(b.minX, b.minY, b.minZ),
+                                blockA.getStructure().getInterpolatedProgress(Framez.proxy.getFrame() - (1 + (1 - Timing.SECONDS))));
+                Vec3d max = blockA
+                        .getStructure()
+                        .getMovement()
+                        .transform(new Vec3d(b.maxX, b.maxY, b.maxZ),
+                                blockA.getStructure().getInterpolatedProgress(Framez.proxy.getFrame() - (1 + (1 - Timing.SECONDS))));
+
+                b.minX = min.getX();
+                b.minY = min.getY();
+                b.minZ = min.getZ();
+                b.maxX = max.getX();
+                b.maxY = max.getY();
+                b.maxZ = max.getZ();
 
                 if (blockA.getTileEntity() != null)
-                    blockA.getTileEntity().setWorldObj(blockA.getWorldWrapper());
+                    blockA.getTileEntity().setWorldObj(FakeWorld.getFakeWorld(blockA));
 
                 return b;
             }
 
             if (blockA.getTileEntity() != null)
-                blockA.getTileEntity().setWorldObj(blockA.getWorldWrapper());
+                blockA.getTileEntity().setWorldObj(FakeWorld.getFakeWorld(blockA));
         }
 
         if (blockB != null) {
@@ -174,64 +211,103 @@ public class TileMoving extends TileEntity {
             if (blockB.getTileEntity() != null)
                 blockB.getTileEntity().setWorldObj(worldObj);
 
-            World w = Framez.proxy.getWorld();
-            Framez.proxy.getPlayer().worldObj = blockB.getWorldWrapper();
-            AxisAlignedBB b = blockB.getBlock().getSelectedBoundingBoxFromPool(blockB.getWorldWrapper(), blockB.getLocation().x,
-                    blockB.getLocation().y, blockB.getLocation().z);
+            World w = Minecraft.getMinecraft().theWorld;
+            Framez.proxy.getPlayer().worldObj = FakeWorld.getFakeWorld(blockB);
+            AxisAlignedBB b = blockB.getBlock().getSelectedBoundingBoxFromPool(FakeWorld.getFakeWorld(blockB), blockB.getX(),
+                    blockB.getY(), blockB.getZ());
             Framez.proxy.getPlayer().worldObj = w;
 
             if (b != null) {
                 b = b.copy();
 
-                b.minX += blockB.getDirection().offsetX * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.minY += blockB.getDirection().offsetY * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.minZ += blockB.getDirection().offsetZ * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.maxX += blockB.getDirection().offsetX * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.maxY += blockB.getDirection().offsetY * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
-                b.maxZ += blockB.getDirection().offsetZ * (blockB.getMoved() - blockB.getSpeed() * (1 - Framez.proxy.getFrame()));
+                Vec3d min = blockB
+                        .getStructure()
+                        .getMovement()
+                        .transform(new Vec3d(b.minX, b.minY, b.minZ),
+                                blockB.getStructure().getInterpolatedProgress(Framez.proxy.getFrame() - (1 + (1 - Timing.SECONDS))));
+                Vec3d max = blockB
+                        .getStructure()
+                        .getMovement()
+                        .transform(new Vec3d(b.maxX, b.maxY, b.maxZ),
+                                blockB.getStructure().getInterpolatedProgress(Framez.proxy.getFrame() - (1 + (1 - Timing.SECONDS))));
+
+                b.minX = min.getX();
+                b.minY = min.getY();
+                b.minZ = min.getZ();
+                b.maxX = max.getX();
+                b.maxY = max.getY();
+                b.maxZ = max.getZ();
 
                 if (blockB.getTileEntity() != null)
-                    blockB.getTileEntity().setWorldObj(blockB.getWorldWrapper());
+                    blockB.getTileEntity().setWorldObj(FakeWorld.getFakeWorld(blockB));
 
                 return b;
             }
 
             if (blockB.getTileEntity() != null)
-                blockB.getTileEntity().setWorldObj(blockB.getWorldWrapper());
+                blockB.getTileEntity().setWorldObj(FakeWorld.getFakeWorld(blockB));
         }
 
         return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1, zCoord + 1);
     }
 
-    public MovingObjectPosition rayTrace(Vec3 start, Vec3 end) {
+    public MovingObjectPosition rayTrace(Vec3d start, Vec3d end) {
 
         MovingObjectPosition mopA = null;
         MovingObjectPosition mopB = null;
 
-        if (blockA != null) {
-            MovingBlock blockA = this.blockA;
-            Vec3 start2 = start.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()),
-                    blockA.getDirection().offsetY * (-blockA.getMoved()), blockA.getDirection().offsetZ * (-blockA.getMoved()));
-            Vec3 end2 = end.addVector(blockA.getDirection().offsetX * (-blockA.getMoved()),
-                    blockA.getDirection().offsetY * (-blockA.getMoved()), blockA.getDirection().offsetZ * (-blockA.getMoved()));
+        Vec3d start2 = null;
+        Vec3d end2 = null;
 
-            mopA = blockA.getBlock().collisionRayTrace(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
-                    blockA.getLocation().z, start2, end2);
+        if (blockA != null) {
+            start2 = blockA
+                    .getStructure()
+                    .getMovement()
+                    .transform(
+                            start,
+                            -(worldObj.isRemote ? blockA.getStructure().getInterpolatedProgress(
+                                    Framez.proxy.getFrame() - (1 + (1 - Timing.SECONDS))) : blockA.getStructure().getProgress()));
+            end2 = blockA
+                    .getStructure()
+                    .getMovement()
+                    .transform(
+                            end,
+                            -(worldObj.isRemote ? blockA.getStructure().getInterpolatedProgress(
+                                    Framez.proxy.getFrame() - (1 + (1 - Timing.SECONDS))) : blockA.getStructure().getProgress()));
+
+            mopA = blockA.getBlock().collisionRayTrace(FakeWorld.getFakeWorld(blockA), blockA.getX(), blockA.getY(), blockA.getZ(),
+                    start2.toVec3(), end2.toVec3());
             if (mopA != null)
-                mopA.hitInfo = blockA;
+                mopA.hitInfo = new Pair<MovingBlock, Object>(blockA, mopA.hitInfo);
         }
 
         if (blockB != null) {
-            MovingBlock blockB = this.blockB;
-            Vec3 start2 = start.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()),
-                    blockB.getDirection().offsetY * (-blockB.getMoved()), blockB.getDirection().offsetZ * (-blockB.getMoved()));
-            Vec3 end2 = end.addVector(blockB.getDirection().offsetX * (-blockB.getMoved()),
-                    blockB.getDirection().offsetY * (-blockB.getMoved()), blockB.getDirection().offsetZ * (-blockB.getMoved()));
+            if (start2 == null) {
+                start2 = blockB
+                        .getStructure()
+                        .getMovement()
+                        .transform(
+                                start,
+                                -(worldObj.isRemote ? blockB.getStructure().getInterpolatedProgress(
+                                        Framez.proxy.getFrame() - (1 + (1 - Timing.SECONDS))) : blockB.getStructure().getProgress()));
+                end2 = blockB
+                        .getStructure()
+                        .getMovement()
+                        .transform(
+                                end,
+                                -(worldObj.isRemote ? blockB.getStructure().getInterpolatedProgress(
+                                        Framez.proxy.getFrame() - (1 + (1 - Timing.SECONDS))) : blockB.getStructure().getProgress()));
+            }
 
-            mopB = blockB.getBlock().collisionRayTrace(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
-                    blockB.getLocation().z, start2, end2);
-            if (mopB != null)
-                mopB.hitInfo = blockB;
+            mopB = blockB.getBlock().collisionRayTrace(FakeWorld.getFakeWorld(blockB), blockB.getX(), blockB.getY(), blockB.getZ(),
+                    start2.toVec3(), end2.toVec3());
+            if (mopB != null) {
+                mopB.hitInfo = new Pair<MovingBlock, Object>(blockB, mopB.hitInfo);
+                Vec3i v = blockB.getStructure().getMovement().transform(new Vec3i(mopB.blockX, mopB.blockY, mopB.blockZ));
+                mopB.blockX = v.getX();
+                mopB.blockY = v.getY();
+                mopB.blockZ = v.getZ();
+            }
         }
 
         if (mopA == null && mopB == null)
@@ -241,14 +317,14 @@ public class TileMoving extends TileEntity {
         if (mopB != null && mopA == null)
             return mopB;
 
-        if (mopA.hitVec.distanceTo(start) < mopB.hitVec.distanceTo(start))
+        if (mopA.hitVec.squareDistanceTo(start2.toVec3()) < mopB.hitVec.squareDistanceTo(start2.toVec3()))
             return mopA;
         return mopB;
     }
 
     public MovingObjectPosition rayTrace(EntityPlayer player) {
 
-        return rayTrace(RayTracer.getStartVec(player), RayTracer.getEndVec(player));
+        return rayTrace(RayTracer.instance().getStartVector(player), RayTracer.instance().getEndVector(player));
     }
 
     public MovingBlock getSelected(MovingObjectPosition mop) {
@@ -256,8 +332,9 @@ public class TileMoving extends TileEntity {
         if (mop == null)
             return null;
 
-        if (mop.hitInfo != null && mop.hitInfo instanceof MovingBlock)
-            return (MovingBlock) mop.hitInfo;
+        if (mop.hitInfo != null && mop.hitInfo instanceof Entry<?, ?> && ((Entry<?, ?>) mop.hitInfo).getKey() != null
+                && ((Entry<?, ?>) mop.hitInfo).getKey() instanceof MovingBlock)
+            return (MovingBlock) ((Entry<?, ?>) mop.hitInfo).getKey();
 
         return null;
     }
@@ -275,31 +352,18 @@ public class TileMoving extends TileEntity {
         if (b == null)
             return false;
 
-        boolean result = b.getBlock().onBlockActivated(b.getWorldWrapper(), b.getLocation().x, b.getLocation().y, b.getLocation().z,
-                player, mop.sideHit, (float) mop.hitVec.xCoord - mop.blockX, (float) mop.hitVec.yCoord - mop.blockY,
-                (float) mop.hitVec.zCoord - mop.blockZ);
-
-        sendUpdatePacket(UpdateType.ALL);
+        boolean result = b.getBlock().onBlockActivated(FakeWorld.getFakeWorld(b), b.getX(), b.getY(), b.getZ(), player, mop.sideHit,
+                (float) mop.hitVec.xCoord - mop.blockX, (float) mop.hitVec.yCoord - mop.blockY, (float) mop.hitVec.zCoord - mop.blockZ);
 
         return result;
     }
 
     public int getLightValue() {
 
-        int a = 0;
-        int b = 0;
+        if (blockA != null)
+            return blockA.getBlock().getLightValue(FakeWorld.getFakeWorld(blockA), blockA.getX(), blockA.getY(), blockA.getZ());
 
-        if (blockA != null) {
-            a = blockA.getBlock().getLightValue(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
-                    blockA.getLocation().z);
-        }
-        if (blockB != null) {
-            b = blockB.getBlock().getLightValue(blockB.getWorldWrapper(), blockB.getLocation().x, blockB.getLocation().y,
-                    blockB.getLocation().z);
-        }
-
-        // Temporary!
-        return Math.max(a, b);
+        return 0;
     }
 
     public int getLightOpacity() {
@@ -310,12 +374,11 @@ public class TileMoving extends TileEntity {
     public void randomDisplayTick(Random rnd) {
 
         if (blockA != null) {
-            blockA.getBlock().randomDisplayTick(blockA.getWorldWrapper(), blockA.getLocation().x, blockA.getLocation().y,
-                    blockA.getLocation().z, rnd);
+            blockA.getBlock().randomDisplayTick(FakeWorld.getFakeWorld(blockA), blockA.getX(), blockA.getY(), blockA.getZ(), rnd);
         }
     }
 
-    public ItemStack getPickBlock(MovingObjectPosition target) {
+    public ItemStack getPickBlock(MovingObjectPosition target, EntityPlayer player) {
 
         MovingObjectPosition mop = rayTrace(Framez.proxy.getPlayer());
         if (mop == null)
@@ -324,113 +387,24 @@ public class TileMoving extends TileEntity {
         if (block == null)
             return null;
 
-        return block.getBlock().getPickBlock(mop, block.getWorldWrapper(), block.getX(), block.getY(), block.getZ());
-    }
-
-    public void sendUpdatePacket(UpdateType type) {
-
-        this.type = type;
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-    }
-
-    @Override
-    public Packet getDescriptionPacket() {
-
-        NBTTagCompound tag = new NBTTagCompound();
-
-        if (blockA != null && type != null) {
-            if (type.isBlock()) {
-                UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(blockA.getBlock());
-                tag.setString("mod", ui.modId);
-                tag.setString("block", ui.name);
-                tag.setInteger("meta", blockA.getMetadata());
-            }
-            // if (type.isTile() && blockA.getTileEntity() != null) {
-            // Packet p = blockA.getTileEntity().getDescriptionPacket();
-            // if (p != null && p instanceof S35PacketUpdateTileEntity) {
-            // try {
-            // NBTTagCompound t = ReflectionHelper.getPrivateValue(S35PacketUpdateTileEntity.class,
-            // ((S35PacketUpdateTileEntity) p), "field_148860_e");
-            // tag.setTag("tile", t);
-            // } catch (Exception ex) {
-            // }
-            // }
-            // }
-        }
-
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-
-        NBTTagCompound tag = pkt.func_148857_g();
-
-        // if (!tag.hasKey("block") && !tag.hasKey("tile")) {
-        // if (blockA != null && blockA.getTileEntity() != null)
-        // blockA.getTileEntity().onDataPacket(net, pkt);
-        // return;
-        // }
-
-        if (blockA == null)
-            return;
-
-        if (tag.hasKey("block")) {
-            Block bl = GameRegistry.findBlock(tag.getString("mod"), tag.getString("block"));
-            if (blockA.getBlock() != bl)
-                blockA.setBlock(bl);
-            int meta = tag.getInteger("meta");
-            if (blockA.getMetadata() != meta)
-                blockA.setMetadata(meta);
-            blockA.setRenderList(-1);
-        }
-        // if (tag.hasKey("tile") && blockA.getTileEntity() != null) {
-        // S35PacketUpdateTileEntity p = new S35PacketUpdateTileEntity(blockA.getLocation().x, blockA.getLocation().y,
-        // blockA.getLocation().z, 0, tag.getCompoundTag("tile"));
-        // blockA.getTileEntity().onDataPacket(net, p);
-        // }
+        return block.getBlock().getPickBlock(mop, FakeWorld.getFakeWorld(block), block.getX(), block.getY(), block.getZ(), player);
     }
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
 
-        if (blockA != null) {
-            TileEntity te = blockA.getTileEntity();
-            if (te != null)
-                return te
-                        .getRenderBoundingBox()
-                        .copy()
-                        .offset(blockA.getDirection().offsetX * blockA.getMoved(), blockA.getDirection().offsetY * blockA.getMoved(),
-                                blockA.getDirection().offsetZ * blockA.getMoved());
-            return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1, zCoord + 1).offset(
-                    blockA.getDirection().offsetX * blockA.getMoved(), blockA.getDirection().offsetY * blockA.getMoved(),
-                    blockA.getDirection().offsetZ * blockA.getMoved());
-        }
+        // if (blockA != null) {
+        // TileEntity te = blockA.getTileEntity();
+        // if (te != null)
+        // return te
+        // .getRenderBoundingBox()
+        // .copy().expand(1, 1, 1);
+        // return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1, zCoord + 1).offset(
+        // blockA.getDirection().offsetX * blockA.getMoved(), blockA.getDirection().offsetY * blockA.getMoved(),
+        // blockA.getDirection().offsetZ * blockA.getMoved());
+        // }
 
-        return super.getRenderBoundingBox();
+        return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 1, yCoord + 1, zCoord + 1).expand(1, 1, 1);
     }
 
-    public static enum UpdateType {
-        BLOCK(true, false), TILE(false, true), ALL(true, true);
-
-        private boolean block;
-        private boolean tile;
-
-        private UpdateType(boolean block, boolean tile) {
-
-            this.block = block;
-            this.tile = tile;
-        }
-
-        public boolean isBlock() {
-
-            return block;
-        }
-
-        public boolean isTile() {
-
-            return tile;
-        }
-
-    }
 }

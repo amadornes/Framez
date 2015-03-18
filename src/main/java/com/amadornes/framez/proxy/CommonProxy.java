@@ -5,28 +5,11 @@ import net.minecraft.world.World;
 
 public class CommonProxy {
 
-    public void init() {
-
-    }
-
-    public void registerRenders() {
-
-    }
-
-    public void setPlayer(EntityPlayer player) {
-
-    }
-
-    public void setWorld(World world) {
+    public void registerRenderers() {
 
     }
 
     public EntityPlayer getPlayer() {
-
-        return null;
-    }
-
-    public World getWorld() {
 
         return null;
     }
@@ -43,6 +26,11 @@ public class CommonProxy {
     public boolean isGamePaused() {
 
         return false;
+    }
+
+    public World getWorld() {
+
+        return null;
     }
 
 }

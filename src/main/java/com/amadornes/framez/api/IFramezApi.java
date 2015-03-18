@@ -1,19 +1,15 @@
 package com.amadornes.framez.api;
 
-import net.minecraft.world.World;
+import com.amadornes.framez.api.modifier.IFrameModifierRegistry;
+import com.amadornes.framez.api.modifier.IMotorModifierRegistry;
+import com.amadornes.framez.api.movement.IFrameMovementRegistry;
 
-import com.amadornes.framez.api.movement.IMovementApi;
+public interface IFramezAPI {
 
-public interface IFramezApi {
+    public IFrameModifierRegistry frameModifiers();
 
-    public IModifierRegistry getModifierRegistry();
+    public IMotorModifierRegistry motorModifiers();
 
-    public IMotorRegistry getMotorRegistry();
-
-    public IMovementApi getMovementApi();
-
-    public IFrame getFrame(World world, int x, int y, int z);
-
-    public void registerFrameProvider(IFrameProvider provider);
+    public IFrameMovementRegistry movement();
 
 }

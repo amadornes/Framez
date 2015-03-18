@@ -1,5 +1,9 @@
 package com.amadornes.framez.compat;
 
+import net.minecraft.item.ItemStack;
+
+import com.amadornes.framez.api.IFramezWrench.WrenchAction;
+
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -12,17 +16,34 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 public abstract class CompatModule {
 
-    public abstract void preInit(FMLPreInitializationEvent ev);
+    public void preInit(FMLPreInitializationEvent ev) {
 
-    public abstract void init(FMLInitializationEvent ev);
+    }
 
-    public abstract void postInit(FMLPostInitializationEvent ev);
+    public void init(FMLInitializationEvent ev) {
 
-    public abstract void registerBlocks();
+    }
 
-    public abstract void registerItems();
+    public void postInit(FMLPostInitializationEvent ev) {
+
+    }
+
+    public void registerBlocks() {
+
+    }
+
+    public void registerItems() {
+
+    }
 
     @SideOnly(Side.CLIENT)
-    public abstract void registerRenders();
+    public void registerRenders() {
+
+    }
+
+    public WrenchAction getWrenchAction(ItemStack stack) {
+
+        return null;
+    }
 
 }

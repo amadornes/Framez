@@ -1,212 +1,283 @@
 package com.amadornes.framez.tile;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import codechicken.lib.vec.BlockCoord;
+import uk.co.qmunity.lib.helper.RedstoneHelper;
+import uk.co.qmunity.lib.misc.Pair;
+import uk.co.qmunity.lib.vec.IWorldLocation;
+import uk.co.qmunity.lib.vec.Vec3i;
 
-import com.amadornes.framez.api.movement.IFrameMove;
-import com.amadornes.framez.config.Config;
-import com.amadornes.framez.movement.MotorCache;
-import com.amadornes.framez.movement.MovementUtils;
+import com.amadornes.framez.api.IDebuggable;
+import com.amadornes.framez.api.Priority;
+import com.amadornes.framez.api.Priority.PriorityEnum;
+import com.amadornes.framez.api.modifier.IMotorModifier;
+import com.amadornes.framez.api.movement.BlockMovementType;
+import com.amadornes.framez.api.movement.IMotor;
+import com.amadornes.framez.api.movement.IMovable;
+import com.amadornes.framez.api.movement.IMovement;
+import com.amadornes.framez.api.movement.IMovingBlock;
+import com.amadornes.framez.api.movement.MotorSetting;
+import com.amadornes.framez.movement.MovementHelper;
+import com.amadornes.framez.movement.MovementScheduler;
+import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
-import com.amadornes.framez.movement.StructureTickHandler;
 import com.amadornes.framez.network.NetworkHandler;
-import com.amadornes.framez.network.packet.PacketStartMoving;
-import com.amadornes.framez.world.WorldWrapperProvider;
+import com.amadornes.framez.network.PacketMotorSetting;
+import com.amadornes.framez.util.MotorCache;
+import com.amadornes.framez.util.ThreadBlockChecking;
+import com.amadornes.framez.util.Timing;
 
-public abstract class TileMotor extends TileEntity implements IFrameMove {
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
-    public static TileMotor active = null;
+public abstract class TileMotor extends TileEntity implements IMotor, IDebuggable, IMovable {
 
-    public abstract boolean shouldMove();
+    protected MovingStructure structure;
+    protected List<Vec3i> blocking = new ArrayList<Vec3i>();
 
-    public abstract double getMovementSpeed();
-
-    public void consumeFramezPower(double power) {
-
-        stored -= power;
-    }
-
-    public boolean hasEnoughFramezPower(double power) {
-
-        return stored >= power;
-    }
-
-    public Object getExtraInfo() {
-
-        return null;
-    }
+    private boolean redstoneInput = false;
+    private boolean scheduled = false;
 
     private ForgeDirection face = ForgeDirection.DOWN;
+    private HashSet<MotorSetting> settings = new HashSet<MotorSetting>();
+    private List<IMotorModifier> modifiers = new ArrayList<IMotorModifier>();
 
-    private ForgeDirection direction = ForgeDirection.SOUTH;
+    private double powerStorageSize = 1000000;
+    private double storedPower = 0;
 
-    private MovingStructure structure = null;
+    @Override
+    public World getWorld() {
 
-    private String placer = "";
-
-    private boolean canMove = false;
-    private List<BlockCoord> movedBlocks = null;
-    private int lastCheck = 0;
-
-    protected double stored = 0;
-    protected double maxStored = 100000;
-
-    private BlockCoord blockingCoord = null;
-
-    public ForgeDirection getFace() {
-
-        return face;
+        return getWorldObj();
     }
 
-    public ForgeDirection getDirection() {
+    @Override
+    public int getX() {
 
-        return direction;
+        return xCoord;
     }
 
-    public boolean setFace(ForgeDirection face) {
+    @Override
+    public int getY() {
 
-        return setFace(face, false);
+        return yCoord;
     }
 
-    public boolean setFace(ForgeDirection face, boolean force) {
+    @Override
+    public int getZ() {
 
-        if (structure != null)
-            return false;
+        return zCoord;
+    }
 
-        if (face == null)
-            return false;
+    @Override
+    public Collection<IMotorModifier> getModifiers() {
 
-        if ((face == direction || face == direction.getOpposite()) && !force)
-            return false;
+        if (modifiers == null)
+            modifiers = new ArrayList<IMotorModifier>();
 
-        this.face = face;
-        sendUpdatePacket();
+        return modifiers;
+    }
+
+    @Override
+    public boolean canWork() {
 
         return true;
     }
 
-    public boolean setDirection(ForgeDirection direction) {
+    @Override
+    public boolean isWorking() {
 
-        return setDirection(direction, false);
-    }
-
-    public boolean setDirection(ForgeDirection direction, boolean force) {
-
-        if (structure != null)
-            return false;
-
-        if (direction == null)
-            return false;
-
-        if ((direction == face || direction == face.getOpposite()) && !force)
-            return false;
-
-        this.direction = direction;
-        sendUpdatePacket();
-
-        return true;
-    }
-
-    public double getMoved() {
-
-        return structure == null ? 0 : structure.getMoved();
+        return structure != null && structure.getProgress() < 1;
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
+    public boolean move() {
 
-        super.writeToNBT(tag);
+        try {
 
-        writeUpdatePacket(tag);
-    }
+            if (getWorld() == null || getWorld().isRemote)
+                return false;
 
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
+            IMovement movement = getMovement();
+            if (movement == null)
+                return false;
 
-        super.readFromNBT(tag);
+            ForgeDirection face = getFace();
 
-        readUpdatePacket(tag);
-    }
+            Pair<List<MovingBlock>, List<Vec3i>> p = MovementHelper.findMovedBlocks(getWorld(), getX() + face.offsetX, getY()
+                    + face.offsetY, getZ() + face.offsetZ, face.getOpposite(), movement);
 
-    public void writeUpdatePacket(NBTTagCompound tag) {
+            List<MovingBlock> blocks = p.getKey();
+            blocks.remove(new MovingBlock(new Vec3i((IWorldLocation) this), null, null));
 
-        tag.setInteger("face", getFace().ordinal());
-        tag.setInteger("direction", getDirection().ordinal());
+            if (blocks.size() == 0)
+                return false;
 
-        tag.setString("placer", placer);
+            List<Vec3i> old = blocking;
+            blocking = p.getValue();
+            boolean send = false;
+            if ((old.size() != blocking.size())) {
+                send = true;
+            } else {
+                for (Vec3i v : old) {
+                    if (!blocking.contains(v)) {
+                        send = true;
+                        break;
+                    }
+                }
+                if (!send) {
+                    for (Vec3i v : blocking) {
+                        if (!old.contains(v)) {
+                            send = true;
+                            break;
+                        }
+                    }
+                }
+            }
 
-        tag.setDouble("stored", stored);
+            double totalConsumed = 0;
+            for (MovingBlock b : blocks) {
+                b.snapshot();
+                int parts = b.getMultiparts();
+                if (parts <= b.getMaxMultiparts()) {
+                    totalConsumed += parts * 10;
+                } else {
+                    if (!blocking.contains(new Vec3i(b))) {
+                        blocking.add(new Vec3i(b));
+                        send = true;
+                    }
+                }
+                totalConsumed += 100;
+                if (b.getTileEntity() != null)
+                    totalConsumed += 200;
+            }
 
-        if (blockingCoord != null) {
-            tag.setInteger("blockingX", blockingCoord.x);
-            tag.setInteger("blockingY", blockingCoord.y);
-            tag.setInteger("blockingZ", blockingCoord.z);
+            if (send)
+                sendUpdatePacket();
+            if (blocking.size() > 0)
+                return false;
+
+            double actuallyConsumed = drainPower(totalConsumed, true);
+            if (actuallyConsumed < totalConsumed)
+                return false;
+            drainPower(actuallyConsumed, false);
+
+            Timing.SECONDS = 1;
+            structure = new MovingStructure(this, movement.clone(), 1 / (20 * Timing.SECONDS), blocks);
+            // structure.tick(Phase.START);
+            // structure.tick(Phase.END);
+            MovementScheduler.instance().addStructure(structure);
+
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+        return false;
     }
 
-    public void readUpdatePacket(NBTTagCompound tag) {
+    @Override
+    public Set<MotorSetting> getSettings() {
 
-        face = ForgeDirection.getOrientation(tag.getInteger("face"));
-        direction = ForgeDirection.getOrientation(tag.getInteger("direction"));
+        return settings;
+    }
 
-        placer = tag.getString("placer");
+    @Override
+    public void configure(MotorSetting setting) {
 
-        stored = tag.getDouble("stored");
+        if (getWorldObj().isRemote) {
+            NetworkHandler.instance().sendToServer(new PacketMotorSetting(this, setting));
+            return;
+        }
 
-        if (tag.hasKey("blockingX")) {
-            blockingCoord = new BlockCoord(tag.getInteger("blockingX"), tag.getInteger("blockingY"), tag.getInteger("blockingZ"));
+        if (settings.contains(setting)) {
+            settings.remove(setting);
         } else {
-            blockingCoord = null;
+            for (MotorSetting s : setting.related)
+                settings.remove(s);
+            settings.add(setting);
         }
-    }
 
-    @Override
-    public Packet getDescriptionPacket() {
+        sendUpdatePacket();
 
-        NBTTagCompound tag = new NBTTagCompound();
-        writeUpdatePacket(tag);
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-
-        readUpdatePacket(pkt.func_148857_g());
-
-        getWorldObj().markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
-    }
-
-    public void sendUpdatePacket() {
-
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        onBlockUpdate();
     }
 
     @Override
     public void updateEntity() {
 
-        MotorCache.loadMotor(this);
+        if (structure != null && structure.getProgress() >= 1)
+            structure = null;
 
-        if (!worldObj.isRemote) {
-            lastCheck++;
-            if (lastCheck == 10) {
-                lastCheck = 0;
-                checkIfCanMove();
-            }
+        if (scheduled) {
+            if (!isWorking() && canWork())
+                if (!move() && !getSettings().contains(MotorSetting.REDSTONE_PULSE))
+                    ThreadBlockChecking.instance().addMotor(this);
+
+            scheduled = false;
+        }
+    }
+
+    public void onBlockUpdate() {
+
+        boolean lastInput = redstoneInput;
+        redstoneInput = RedstoneHelper.getInput(getWorld(), getX(), getY(), getZ()) > 0;
+
+        if ((lastInput != redstoneInput || !getSettings().contains(MotorSetting.REDSTONE_PULSE))
+                && (getSettings().contains(MotorSetting.REDSTONE_INVERTED) ? !redstoneInput : redstoneInput)) {
+            scheduled = true;
+        } else {
+            ThreadBlockChecking.instance().removeMotor(this);
+        }
+    }
+
+    @Override
+    public ForgeDirection getFace() {
+
+        return face;
+    }
+
+    public boolean setFace(ForgeDirection face) {
+
+        this.face = face;
+        sendUpdatePacket();
+        return true;
+    }
+
+    public boolean rotate(ForgeDirection axis) {
+
+        if (getMovement().rotate(this, axis)) {
+            sendUpdatePacket();
+            return true;
         }
 
-        if (shouldMove())
-            move();
+        return true;
+    }
 
-        if (structure != null && structure.getMoved() >= 1)
-            structure = null;
+    @Override
+    public boolean debug(World world, int x, int y, int z, ForgeDirection face, EntityPlayer player) {
+
+        if (!world.isRemote)
+            return true;
+
+        player.addChatMessage(new ChatComponentText("Power: " + getEnergyBuffer() + "/" + getEnergyBufferSize()));
+        player.addChatMessage(new ChatComponentText("Face: " + getFace().name().toLowerCase()));
+        getMovement().debug(world, x, y, z, face, player);
+
+        return true;
     }
 
     public MovingStructure getStructure() {
@@ -220,145 +291,223 @@ public abstract class TileMotor extends TileEntity implements IFrameMove {
     }
 
     @Override
-    public boolean canBeMoved(ForgeDirection face, ForgeDirection direction) {
+    public double getEnergyBufferSize() {
 
-        return structure == null && face != getFace();
+        return powerStorageSize;
     }
 
-    public boolean move() {
+    @Override
+    public double getEnergyBuffer() {
 
-        if (worldObj.isRemote)
-            return false;
-        if (structure != null)
-            return false;
+        return storedPower;
+    }
 
-        if (lastCheck > 0)
-            checkIfCanMove();
-        if (canMove) {
-            List<BlockCoord> blocks = movedBlocks;
-            double power = 0;
-            power += Config.PowerUsage.getPowerUsedPerMove;
-            for (BlockCoord b : blocks) {
-                power += Config.PowerUsage.getPowerUsedPerBlock;
-                if (getWorldObj().getTileEntity(b.x, b.y, b.z) != null)
-                    power += Config.PowerUsage.getPowerUsedPerTileEntity;
+    @Override
+    public double injectPower(double amount, boolean simulated) {
+
+        double injected = Math.min(getEnergyBufferSize() - getEnergyBuffer(), amount);
+
+        if (simulated)
+            return injected;
+
+        storedPower += injected;
+
+        sendUpdatePacket();
+
+        return injected;
+    }
+
+    @Override
+    public double drainPower(double amount, boolean simulated) {
+
+        double drained = Math.min(getEnergyBuffer(), amount);
+
+        if (simulated)
+            return drained;
+
+        storedPower -= drained;
+
+        sendUpdatePacket();
+
+        return drained;
+    }
+
+    // NBT saving and tile updates
+
+    @Override
+    public void writeToNBT(NBTTagCompound tag) {
+
+        super.writeToNBT(tag);
+
+        tag.setBoolean("redstoneInput", redstoneInput);
+
+        tag.setInteger("face", getFace().ordinal());
+
+        NBTTagCompound movement = new NBTTagCompound();
+        getMovement().writeToNBT(movement);
+        tag.setTag("movement", movement);
+
+        NBTTagList l = new NBTTagList();
+        for (MotorSetting s : settings)
+            l.appendTag(new NBTTagString(s.ordinal() + ""));
+        tag.setTag("settings", l);
+
+        tag.setDouble("power", getEnergyBuffer());
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+
+        super.readFromNBT(tag);
+
+        redstoneInput = tag.getBoolean("redstoneInput");
+
+        face = ForgeDirection.getOrientation(tag.getInteger("face"));
+
+        getMovement().readFromNBT(tag.getCompoundTag("movement"));
+
+        settings.clear();
+        NBTTagList l = tag.getTagList("settings", new NBTTagString().getId());
+        for (int i = 0; i < l.tagCount(); i++)
+            settings.add(MotorSetting.values()[Integer.parseInt(l.getStringTagAt(i))]);
+
+        storedPower = tag.getDouble("power");
+    }
+
+    protected void writeToPacketNBT(NBTTagCompound tag) {
+
+        tag.setInteger("face", getFace().ordinal());
+
+        NBTTagCompound movement = new NBTTagCompound();
+        getMovement().writeToNBT(movement);
+        tag.setTag("movement", movement);
+
+        NBTTagList l = new NBTTagList();
+        for (MotorSetting s : settings)
+            l.appendTag(new NBTTagString(s.ordinal() + ""));
+        tag.setTag("settings", l);
+
+        if (blocking.size() > 0) {
+            NBTTagList blocking = new NBTTagList();
+            for (Vec3i v : this.blocking) {
+                NBTTagCompound t = new NBTTagCompound();
+                t.setInteger("x", v.getX());
+                t.setInteger("y", v.getY());
+                t.setInteger("z", v.getZ());
+                blocking.appendTag(t);
             }
-            if (hasEnoughFramezPower(power)) {
-                MovingStructure structure = new MovingStructure(worldObj, direction, getMovementSpeed() / 20D);
-                structure.addBlocks(blocks);
+            tag.setTag("blocking", blocking);
+        }
 
-                this.structure = structure;
-                StructureTickHandler.INST.addStructure(structure);
+        tag.setDouble("power", getEnergyBuffer());
+    }
 
-                NetworkHandler.sendToDimension(new PacketStartMoving(this), worldObj.provider.dimensionId);
+    protected void readFromPacketNBT(NBTTagCompound tag) {
 
-                consumeFramezPower(power);
-                sendUpdatePacket();
+        face = ForgeDirection.getOrientation(tag.getInteger("face"));
 
-                return true;
+        getMovement().readFromNBT(tag.getCompoundTag("movement"));
+
+        settings.clear();
+        NBTTagList l = tag.getTagList("settings", new NBTTagString().getId());
+        for (int i = 0; i < l.tagCount(); i++)
+            settings.add(MotorSetting.values()[Integer.parseInt(l.getStringTagAt(i))]);
+
+        blocking = new ArrayList<Vec3i>();
+        if (tag.hasKey("blocking")) {
+            NBTTagList blocking = tag.getTagList("blocking", new NBTTagCompound().getId());
+            for (int i = 0; i < blocking.tagCount(); i++) {
+                NBTTagCompound t = blocking.getCompoundTagAt(i);
+                this.blocking.add(new Vec3i(t.getInteger("x"), t.getInteger("y"), t.getInteger("z")));
             }
         }
+
+        storedPower = tag.getDouble("power");
+
+        markForRenderUpdate();
+    }
+
+    @Override
+    public Packet getDescriptionPacket() {
+
+        NBTTagCompound tCompound = new NBTTagCompound();
+        writeToPacketNBT(tCompound);
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tCompound);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+
+        readFromPacketNBT(pkt.func_148857_g());
+    }
+
+    protected void sendUpdatePacket() {
+
+        if (!worldObj.isRemote)
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+    }
+
+    protected void markForRenderUpdate() {
+
+        if (worldObj != null)
+            worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
+    }
+
+    protected void notifyNeighborBlockUpdate() {
+
+        worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, getBlockType());
+    }
+
+    @Override
+    @Priority(PriorityEnum.OVERRIDE)
+    public BlockMovementType getMovementType(World world, int x, int y, int z, ForgeDirection side, IMovement movement) {
+
+        if (side == getFace())
+            return BlockMovementType.UNMOVABLE;
+
+        return !isWorking() ? BlockMovementType.MOVABLE : BlockMovementType.UNMOVABLE;
+    }
+
+    @Override
+    public boolean startMoving(IMovingBlock block) {
+
         return false;
     }
 
-    private void checkIfCanMove() {
+    @Override
+    public boolean finishMoving(IMovingBlock block) {
 
-        active = this;
-        setBlockingCoord(null);
+        return false;
+    }
 
-        canMove = false;
-        movedBlocks = null;
+    public void onUnload() {
 
-        if (worldObj == WorldWrapperProvider.getWrapper(worldObj.provider.dimensionId))
-            return;
-
-        if (worldObj.getBlock(xCoord + face.offsetX, yCoord + face.offsetY, zCoord + face.offsetZ) != Blocks.air) {
-            List<BlockCoord> blocks = movedBlocks = MovementUtils.getMovedBlocks(this);
-            if (blocks.size() > 0 && MovementUtils.canMove(blocks, getWorldObj(), direction)) {
-                canMove = true;
-                return;
+        MovingStructure s = getStructure();
+        if (s != null)
+            while (s.getProgress() < 1) {
+                s.tick(Phase.START);
+                s.tick(Phase.END);
             }
-        }
-        movedBlocks = null;
-
-        active = null;
     }
 
-    public boolean canMove() {
+    public List<Vec3i> getBlocking() {
 
-        return canMove;
+        return blocking;
     }
 
-    public final int getColorMultiplier() {
+    @Override
+    public void validate() {
 
-        return getColorMultiplierForPlayer(placer);
-    }
-
-    public static final int getColorMultiplierForPlayer(String placer) {
-
-        if (placer.equals("amadornes"))
-            return 0xCC0000;
-
-        if (placer.equals("KrystalRaven"))
-            return 0x5100B3;
-
-        if (placer.equals("Quetzz"))
-            return 0x441E94;
-
-        if (placer.equals("PurpleMentat"))
-            return 0xAA00AA;
-
-        if (placer.equals("Aureylian"))
-            return 0xEEAAAA;
-
-        if (placer.equals("Loneztar"))
-            return 0xEEAAAA;
-
-        return 0xAA0000;
-    }
-
-    public void setPlacer(String placer) {
-
-        this.placer = placer;
-    }
-
-    public String getPlacer() {
-
-        return placer;
-    }
-
-    protected boolean isBeingPowered() {
-
-        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0 || worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
+        super.validate();
+        MotorCache.onLoad(this);
     }
 
     @Override
     public void invalidate() {
 
         super.invalidate();
-
+        MotorCache.onUnload(this);
         onUnload();
-        MotorCache.unloadMotor(this);
-    }
-
-    public void onUnload() {
-
-        if (structure != null) {
-            structure.finishMoving();
-            StructureTickHandler.INST.removeStructure(structure);
-            structure = null;
-        }
-    }
-
-    public BlockCoord getBlockingCoord() {
-
-        return blockingCoord;
-    }
-
-    public void setBlockingCoord(BlockCoord blockingCoord) {
-
-        this.blockingCoord = blockingCoord;
-        sendUpdatePacket();
     }
 
 }

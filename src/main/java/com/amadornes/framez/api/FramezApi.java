@@ -1,22 +1,17 @@
 package com.amadornes.framez.api;
 
-import cpw.mods.fml.common.Loader;
+public class FramezAPI {
 
-public class FramezApi {
+    private static IFramezAPI instance;
 
-    private static IFramezApi inst;
+    public static IFramezAPI instance() {
 
-    public static IFramezApi inst() {
-
-        return inst;
+        return instance;
     }
 
-    public static void setup(IFramezApi inst) {
+    public static void setup(IFramezAPI instance) {
 
-        if (!Loader.instance().activeModContainer().getModId().equals("framez"))
-            return;
-
-        FramezApi.inst = inst;
+        FramezAPI.instance = instance;
     }
 
 }
