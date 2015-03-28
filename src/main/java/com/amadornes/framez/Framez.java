@@ -1,20 +1,16 @@
 package com.amadornes.framez;
 
-import java.util.List;
-
 import net.minecraftforge.common.MinecraftForge;
 
 import org.apache.logging.log4j.Logger;
 
 import com.amadornes.framez.api.FramezAPI;
-import com.amadornes.framez.api.modifier.IMotorModifier;
 import com.amadornes.framez.client.gui.GuiHandler;
 import com.amadornes.framez.compat.CompatibilityUtils;
 import com.amadornes.framez.hax.GuiHax;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.modifier.FrameModifierRegistry;
-import com.amadornes.framez.modifier.MotorFactory;
 import com.amadornes.framez.modifier.MotorModifierRegistry;
 import com.amadornes.framez.modifier.frame.FrameModifierMaterialBronze;
 import com.amadornes.framez.modifier.frame.FrameModifierMaterialCopper;
@@ -27,6 +23,7 @@ import com.amadornes.framez.modifier.frame.FrameModifierMaterialSilver;
 import com.amadornes.framez.modifier.frame.FrameModifierMaterialTin;
 import com.amadornes.framez.modifier.frame.FrameModifierMaterialWood;
 import com.amadornes.framez.modifier.frame.FrameModifierSimple;
+import com.amadornes.framez.modifier.frame.FrameSideModifierLatching;
 import com.amadornes.framez.movement.FrameMovementRegistry;
 import com.amadornes.framez.movement.MovementScheduler;
 import com.amadornes.framez.movement.data.MovementDataProviderDefault;
@@ -38,7 +35,6 @@ import com.amadornes.framez.part.PartFactory;
 import com.amadornes.framez.part.PartFrame;
 import com.amadornes.framez.proxy.CommonProxy;
 import com.amadornes.framez.ref.ModInfo;
-import com.amadornes.framez.tile.TileMotorSlider;
 import com.amadornes.framez.util.ThreadBlockChecking;
 import com.amadornes.framez.util.WrenchUtils;
 
@@ -53,7 +49,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 @Mod(modid = ModInfo.MODID, name = ModInfo.NAME, dependencies = "required-after:qmunitylib")
 public class Framez {
@@ -73,6 +68,14 @@ public class Framez {
 
         FramezAPI.setup(new FramezAPIImpl());
 
+        ThreadBlockChecking.instance().start();
+
+        CompatibilityUtils.preInit(event);
+
+        /*
+         * Register default movement handlers and data providers
+         */
+
         FrameMovementRegistry.instance().registerMovementHandler(new MovementHandlerDefault());
         FrameMovementRegistry.instance().registerMovementHandler(new MovementHandlerFluid());
         MovementHandlerFMP fmpHandler = new MovementHandlerFMP();
@@ -81,8 +84,9 @@ public class Framez {
 
         FrameMovementRegistry.instance().registerMovementDataProvider(new MovementDataProviderDefault());
 
-        ThreadBlockChecking.instance().start();
-
+        /*
+         * Register frame modifiers
+         */
         FrameModifierRegistry.instance().registerModifier(new FrameModifierSimple());
 
         FrameModifierRegistry.instance().registerModifier(new FrameModifierMaterialWood());
@@ -101,11 +105,31 @@ public class Framez {
 
         FrameModifierRegistry.instance().registerModifier(new FrameModifierMaterialEnderium());
 
-        CompatibilityUtils.preInit(event);
+        /*
+         * Register frame side modifiers
+         */
+
+        FrameModifierRegistry.instance().registerModifier(new FrameSideModifierLatching());
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
+
+        /*
+         * Register modifiers
+         */
+
+        MotorModifierRegistry.instance().registerCombination("dc");
+        MotorModifierRegistry.instance().registerCombination("eu");
+        MotorModifierRegistry.instance().registerCombination("rf");
+        MotorModifierRegistry.instance().registerCombination("eu", "rf");
+        MotorModifierRegistry.instance().registerCombination("ae2");
+
+        FrameModifierRegistry.instance().getAllCombinations(PartFrame.class);
+
+        /*
+         * Register items, blocks and events
+         */
 
         FramezItems.init();
         FramezItems.register();
@@ -117,6 +141,10 @@ public class Framez {
         FMLCommonHandler.instance().bus().register(MovementScheduler.instance());
 
         MinecraftForge.EVENT_BUS.register(new WrenchUtils());
+
+        /*
+         * Register multiparts, networking, rendering and GUI-related stuff
+         */
 
         PartFactory.init();
 
@@ -140,11 +168,6 @@ public class Framez {
             e.printStackTrace();
             FMLCommonHandler.instance().exitJava(-1, true);
         }
-
-        FrameModifierRegistry.instance().getAllCombinations(PartFrame.class);
-        for (List<IMotorModifier> l : MotorModifierRegistry.instance().getAllCombinations(TileMotorSlider.class))
-            GameRegistry
-                    .registerTileEntity(MotorFactory.createMotorClass(TileMotorSlider.class, l), MotorFactory.getIdentifier("motor", l));
     }
 
     @EventHandler

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.amadornes.framez.api.modifier.IFrameModifier;
 import com.amadornes.framez.api.modifier.IFrameModifierRegistry;
+import com.amadornes.framez.api.modifier.IFrameSideModifier;
 import com.amadornes.framez.api.movement.IFrame;
 import com.amadornes.framez.util.SorterElementCount;
 import com.amadornes.framez.util.SorterModifierType;
@@ -30,9 +31,11 @@ public class FrameModifierRegistry implements IFrameModifierRegistry {
     public void registerModifier(IFrameModifier modifier) {
 
         if (modifier == null)
-            return;
+            throw new RuntimeException("Attempted to register a null frame modifier");
+        if (modifier.getType() == null)
+            throw new RuntimeException("Attempted to register a frame modifier with a null identifier");
         if (findModifier(modifier.getType()) != null)
-            return;
+            throw new RuntimeException("Attempted to register a frame modifier that has already been registered");
 
         registered.add(modifier);
     }
@@ -55,12 +58,14 @@ public class FrameModifierRegistry implements IFrameModifierRegistry {
 
     public Collection<List<IFrameModifier>> getAllCombinations(Class<? extends IFrame> frameClazz) {
 
-        // if (combinations.containsKey(frameClazz))
-        // return combinations.get(frameClazz);
+        if (combinations.containsKey(frameClazz))
+            return combinations.get(frameClazz);
 
         List<List<IFrameModifier>> combinations = new ArrayList<List<IFrameModifier>>();
 
         for (IFrameModifier p : registered) {
+            if (p instanceof IFrameSideModifier)
+                continue;
             List<List<IFrameModifier>> pos = new ArrayList<List<IFrameModifier>>();
             pos.add(Arrays.asList(new IFrameModifier[] { p }));
             addModifiers(pos, Arrays.asList(new IFrameModifier[] { p }));
@@ -94,6 +99,8 @@ public class FrameModifierRegistry implements IFrameModifierRegistry {
             if (current.contains(p))
                 continue;
             if (!areCompatible(current, p))
+                continue;
+            if (p instanceof IFrameSideModifier)
                 continue;
 
             List<IFrameModifier> l = new ArrayList<IFrameModifier>();

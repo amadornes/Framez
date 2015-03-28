@@ -9,7 +9,21 @@ public class FramezUtils {
 
     public static boolean hasModifier(IFrame frame, IFrameModifier mod) {
 
-        Collection<IFrameModifier> mods = frame.getModifiers();
+        return hasModifier(frame.getModifiers(), mod);
+    }
+
+    public static boolean hasModifier(IFrame frame, Class<? extends IFrameModifier> mod) {
+
+        return hasModifier(frame.getModifiers(), mod);
+    }
+
+    public static boolean hasModifier(IFrame frame, String mod) {
+
+        return hasModifier(frame.getModifiers(), mod);
+    }
+
+    public static boolean hasModifier(Collection<? extends IFrameModifier> mods, IFrameModifier mod) {
+
         if (mods == null)
             return false;
 
@@ -20,9 +34,8 @@ public class FramezUtils {
         return false;
     }
 
-    public static boolean hasModifier(IFrame frame, Class<? extends IFrameModifier> mod) {
+    public static boolean hasModifier(Collection<? extends IFrameModifier> mods, Class<? extends IFrameModifier> mod) {
 
-        Collection<IFrameModifier> mods = frame.getModifiers();
         if (mods == null)
             return false;
 
@@ -33,9 +46,8 @@ public class FramezUtils {
         return false;
     }
 
-    public static boolean hasModifier(IFrame frame, String mod) {
+    public static boolean hasModifier(Collection<? extends IFrameModifier> mods, String mod) {
 
-        Collection<IFrameModifier> mods = frame.getModifiers();
         if (mods == null)
             return false;
 

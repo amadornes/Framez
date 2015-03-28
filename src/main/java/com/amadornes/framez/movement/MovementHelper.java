@@ -14,6 +14,7 @@ import com.amadornes.framez.api.Priority.PriorityEnum;
 import com.amadornes.framez.api.movement.BlockMovementType;
 import com.amadornes.framez.api.movement.IMovable;
 import com.amadornes.framez.api.movement.IMovement;
+import com.amadornes.framez.api.movement.IStickinessHandler;
 import com.amadornes.framez.api.movement.ISticky;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.tile.TileMoving;
@@ -23,6 +24,12 @@ public class MovementHelper {
 
     public static Pair<List<MovingBlock>, List<Vec3i>> findMovedBlocks(World world, int x, int y, int z, ForgeDirection side,
             IMovement movement) {
+
+        return findMovedBlocks(world, x, y, z, side, movement, new ArrayList<Vec3i>());
+    }
+
+    public static Pair<List<MovingBlock>, List<Vec3i>> findMovedBlocks(World world, int x, int y, int z, ForgeDirection side,
+            IMovement movement, List<Vec3i> ignored) {
 
         List<MovingBlock> moved = new ArrayList<MovingBlock>();
         Graph<MovingBlock> graph = new Graph<MovingBlock>();
@@ -39,7 +46,7 @@ public class MovementHelper {
 
         while (current.size() > 0) {
             for (MovingBlock b : current) {
-                for (MovingBlock bl : findBlocks(b.getWorld(), b.getX(), b.getY(), b.getZ(), movement, moved)) {
+                for (MovingBlock bl : findBlocks(b.getWorld(), b.getX(), b.getY(), b.getZ(), movement, moved, ignored)) {
                     bl.snapshot();
                     graph.addEdge(b, bl);
                     if (!tmp.contains(bl) && !current.contains(bl) && !moved.contains(bl)) {
@@ -110,19 +117,42 @@ public class MovementHelper {
         return new MovingBlock(new Vec3i(x, y, z, world), null, FrameMovementRegistry.instance().findFrames(world, x, y, z));
     }
 
-    public static List<MovingBlock> findBlocks(World world, int x, int y, int z, IMovement movement, List<MovingBlock> alreadyMoving) {
+    public static List<MovingBlock> findBlocks(World world, int x, int y, int z, IMovement movement, List<MovingBlock> alreadyMoving,
+            List<Vec3i> ignored) {
 
         List<MovingBlock> blocks = new ArrayList<MovingBlock>();
 
         List<ISticky> stickies = FrameMovementRegistry.instance().findStickies(world, x, y, z);
         for (ISticky sticky : stickies) {
             for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-                if (!sticky.isSideSticky(world, x, y, z, d, movement))
+                boolean handled = false;
+                boolean isSticky = false;
+
+                for (IStickinessHandler h : FrameMovementRegistry.instance().getStickinessHandlers()) {
+                    if (h.canHandle(world, x, y, z, d)) {
+                        handled = true;
+                        isSticky = h.isSideSticky(world, x, y, z, d, movement);
+                        break;
+                    }
+                }
+
+                if (handled && !isSticky)
+                    continue;
+                if (!handled && !sticky.isSideSticky(world, x, y, z, d, movement))
                     continue;
 
                 MovingBlock b = findBlock(world, x + d.offsetX, y + d.offsetY, z + d.offsetZ, d.getOpposite(), movement);
-                if (b != null && !blocks.contains(b))
-                    blocks.add(b);
+                if (b != null && !blocks.contains(b)) {
+                    boolean ignore = false;
+                    for (Vec3i v : ignored) {
+                        if (b.equals(v)) {
+                            ignore = true;
+                            break;
+                        }
+                    }
+                    if (!ignore)
+                        blocks.add(b);
+                }
             }
         }
 

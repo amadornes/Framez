@@ -11,6 +11,7 @@ import uk.co.qmunity.lib.vec.IWorldLocation;
 import uk.co.qmunity.lib.vec.Vec3d;
 
 import com.amadornes.framez.api.modifier.IFrameModifier;
+import com.amadornes.framez.api.modifier.IFrameSideModifier;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -18,6 +19,12 @@ import cpw.mods.fml.relauncher.SideOnly;
 public interface IFrame extends ISticky, IWorldLocation {
 
     public Collection<IFrameModifier> getModifiers();
+
+    public Collection<IFrameSideModifier> getSideModifiers(ForgeDirection side);
+
+    public boolean addSideModifier(ForgeDirection side, String modifier);
+
+    public boolean removeSideModifier(ForgeDirection side, String modifier);
 
     @SideOnly(Side.CLIENT)
     public boolean renderStatic(RenderHelper renderer, int pass);

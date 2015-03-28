@@ -55,5 +55,4 @@ public class PartFactory implements IPartFactory, IPartConverter {
 
         return null;
     }
-
 }

@@ -12,6 +12,8 @@ public interface IFrameMovementRegistry {
 
     public void registerStickyProvider(IStickyProvider provider);
 
+    public void registerStickinessHandler(IStickinessHandler handler);
+
     public Collection<IMovable> findMovables(World world, int x, int y, int z);
 
     public Collection<ISticky> findStickies(World world, int x, int y, int z);

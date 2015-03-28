@@ -20,25 +20,26 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockMotor extends BlockContainer {
 
-    public BlockMotor() {
+    private String id;
+
+    public BlockMotor(String id) {
 
         super(Material.iron);
 
-        setBlockName(References.Block.MOTOR);
+        this.id = id;
+        setBlockName(References.Block.MOTOR + "_" + id);
     }
 
     @Override
     public String getUnlocalizedName() {
 
-        return "tile." + ModInfo.MODID + ":" + References.Block.MOTOR;
+        return "tile." + ModInfo.MODID + ":" + References.Block.MOTOR + "_" + id;
     }
 
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
 
-        TileMotor motor = MotorFactory.createMotor(TileMotorSlider.class, "motor");
-
-        return motor;
+        return MotorFactory.createMotor(TileMotorSlider.class, "slider_" + id);
     }
 
     @Override

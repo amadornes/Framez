@@ -3,6 +3,7 @@ package com.amadornes.framez.api.movement;
 import java.util.Collection;
 import java.util.Set;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import uk.co.qmunity.lib.vec.IWorldLocation;
 
@@ -39,5 +40,15 @@ public interface IMotor extends IWorldLocation {
      * Returns the amount of power that was drained
      */
     public double drainPower(double amount, boolean simulated);
+
+    public void onUnload();
+
+    public void tick();
+
+    public void onFirstTick();
+
+    public void writeToNBT(NBTTagCompound tag);
+
+    public void readFromNBT(NBTTagCompound tag);
 
 }

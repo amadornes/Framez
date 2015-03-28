@@ -95,6 +95,8 @@ public class References {
         public static final String MATERIAL_ENDERIUM = "enderium";
 
         public static final String SIMPLE = "simple";
+
+        public static final String SIDE_LATCHING = "side_latching";
     }
 
 }

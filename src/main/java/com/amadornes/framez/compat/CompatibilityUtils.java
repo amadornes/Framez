@@ -9,6 +9,7 @@ import java.util.Map;
 import net.minecraft.item.ItemStack;
 
 import com.amadornes.framez.api.IFramezWrench.WrenchAction;
+import com.amadornes.framez.compat.ae2.CompatModuleAE2;
 import com.amadornes.framez.compat.cc.CompatModuleCC;
 import com.amadornes.framez.compat.ic2.CompatModuleIC2;
 import com.amadornes.framez.compat.oc.CompatModuleOC;
@@ -137,11 +138,13 @@ public class CompatibilityUtils {
      * Register modules here
      */
     static {
+
         registerModule(Dependencies.CC, CompatModuleCC.class, null);
         registerModule(Dependencies.OC, CompatModuleOC.class, null);
 
         registerModule("api:" + Dependencies.API_RF, CompatModuleRF.class, null);
         registerModule(Dependencies.IC2, CompatModuleIC2.class, null);
+        registerModule(Dependencies.AE2, CompatModuleAE2.class, null);
     }
 
 }

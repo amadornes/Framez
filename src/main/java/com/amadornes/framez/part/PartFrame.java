@@ -39,17 +39,21 @@ import codechicken.multipart.TNormalOcclusion;
 
 import com.amadornes.framez.Framez;
 import com.amadornes.framez.api.modifier.IFrameModifier;
+import com.amadornes.framez.api.modifier.IFrameSideModifier;
 import com.amadornes.framez.api.movement.IFrame;
 import com.amadornes.framez.api.movement.IMovement;
 import com.amadornes.framez.client.RenderFrame;
 import com.amadornes.framez.config.Config;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.modifier.FrameFactory;
+import com.amadornes.framez.modifier.FrameModifierRegistry;
 import com.amadornes.framez.ref.References;
+import com.amadornes.framez.util.FramezUtils;
 
 public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
-    private List<IFrameModifier> modifiers = new ArrayList<IFrameModifier>();
+    private List<IFrameModifier> modifiers;
+    private List<IFrameSideModifier>[] sideModifiers;
     private boolean[] hidden = new boolean[6];
 
     public PartFrame() {
@@ -210,6 +214,57 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         return modifiers;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<IFrameSideModifier> getSideModifiers(ForgeDirection side) {
+
+        if (sideModifiers == null) {
+            sideModifiers = new ArrayList[6];
+            for (int i = 0; i < 6; i++)
+                sideModifiers[i] = new ArrayList<IFrameSideModifier>();
+        }
+
+        return sideModifiers[side.ordinal()];
+    }
+
+    @Override
+    public boolean addSideModifier(ForgeDirection side, String modifier) {
+
+        IFrameModifier mod = FrameModifierRegistry.instance().findModifier(modifier);
+        if (mod == null)
+            return false;
+        if (!(mod instanceof IFrameSideModifier))
+            return false;
+
+        Collection<IFrameSideModifier> l = getSideModifiers(side);
+        if (FramezUtils.hasModifier(l, mod))
+            return false;
+
+        boolean result = l.add((IFrameSideModifier) mod);
+        sendDescUpdate();
+        tile().markDirty();
+        return result;
+    }
+
+    @Override
+    public boolean removeSideModifier(ForgeDirection side, String modifier) {
+
+        IFrameModifier mod = FrameModifierRegistry.instance().findModifier(modifier);
+        if (mod == null)
+            return false;
+        if (!(mod instanceof IFrameSideModifier))
+            return false;
+
+        Collection<IFrameSideModifier> l = getSideModifiers(side);
+        if (!FramezUtils.hasModifier(l, mod))
+            return false;
+
+        boolean result = l.remove(mod);
+        sendDescUpdate();
+        tile().markDirty();
+        return result;
+    }
+
     @Override
     public int getMaxMovedBlocks() {
 
@@ -296,11 +351,15 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
         if (hidden == null)
             hidden = new boolean[6];
 
-        if (!is2D())
-            return RenderFrame.renderFrame3D(renderer, border, borderT, cross, simple, hidden, pass);
-        else
-            return RenderFrame.renderFrame2D(renderer, simple, hidden);
+        boolean renderedModifier = false;
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
+            for (IFrameSideModifier m : getSideModifiers(d))
+                renderedModifier |= m.renderStatic(this, d, renderer, pass);
 
+        if (!is2D())
+            return RenderFrame.renderFrame3D(renderer, border, borderT, cross, simple, hidden, pass) || renderedModifier;
+        else
+            return RenderFrame.renderFrame2D(renderer, simple, hidden) || renderedModifier;
     }
 
     @Override
@@ -323,6 +382,15 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
     @Override
     public void renderDynamic(Vec3d pos, int pass, double frame) {
 
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
+            for (IFrameSideModifier m : getSideModifiers(d))
+                m.renderDynamic(this, d, pos, pass, frame);
+    }
+
+    @Override
+    public void renderDynamic(Vector3 pos, float frame, int pass) {
+
+        renderDynamic(new Vec3d(pos.x, pos.y, pos.z), pass, frame);
     }
 
     @Override
@@ -443,8 +511,13 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
         super.save(tag);
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++) {
             tag.setBoolean("hidden_" + i, hidden[i]);
+            NBTTagList l = new NBTTagList();
+            for (IFrameSideModifier m : getSideModifiers(ForgeDirection.getOrientation(i)))
+                l.appendTag(new NBTTagString(m.getType()));
+            tag.setTag("sidemods_" + i, l);
+        }
     }
 
     @Override
@@ -455,8 +528,14 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
         super.load(tag);
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++) {
             hidden[i] = tag.getBoolean("hidden_" + i);
+            NBTTagList l = tag.getTagList("sidemods_" + i, new NBTTagString().getId());
+            Collection<IFrameSideModifier> c = getSideModifiers(ForgeDirection.getOrientation(i));
+            c.clear();
+            for (int j = 0; j < l.tagCount(); j++)
+                c.add((IFrameSideModifier) FrameModifierRegistry.instance().findModifier(l.getStringTagAt(j)));
+        }
     }
 
     @Override
@@ -469,6 +548,13 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
         for (int i = 0; i < 6; i++)
             packet.writeBoolean(hidden[i]);
+
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+            Collection<IFrameSideModifier> c = getSideModifiers(d);
+            packet.writeInt(c.size());
+            for (IFrameModifier m : c)
+                packet.writeString(m.getType());
+        }
     }
 
     @Override
@@ -481,6 +567,14 @@ public class PartFrame extends TMultiPart implements TNormalOcclusion, IFrame {
 
         for (int i = 0; i < 6; i++)
             hidden[i] = packet.readBoolean();
+
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+            Collection<IFrameSideModifier> c = getSideModifiers(d);
+            c.clear();
+            int amt = packet.readInt();
+            for (int i = 0; i < amt; i++)
+                c.add((IFrameSideModifier) FrameModifierRegistry.instance().findModifier(packet.readString()));
+        }
     }
 
 }

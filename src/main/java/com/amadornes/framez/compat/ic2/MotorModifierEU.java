@@ -1,11 +1,15 @@
 package com.amadornes.framez.compat.ic2;
 
+import ic2.api.energy.event.EnergyTileLoadEvent;
+import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IEnergySink;
 
 import java.util.Collection;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
+import uk.co.qmunity.lib.vec.IWorldLocation;
 
 import com.amadornes.framez.api.modifier.IMotorModifier;
 import com.amadornes.framez.api.modifier.IMotorModifierPower;
@@ -63,6 +67,24 @@ public class MotorModifierEU implements IMotorModifierPower {
         public double injectEnergy(ForgeDirection directionFrom, double amount, double voltage) {
 
             return amount - ((IMotor) this).injectPower(amount, false);
+        }
+
+        @Override
+        public void onFirstTick() {
+
+            // FIXME _super.onFirstTick();
+
+            if (!((IWorldLocation) this).getWorld().isRemote)
+                MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
+        }
+
+        @Override
+        public void onUnload() {
+
+            // FIXME _super.onUnload();
+
+            if (!((IWorldLocation) this).getWorld().isRemote)
+                MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
         }
 
     }

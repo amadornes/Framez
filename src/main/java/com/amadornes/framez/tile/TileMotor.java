@@ -216,8 +216,21 @@ public abstract class TileMotor extends TileEntity implements IMotor, IDebuggabl
         onBlockUpdate();
     }
 
+    private boolean firstTick = true;
+
     @Override
     public void updateEntity() {
+
+        if (firstTick) {
+            onFirstTick();
+            firstTick = false;
+        }
+
+        tick();
+    }
+
+    @Override
+    public void tick() {
 
         if (structure != null && structure.getProgress() >= 1)
             structure = null;
@@ -229,6 +242,11 @@ public abstract class TileMotor extends TileEntity implements IMotor, IDebuggabl
 
             scheduled = false;
         }
+    }
+
+    @Override
+    public void onFirstTick() {
+
     }
 
     public void onBlockUpdate() {
@@ -480,6 +498,7 @@ public abstract class TileMotor extends TileEntity implements IMotor, IDebuggabl
         return false;
     }
 
+    @Override
     public void onUnload() {
 
         MovingStructure s = getStructure();

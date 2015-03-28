@@ -1,5 +1,6 @@
 package com.amadornes.framez.proxy;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -8,6 +9,7 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
 import com.amadornes.framez.client.IconSupplier;
+import com.amadornes.framez.client.MOPHelper;
 import com.amadornes.framez.client.RenderFrame;
 import com.amadornes.framez.client.RenderMotor;
 import com.amadornes.framez.client.RenderMovementBlocking;
@@ -33,9 +35,11 @@ public class ClientProxy extends CommonProxy {
         RenderMotor motorRenderer = new RenderMotor();
         ClientRegistry.bindTileEntitySpecialRenderer(TileMotor.class, motorRenderer);
         RenderingRegistry.registerBlockHandler(motorRenderer);
-        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(FramezBlocks.motor), motorRenderer);
+        for (Block m : FramezBlocks.motors.keySet())
+            MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(m), motorRenderer);
 
         MinecraftForge.EVENT_BUS.register(new RenderMovementBlocking());
+        MinecraftForge.EVENT_BUS.register(new MOPHelper());
     }
 
     private double frame;

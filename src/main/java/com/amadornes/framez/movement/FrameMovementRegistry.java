@@ -19,6 +19,7 @@ import com.amadornes.framez.api.movement.IMovable;
 import com.amadornes.framez.api.movement.IMovementDataProvider;
 import com.amadornes.framez.api.movement.IMovementHandler;
 import com.amadornes.framez.api.movement.IMovingBlock;
+import com.amadornes.framez.api.movement.IStickinessHandler;
 import com.amadornes.framez.api.movement.ISticky;
 import com.amadornes.framez.api.movement.IStickyProvider;
 import com.amadornes.framez.util.SorterPriority;
@@ -35,13 +36,16 @@ public class FrameMovementRegistry implements IFrameMovementRegistry {
     private List<IMovementDataProvider> dataProviders = new ArrayList<IMovementDataProvider>();
     private List<IMovementHandler> movementHandlers = new ArrayList<IMovementHandler>();
     private List<IStickyProvider> stickyProviders = new ArrayList<IStickyProvider>();
+    private List<IStickinessHandler> stickinessHandlers = new ArrayList<IStickinessHandler>();
 
     private boolean canRegisterMovementHandlers = true;
     private boolean canRegisterStickyProviders = true;
+    private boolean canRegisterStickinessHandlers = true;
 
     @Override
     public void registerMovementDataProvider(IMovementDataProvider provider) {
 
+        // FIXME Change returns to throws
         if (provider == null)
             return;
         if (dataProviders.contains(provider))
@@ -54,7 +58,7 @@ public class FrameMovementRegistry implements IFrameMovementRegistry {
     public void registerMovementHandler(IMovementHandler handler) {
 
         if (!canRegisterMovementHandlers)
-            throw new RuntimeException("All the movement handlers have already been sorted and setup. Register yours before!");
+            throw new RuntimeException("All the movement handlers have already been sorted and set up. Register yours before!");
 
         if (handler == null)
             return;
@@ -68,7 +72,7 @@ public class FrameMovementRegistry implements IFrameMovementRegistry {
     public void registerStickyProvider(IStickyProvider provider) {
 
         if (!canRegisterStickyProviders)
-            throw new RuntimeException("All the movement handlers have already been sorted and setup. Register yours before!");
+            throw new RuntimeException("All the sticky providers have already been sorted and set up. Register yours before!");
 
         if (provider == null)
             return;
@@ -76,6 +80,20 @@ public class FrameMovementRegistry implements IFrameMovementRegistry {
             return;
 
         stickyProviders.add(provider);
+    }
+
+    @Override
+    public void registerStickinessHandler(IStickinessHandler handler) {
+
+        if (!canRegisterStickinessHandlers)
+            throw new RuntimeException("All the stickiness handlers have already been sorted and set up. Register yours before!");
+
+        if (handler == null)
+            return;
+        if (stickinessHandlers.contains(handler))
+            return;
+
+        stickinessHandlers.add(handler);
     }
 
     private void sortMovementHandlersAndDisableRegistration() {
@@ -94,6 +112,15 @@ public class FrameMovementRegistry implements IFrameMovementRegistry {
 
         canRegisterStickyProviders = false;
         Collections.sort(stickyProviders, new SorterPriority.SorterPriorityInstance());
+    }
+
+    private void sortStickinessHandlersAndDisableRegistration() {
+
+        if (!canRegisterStickinessHandlers)
+            return;
+
+        canRegisterStickinessHandlers = false;
+        Collections.sort(stickinessHandlers, new SorterPriority.SorterPriorityInstance());
     }
 
     @Override
@@ -128,6 +155,7 @@ public class FrameMovementRegistry implements IFrameMovementRegistry {
             return null;
 
         sortStickyProvidersAndDisableRegistration();
+        sortStickinessHandlersAndDisableRegistration();
 
         List<ISticky> l = new ArrayList<ISticky>();
 
@@ -171,6 +199,11 @@ public class FrameMovementRegistry implements IFrameMovementRegistry {
                     l.add((IFrame) p);// FIXME actual multipart handling
 
         return l;
+    }
+
+    public List<IStickinessHandler> getStickinessHandlers() {
+
+        return stickinessHandlers;
     }
 
     public NBTTagCompound writeInfo(IMovingBlock block) {

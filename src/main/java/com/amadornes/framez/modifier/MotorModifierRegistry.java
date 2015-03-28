@@ -1,17 +1,12 @@
 package com.amadornes.framez.modifier;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.amadornes.framez.api.modifier.IMotorModifier;
 import com.amadornes.framez.api.modifier.IMotorModifierRegistry;
-import com.amadornes.framez.api.movement.IMotor;
-import com.amadornes.framez.util.SorterElementCount;
 import com.amadornes.framez.util.SorterModifierType;
 
 public class MotorModifierRegistry implements IMotorModifierRegistry {
@@ -24,15 +19,17 @@ public class MotorModifierRegistry implements IMotorModifierRegistry {
     }
 
     private List<IMotorModifier> registered = new ArrayList<IMotorModifier>();
-    private Map<Class<? extends IMotor>, List<List<IMotorModifier>>> combinations = new HashMap<Class<? extends IMotor>, List<List<IMotorModifier>>>();
+    private List<List<IMotorModifier>> combinations = new ArrayList<List<IMotorModifier>>();
 
     @Override
     public void registerModifier(IMotorModifier modifier) {
 
         if (modifier == null)
-            return;
+            throw new RuntimeException("Attempted to register a null motor modifier");
+        if (modifier.getType() == null)
+            throw new RuntimeException("Attempted to register a motor modifier with a null identifier");
         if (findModifier(modifier.getType()) != null)
-            return;
+            throw new RuntimeException("Attempted to register a motor modifier that has already been registered");
 
         registered.add(modifier);
     }
@@ -53,95 +50,23 @@ public class MotorModifierRegistry implements IMotorModifierRegistry {
         return null;
     }
 
-    public Collection<List<IMotorModifier>> getAllCombinations(Class<? extends IMotor> frameClazz) {
+    public void registerCombination(String... modifiers) {
 
-        // if (combinations.containsKey(frameClazz))
-        // return combinations.get(frameClazz);
-
-        List<List<IMotorModifier>> combinations = new ArrayList<List<IMotorModifier>>();
-
-        for (IMotorModifier p : registered) {
-            List<List<IMotorModifier>> pos = new ArrayList<List<IMotorModifier>>();
-            pos.add(Arrays.asList(new IMotorModifier[] { p }));
-            addModifiers(pos, Arrays.asList(new IMotorModifier[] { p }));
-
-            for (List<IMotorModifier> l : pos) {
-                boolean found = false;
-
-                for (List<IMotorModifier> l2 : combinations) {
-                    Collections.sort(l, new SorterModifierType());
-                    Collections.sort(l2, new SorterModifierType());
-                    found = l.equals(l2);
-                    if (found)
-                        break;
-                }
-
-                if (!found)
-                    combinations.add(l);
-            }
+        List<IMotorModifier> l = new ArrayList<IMotorModifier>();
+        for (String s : modifiers) {
+            IMotorModifier m = findModifier(s);
+            if (m != null && !l.contains(m))
+                l.add(m);
         }
+        if (l.size() == 0)
+            return;
+        Collections.sort(l, new SorterModifierType());
+        if (!combinations.contains(l))
+            combinations.add(l);
+    }
 
-        removeDuplicates(combinations);
-        Collections.sort(combinations, new SorterElementCount());
+    public List<List<IMotorModifier>> getAllCombinations() {
 
-        this.combinations.put(frameClazz, combinations);
         return combinations;
-    }
-
-    private void addModifiers(List<List<IMotorModifier>> possibilities, List<IMotorModifier> current) {
-
-        for (IMotorModifier p : registered) {
-            if (current.contains(p))
-                continue;
-            if (!areCompatible(current, p))
-                continue;
-
-            List<IMotorModifier> l = new ArrayList<IMotorModifier>();
-            l.addAll(current);
-            l.add(p);
-            possibilities.add(l);
-
-            addModifiers(possibilities, l);
-        }
-    }
-
-    private boolean areCompatible(List<IMotorModifier> mods, IMotorModifier m) {
-
-        for (IMotorModifier mod : mods)
-            if (!mod.isCompatibleWith(m) || !m.isCompatibleWith(mod))
-                return false;
-
-        return true;
-    }
-
-    private void removeDuplicates(List<List<IMotorModifier>> possibilities) {
-
-        List<List<IMotorModifier>> removed = new ArrayList<List<IMotorModifier>>();
-
-        for (List<IMotorModifier> l1 : possibilities) {
-            if (removed.contains(l1))
-                continue;
-            for (List<IMotorModifier> l2 : possibilities) {
-                if (removed.contains(l2))
-                    continue;
-                if (l1 == l2)
-                    continue;
-                if (l1.size() != l2.size())
-                    continue;
-                Collections.sort(l1, new SorterModifierType());
-                Collections.sort(l2, new SorterModifierType());
-                boolean error = false;
-                for (int i = 0; i < l1.size(); i++) {
-                    if (l1 != l2) {
-                        error = true;
-                        break;
-                    }
-                }
-                if (!error)
-                    removed.add(l2);
-            }
-        }
-
-        possibilities.removeAll(removed);
     }
 }
