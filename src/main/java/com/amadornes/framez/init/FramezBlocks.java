@@ -1,46 +1,60 @@
 package com.amadornes.framez.init;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.function.IntFunction;
+
+import com.amadornes.framez.Framez;
+import com.amadornes.framez.ModInfo;
+import com.amadornes.framez.block.BlockMetamorphicStone;
+import com.amadornes.framez.block.BlockMotor;
+import com.amadornes.framez.item.ItemBlockMetamorphicStone;
+import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.block.Block;
-
-import com.amadornes.framez.api.modifier.IMotorModifier;
-import com.amadornes.framez.block.BlockMotor;
-import com.amadornes.framez.block.BlockMoving;
-import com.amadornes.framez.modifier.MotorFactory;
-import com.amadornes.framez.modifier.MotorModifierRegistry;
-import com.amadornes.framez.ref.References;
-import com.amadornes.framez.tile.TileMotorSlider;
-import com.amadornes.framez.tile.TileMoving;
-
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class FramezBlocks {
 
-    public static Map<Block, String> motors = new HashMap<Block, String>();
-    public static Block moving;
+    public static Block motor;
+    public static Block metamorphic_stone;
 
-    public static void init() {
+    public static void initialize() {
 
-        for (List<IMotorModifier> l : MotorModifierRegistry.instance().getAllCombinations()) {
-            String id;
-            GameRegistry.registerTileEntity(MotorFactory.createMotorClass(TileMotorSlider.class, l),
-                    id = MotorFactory.getIdentifier("slider", l));
-            motors.put(new BlockMotor(id), id);
-        }
-        moving = new BlockMoving();
+        motor = new BlockMotor();
+        metamorphic_stone = new BlockMetamorphicStone();
     }
 
     public static void register() {
 
-        for (Entry<Block, String> e : motors.entrySet())
-            GameRegistry.registerBlock(e.getKey(), References.Block.MOTOR + "_" + e.getValue());
+        registerBlock(motor, "motor");
+        GameRegistry.registerTileEntity(TileMotor.class, ModInfo.MODID + ":motor");
+        // TODO: Update model registration
+        registerBlock(metamorphic_stone, ItemBlockMetamorphicStone.class, "metamorphic_stone", 0, 1, 2, 3, 4, 5);
+    }
 
-        GameRegistry.registerBlock(moving, References.Block.MOVING);
-        GameRegistry.registerTileEntity(TileMoving.class, References.Block.MOVING);
+    private static void registerBlock(Block block, String name, int... variants) {
+
+        registerBlock(block, ItemBlock.class, name, variants);
+    }
+
+    private static void registerBlock(Block block, Class<? extends ItemBlock> itemblock, String name, int... variants) {
+
+        registerBlock(block, itemblock, name, i -> i + "", variants);
+    }
+
+    private static void registerBlock(Block block, Class<? extends ItemBlock> itemblock, String name, IntFunction<String> i2s,
+            int... variants) {
+
+        GameRegistry.registerBlock(block, itemblock, name);
+        Item item = Item.getItemFromBlock(block);
+        if (variants.length <= 1) {
+            Framez.proxy.registerItemRenderer(item, name, i2s, -1);
+        } else {
+            for (int v : variants)
+                Framez.proxy.registerItemRenderer(item, name, i2s, v);
+        }
+        block.setCreativeTab(FramezCreativeTab.tab);
     }
 
 }

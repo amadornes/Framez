@@ -1,0 +1,23 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"textures": {
+	        "border": "framez:blocks/motor/border",
+	        "border_la": "framez:blocks/motor/border_la",
+	        "center": "framez:blocks/motor/center",
+	        "particle": "framez:blocks/motor/center"
+		},
+		"model": "framez:motor",
+		"transform": "forge:default-block"
+	},
+	"variants": {
+		"normal": [{}],
+		"type=0": [{
+			"model": "framez:motor_linear_actuator",
+			"submodel": {
+				"head": { "model": "framez:motor_linear_actuator_head" }
+			}
+		}],
+		"inventory": [{}]
+	}
+}

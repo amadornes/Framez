@@ -1,0 +1,23 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"textures": {
+	        "border": "framez:blocks/frame/wood/border",
+	        "border_panel": "framez:blocks/frame/wood/border_panel",
+	        "cross": "framez:blocks/frame/wood/cross",
+	        "particle": "framez:blocks/frame/wood/cross"
+		},
+		"model": "framez:frame",
+		"uvlock": true,
+		"transform": "forge:default-block"
+	},
+	"variants": {
+		"multipart": [{
+			"model": "framez:frame"
+		}],
+		"inventory": [{
+			"model": "framez:frame",
+			"transform": "forge:default-block"
+		}]
+	}
+}

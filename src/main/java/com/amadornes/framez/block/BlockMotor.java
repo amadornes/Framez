@@ -1,111 +1,141 @@
 package com.amadornes.framez.block;
 
+import com.amadornes.framez.client.gui.GuiMotorSettings;
+import com.amadornes.framez.init.FramezItems;
+import com.amadornes.framez.motor.IMotorLogic;
+import com.amadornes.framez.tile.TileMotor;
+import com.amadornes.framez.util.PropertyCamouflage;
+
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
-import com.amadornes.framez.client.RenderMotor;
-import com.amadornes.framez.modifier.MotorFactory;
-import com.amadornes.framez.ref.ModInfo;
-import com.amadornes.framez.ref.References;
-import com.amadornes.framez.tile.TileMotor;
-import com.amadornes.framez.tile.TileMotorSlider;
+@SuppressWarnings("unchecked")
+public class BlockMotor extends Block implements ITileEntityProvider {
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+    public static final IProperty<Integer> PROPERTY_LOGIC_TYPE = PropertyInteger.create("type", 0, IMotorLogic.TYPES.length);
+    public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_DOWN = new PropertyCamouflage("camo_down");
+    public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_UP = new PropertyCamouflage("camo_up");
+    public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_NORTH = new PropertyCamouflage("camo_north");
+    public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_SOUTH = new PropertyCamouflage("camo_south");
+    public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_WEST = new PropertyCamouflage("camo_west");
+    public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_EAST = new PropertyCamouflage("camo_east");
+    public static final IUnlistedProperty<IBlockState>[] PROPERTIES_CAMO = new IUnlistedProperty[] { PROPERTY_CAMO_DOWN, PROPERTY_CAMO_UP,
+            PROPERTY_CAMO_NORTH, PROPERTY_CAMO_SOUTH, PROPERTY_CAMO_WEST, PROPERTY_CAMO_EAST };
 
-public class BlockMotor extends BlockContainer {
-
-    private String id;
-
-    public BlockMotor(String id) {
+    public BlockMotor() {
 
         super(Material.iron);
-
-        this.id = id;
-        setBlockName(References.Block.MOTOR + "_" + id);
-    }
-
-    @Override
-    public String getUnlocalizedName() {
-
-        return "tile." + ModInfo.MODID + ":" + References.Block.MOTOR + "_" + id;
     }
 
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
 
-        return MotorFactory.createMotor(TileMotorSlider.class, "slider_" + id);
+        return new TileMotor();
     }
 
     @Override
-    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-
-        onBlockAdded(world, x, y, z);
-    }
-
-    @Override
-    public void onBlockAdded(World world, int x, int y, int z) {
-
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile == null || !(tile instanceof TileMotor))
-            return;
-
-        ((TileMotor) tile).onBlockUpdate();
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
     public int getRenderType() {
 
-        return RenderMotor.RENDER_ID;
+        return 3;
     }
 
     @Override
-    public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axis) {
+    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
 
-        if (world.isRemote)
+        return layer == EnumWorldBlockLayer.CUTOUT;
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX,
+            float hitY, float hitZ) {
+
+        // TODO: Wrench API!
+        if (player.isSneaking() && player.getCurrentEquippedItem() != null
+                && player.getCurrentEquippedItem().getItem() == FramezItems.wrench) {
+            if (world.isRemote)
+                Minecraft.getMinecraft().displayGuiScreen(new GuiMotorSettings(((TileMotor) world.getTileEntity(pos)).getSafeReference()));
             return true;
-
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile == null || !(tile instanceof TileMotor))
-            return false;
-
-        return ((TileMotor) tile).rotate(axis);
+        }
+        return false;
     }
 
     @Override
-    public boolean isNormalCube() {
+    protected BlockState createBlockState() {
 
-        return super.isNormalCube();
+        return new ExtendedBlockState(this, new IProperty[] { PROPERTY_LOGIC_TYPE }, new IUnlistedProperty[] { PROPERTY_CAMO_DOWN,
+                PROPERTY_CAMO_UP, PROPERTY_CAMO_NORTH, PROPERTY_CAMO_SOUTH, PROPERTY_CAMO_WEST, PROPERTY_CAMO_EAST });
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
+
+        TileEntity te = world.getTileEntity(pos);
+        if (te != null && te instanceof TileMotor) return ((TileMotor) te).getActualState(state);
+        return state;
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+
+        TileEntity te = world.getTileEntity(pos);
+        if (te != null && te instanceof TileMotor) return ((TileMotor) te).getExtendedState((IExtendedBlockState) state);
+        return state;
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+
+        return state.getValue(PROPERTY_LOGIC_TYPE);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+
+        return getDefaultState().withProperty(PROPERTY_LOGIC_TYPE, meta);
+    }
+
+    @Override
+    public boolean isBlockNormalCube() {
+
+        // Ambient occlusion
+        return true;
     }
 
     @Override
     public boolean isOpaqueCube() {
 
-        return true;
-    }
-
-    @Override
-    public boolean renderAsNormalBlock() {
-
+        // Block face clipping
         return false;
     }
 
     @Override
-    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
+    public boolean isFullCube() {
 
+        // Solidity
         return true;
     }
 
     @Override
-    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side) {
+    public boolean isFullBlock() {
 
-        return true;
+        // Full block? I guess? Meh, who cares
+        return false;
     }
 
 }

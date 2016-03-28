@@ -1,42 +1,37 @@
 package com.amadornes.framez.client.gui;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ResourceLocation;
-import uk.co.qmunity.lib.client.gui.GuiBase;
-import uk.co.qmunity.lib.client.gui.widget.IGuiWidget;
-import uk.co.qmunity.lib.client.gui.widget.WidgetMode;
+import java.io.IOException;
 
-import com.amadornes.framez.api.movement.MotorSetting;
-import com.amadornes.framez.ref.ModInfo;
+import com.amadornes.framez.ModInfo;
+import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.tile.TileMotor;
 
-public class GuiMotorSettings extends GuiBase {
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.ResourceLocation;
 
-    private static ResourceLocation resLoc = new ResourceLocation(ModInfo.MODID, "textures/gui/settings.png");
+public class GuiMotorSettings extends GuiScreen {
 
-    private TileMotor motor;
+    private final int xSize = 200, ySize = 123;
 
-    public GuiMotorSettings(TileMotor motor) {
+    private final GuiMotorSettingsTab[] tabs;
+    private int tab = 0;
 
-        super(resLoc, 228, 120, "Motor Settings");
+    @SuppressWarnings("unused")
+    private final DynamicReference<TileMotor> motor;
+
+    public GuiMotorSettings(DynamicReference<TileMotor> motor) {
+
+        this.tabs = new GuiMotorSettingsTab[] { //
+                new GuiMotorSettingsTabOverview(motor, xSize, ySize), //
+                new GuiMotorSettingsTabUpgrades(motor, xSize, ySize), //
+                new GuiMotorSettingsTabTriggers(motor, xSize, ySize), //
+                new GuiMotorSettingsTabSpeed(motor, xSize, ySize)//
+        };
+
         this.motor = motor;
-    }
-
-    @Override
-    public void initGui() {
-
-        super.initGui();
-
-        int x_ = (width - xSize) / 2;
-        int y_ = (height - ySize) / 2;
-
-        WidgetMode redstone_pulse = new WidgetMode(0, x_ + 8, y_ + 20, xSize + 14, 0, 2, ModInfo.MODID + ":textures/gui/settings.png");
-        redstone_pulse.value = motor.getSettings().contains(MotorSetting.REDSTONE_PULSE) ? 1 : 0;
-        addWidget(redstone_pulse);
-
-        WidgetMode inverted = new WidgetMode(1, x_ + 8, y_ + 36, xSize + 14, 28, 2, ModInfo.MODID + ":textures/gui/settings.png");
-        inverted.value = motor.getSettings().contains(MotorSetting.REDSTONE_INVERTED) ? 1 : 0;
-        addWidget(inverted);
     }
 
     @Override
@@ -46,28 +41,83 @@ public class GuiMotorSettings extends GuiBase {
     }
 
     @Override
-    public void drawScreen(int x, int y, float partialTick) {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 
-        super.drawScreen(x, y, partialTick);
+        int left = (width - xSize) / 2;
+        int top = (height - ySize) / 2;
 
-        int x_ = (width - xSize) / 2;
-        int y_ = (height - ySize) / 2;
+        mc.renderEngine.bindTexture(new ResourceLocation(ModInfo.MODID, "textures/gui/motor_settings.png"));
+        drawTexturedModalRect(left, top, 0, 0, xSize, ySize);
+        for (int i = 0; i < 4; i++)
+            drawTexturedModalRect(left + xSize - 3, top + 5 + 29 * i, xSize + (tab == i ? 24 : 0), 27 * i, 24, 27);
 
-        drawString(fontRendererObj, I18n.format("gui." + ModInfo.MODID + ":motor.redstone_pulse." + ((WidgetMode) getWidget(0)).value),
-                x_ + 8 + 16, y_ + 20 + 3, COLOR_TEXT);
-        drawString(fontRendererObj, I18n.format("gui." + ModInfo.MODID + ":motor.redstone_inverted." + ((WidgetMode) getWidget(1)).value),
-                x_ + 8 + 16, y_ + 36 + 3, COLOR_TEXT);
+        tabs[tab].drawScreen(mouseX, mouseY, partialTicks);
     }
 
     @Override
-    public void actionPerformed(IGuiWidget widget) {
+    public void actionPerformed(GuiButton button) throws IOException {
 
-        super.actionPerformed(widget);
+        tabs[tab].actionPerformed(button);
+    }
 
-        if (widget.getID() == 0)
-            motor.configure(MotorSetting.REDSTONE_PULSE);
-        if (widget.getID() == 1)
-            motor.configure(MotorSetting.REDSTONE_INVERTED);
+    @Override
+    public void keyTyped(char typedChar, int keyCode) throws IOException {
+
+        super.keyTyped(typedChar, keyCode);
+        if (this.mc.currentScreen != null) tabs[tab].keyTyped(typedChar, keyCode);
+    }
+
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+
+        int left = (width - xSize) / 2;
+        int top = (height - ySize) / 2;
+
+        if (mouseX >= left && mouseX < left + xSize && mouseY >= top && mouseY < top + ySize) {
+            tabs[tab].mouseClicked(mouseX, mouseY, mouseButton);
+            return;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int x = left + xSize, y = top + 5 + 29 * i;
+            if (mouseX >= x && mouseX < x + 24 && mouseY >= y && mouseY < y + 27) {
+                tab = i;
+                mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+
+        int left = (width - xSize) / 2;
+        int top = (height - ySize) / 2;
+
+        if (mouseX >= left && mouseX < left + xSize && mouseY >= top && mouseY < top + ySize) {
+            tabs[tab].mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+            return;
+        }
+    }
+
+    @Override
+    public void mouseReleased(int mouseX, int mouseY, int state) {
+
+        int left = (width - xSize) / 2;
+        int top = (height - ySize) / 2;
+
+        if (mouseX >= left && mouseX < left + xSize && mouseY >= top && mouseY < top + ySize) {
+            tabs[tab].mouseReleased(mouseX, mouseY, state);
+            return;
+        }
+    }
+
+    @Override
+    public void setWorldAndResolution(Minecraft mc, int width, int height) {
+
+        super.setWorldAndResolution(mc, width, height);
+        for (int i = 0; i < 4; i++)
+            tabs[i].setWorldAndResolution(mc, width, height);
     }
 
 }

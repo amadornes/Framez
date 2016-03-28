@@ -1,532 +1,269 @@
 package com.amadornes.framez.tile;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.amadornes.framez.Framez;
+import com.amadornes.framez.api.DynamicReference;
+import com.amadornes.framez.api.motor.EnumMotorAction;
+import com.amadornes.framez.api.motor.EnumMotorStatus;
+import com.amadornes.framez.api.motor.IMotor;
+import com.amadornes.framez.api.motor.IMotorTrigger;
+import com.amadornes.framez.api.motor.IMotorUpgrade;
+import com.amadornes.framez.api.motor.IMotorUpgradeFactory;
+import com.amadornes.framez.api.motor.IMotorVariable;
+import com.amadornes.framez.block.BlockMotor;
+import com.amadornes.framez.motor.IMotorLogic;
+import com.amadornes.framez.motor.MotorHelper;
+import com.amadornes.framez.motor.MotorLogicLinearActuator;
+import com.amadornes.framez.motor.MotorTriggerConstant;
+import com.amadornes.framez.motor.MotorTriggerRedstone;
+import com.amadornes.framez.motor.SimpleMotorVariable;
+import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
+
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import uk.co.qmunity.lib.helper.RedstoneHelper;
-import uk.co.qmunity.lib.misc.Pair;
-import uk.co.qmunity.lib.vec.IWorldLocation;
-import uk.co.qmunity.lib.vec.Vec3i;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
-import com.amadornes.framez.api.IDebuggable;
-import com.amadornes.framez.api.Priority;
-import com.amadornes.framez.api.Priority.PriorityEnum;
-import com.amadornes.framez.api.modifier.IMotorModifier;
-import com.amadornes.framez.api.movement.BlockMovementType;
-import com.amadornes.framez.api.movement.IMotor;
-import com.amadornes.framez.api.movement.IMovable;
-import com.amadornes.framez.api.movement.IMovement;
-import com.amadornes.framez.api.movement.IMovingBlock;
-import com.amadornes.framez.api.movement.MotorSetting;
-import com.amadornes.framez.movement.MovementHelper;
-import com.amadornes.framez.movement.MovementScheduler;
-import com.amadornes.framez.movement.MovingBlock;
-import com.amadornes.framez.movement.MovingStructure;
-import com.amadornes.framez.network.NetworkHandler;
-import com.amadornes.framez.network.PacketMotorSetting;
-import com.amadornes.framez.util.MotorCache;
-import com.amadornes.framez.util.ThreadBlockChecking;
-import com.amadornes.framez.util.Timing;
+@SuppressWarnings("unchecked")
+public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItemHandlerModifiable, ITickable {
 
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+    public static final int UPGRADE_SLOTS = 9;
 
-public abstract class TileMotor extends TileEntity implements IMotor, IDebuggable, IMovable {
+    public static final IMotorVariable<Double> POWER_STORED = new SimpleMotorVariable<Double>("var.framez:power_stored", d -> d + " kJ");
+    public static final IMotorVariable<Double> POWER_STORAGE_SIZE = new SimpleMotorVariable<Double>("var.framez:power_storage_size",
+            d -> d + " kJ");
+    public static final IMotorVariable<Double> MOVEMENT_TIME = new SimpleMotorVariable<Double>();
 
-    protected MovingStructure structure;
-    protected List<Vec3i> blocking = new ArrayList<Vec3i>();
+    public final DynamicReference<TileMotor> reference;
+    private IMotorLogic logic;
 
-    private boolean redstoneInput = false;
-    private boolean scheduled = false;
+    public final Map<EnumMotorAction, IMotorTrigger> triggers = new HashMap<EnumMotorAction, IMotorTrigger>();
+    public final Pair<IMotorUpgrade, ItemStack>[] upgrades = new Pair[getUpgradeSlots()];
+    public final Map<EnumMotorStatus, Boolean> statuses = new HashMap<EnumMotorStatus, Boolean>();
+    public final Map<IMotorVariable<?>, Object> nativeVariables = new HashMap<IMotorVariable<?>, Object>();
 
-    private ForgeDirection face = ForgeDirection.DOWN;
-    private HashSet<MotorSetting> settings = new HashSet<MotorSetting>();
-    private List<IMotorModifier> modifiers = new ArrayList<IMotorModifier>();
+    public TileMotor() {
 
-    private double powerStorageSize = 1000000;
-    private double storedPower = 0;
+        this(null);
+    }
 
-    @Override
-    public World getWorld() {
+    public TileMotor(DynamicReference<TileMotor> reference) {
 
-        return getWorldObj();
+        if (reference == null) {
+            this.reference = new DynamicReference<TileMotor>(this);
+            this.logic = new MotorLogicLinearActuator();// TODO: Set to null here
+        } else {
+            this.reference = reference;
+            this.logic = reference.get().logic;
+        }
+        this.logic.setMotor(this.reference);
+
+        triggers.put(EnumMotorAction.MOVE_FORWARD, new MotorTriggerRedstone(this, false));
+        triggers.put(EnumMotorAction.STOP, new MotorTriggerRedstone(this, true));
+        triggers.put(EnumMotorAction.MOVE_BACKWARD, new MotorTriggerConstant(false));
+        if (triggers.size() != EnumMotorAction.VALUES.length) throw new IllegalStateException("Somebody's been tampering with reality!");
+
+        for (EnumMotorStatus status : EnumMotorStatus.VALUES)
+            statuses.put(status, status == EnumMotorStatus.STOPPED);
+
+        nativeVariables.put(TileMotor.POWER_STORED, 0.0D);
+        nativeVariables.put(TileMotor.POWER_STORAGE_SIZE, 0.0D);
+        nativeVariables.put(TileMotor.MOVEMENT_TIME, 0.0D);
     }
 
     @Override
-    public int getX() {
+    public void update() {
 
-        return xCoord;
+        if (!getMotorWorld().isRemote && triggers.get(EnumMotorAction.MOVE_FORWARD).isActive()) {
+            Set<BlockPos> positions = MotorHelper.findMovedBlocks(getMotorWorld(), getMotorPos(), logic.getFace());
+            try {
+                if (logic.canMove(positions)
+                        && logic.getConsumedEnergy(positions, getVariable(TileMotor.MOVEMENT_TIME)) <= getVariable(TileMotor.POWER_STORED))
+                    logic.move(positions);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public Class<? extends TileMotor> getBaseClass() {
+
+        return TileMotor.class;
     }
 
     @Override
-    public int getY() {
+    public World getMotorWorld() {
 
-        return yCoord;
+        return getWorld();
     }
 
     @Override
-    public int getZ() {
+    public BlockPos getMotorPos() {
 
-        return zCoord;
+        return getPos();
     }
 
     @Override
-    public Collection<IMotorModifier> getModifiers() {
+    public DynamicReference<TileMotor> getSafeReference() {
 
-        if (modifiers == null)
-            modifiers = new ArrayList<IMotorModifier>();
-
-        return modifiers;
+        return reference;
     }
 
     @Override
-    public boolean canWork() {
+    public IMotorTrigger getTrigger(EnumMotorAction action) {
 
-        return true;
+        return triggers.get(action);
     }
 
     @Override
-    public boolean isWorking() {
+    public int getUpgradeSlots() {
 
-        return structure != null && structure.getProgress() < 1;
+        return UPGRADE_SLOTS;
     }
 
     @Override
-    public boolean move() {
+    public Entry<IMotorUpgrade, ItemStack> getUpgrade(int slot) {
 
-        try {
+        return upgrades[slot];
+    }
 
-            if (getWorld() == null || getWorld().isRemote)
-                return false;
+    @Override
+    public boolean checkStatus(EnumMotorStatus status) {
 
-            IMovement movement = getMovement();
-            if (movement == null)
-                return false;
+        return statuses.get(status);
+    }
 
-            ForgeDirection face = getFace();
+    @Override
+    public <T> T getVariable(IMotorVariable<T> variable) {
 
-            Pair<List<MovingBlock>, List<Vec3i>> p = MovementHelper.findMovedBlocks(getWorld(), getX() + face.offsetX, getY()
-                    + face.offsetY, getZ() + face.offsetZ, face.getOpposite(), movement);
-
-            List<MovingBlock> blocks = p.getKey();
-            blocks.remove(new MovingBlock(new Vec3i((IWorldLocation) this), null, null));
-
-            if (blocks.size() == 0)
-                return false;
-
-            List<Vec3i> old = blocking;
-            blocking = p.getValue();
-            boolean send = false;
-            if ((old.size() != blocking.size())) {
-                send = true;
-            } else {
-                for (Vec3i v : old) {
-                    if (!blocking.contains(v)) {
-                        send = true;
-                        break;
-                    }
+        List<IMotorUpgrade> sortedUpgrades = new ArrayList<IMotorUpgrade>();
+        T value = (T) nativeVariables.get(variable);
+        boolean foundValue = nativeVariables.containsKey(variable);
+        for (Pair<IMotorUpgrade, ItemStack> pair : upgrades) {
+            if (pair != null) {
+                sortedUpgrades.add(pair.getKey());
+                if (!foundValue && pair.getKey().getProvidedVariables().containsKey(variable)) {
+                    value = (T) pair.getKey().getProvidedVariables().get(variable);
+                    foundValue = true;
                 }
-                if (!send) {
-                    for (Vec3i v : blocking) {
-                        if (!old.contains(v)) {
-                            send = true;
-                            break;
+            }
+        }
+        sortedUpgrades.sort((a, b) -> Integer.compare(b.getAlterationPriority(variable), a.getAlterationPriority(variable)));
+        return sortedUpgrades.stream().reduce(value, (a, b) -> b.alterValue(a, variable), (a, b) -> b);
+    }
+
+    public Map<IMotorVariable<?>, Object> gatherVariables() {
+
+        Map<IMotorVariable<?>, Object> variables = new LinkedHashMap<IMotorVariable<?>, Object>();
+        for (IMotorVariable<?> var : nativeVariables.keySet())
+            variables.put(var, getVariable(var));
+        for (Pair<IMotorUpgrade, ItemStack> p : this.upgrades)
+            if (p != null) for (IMotorVariable<?> var : p.getKey().getProvidedVariables().keySet())
+                variables.put(var, getVariable(var));
+        return variables;
+    }
+
+    @Override
+    public int getSlots() {
+
+        return getUpgradeSlots();
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+
+        return upgrades[slot] != null ? upgrades[slot].getRight() : null;
+    }
+
+    @Override
+    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+
+        // if (getStackInSlot(slot) != null) return stack;
+
+        if (!stack.hasCapability(IMotorUpgradeFactory.CAPABILITY_ITEM_UPGRADE, null)) return stack;
+        IMotorUpgradeFactory upgradeFactory = stack.getCapability(IMotorUpgradeFactory.CAPABILITY_ITEM_UPGRADE, null);
+        if (MotorHelper.addUpgrade(this, upgradeFactory, slot, stack, simulate)) return stack.copy().splitStack(stack.stackSize - 1);
+        return stack;
+    }
+
+    @Override
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+
+        if (getStackInSlot(slot) == null) return null;
+
+        ItemStack stack = upgrades[slot].getRight();
+        if (!simulate) MotorHelper.removeUpgrade(this, slot);
+        return stack;
+    }
+
+    @Override
+    public void setStackInSlot(int slot, ItemStack stack) {
+
+        if (stack == null) extractItem(slot, 1, false);
+        else insertItem(slot, stack, false);
+    }
+
+    public void copyFrom(TileMotor motor) {
+
+        this.logic = motor.logic;
+
+        this.triggers.putAll(motor.triggers);
+        for (int i = 0; i < getUpgradeSlots(); i++)
+            this.upgrades[i] = motor.upgrades[i];
+        this.statuses.putAll(motor.statuses);
+        this.nativeVariables.putAll(motor.nativeVariables);
+    }
+
+    public IMotorLogic getLogic() {
+
+        return logic;
+    }
+
+    public void setUpgrade(int slot, IMotorUpgrade upgrade, ItemStack stack) {
+
+        if (upgrade == null || stack == null) upgrades[slot] = null;
+        else upgrades[slot] = new ImmutablePair<IMotorUpgrade, ItemStack>(upgrade, stack);
+    }
+
+    public IBlockState getActualState(IBlockState state) {
+
+        return state.withProperty(BlockMotor.PROPERTY_LOGIC_TYPE, logic.getID());
+    }
+
+    public IExtendedBlockState getExtendedState(IExtendedBlockState state) {
+
+        for (Pair<IMotorUpgrade, ItemStack> pair : upgrades) {
+            if (pair != null) {
+                if (pair.getKey() instanceof UpgradeCamouflage) {
+                    UpgradeCamouflage camo = (UpgradeCamouflage) pair.getKey();
+                    for (int i = 0; i < 6; i++) {
+                        ItemStack stack = camo.getStackInSlot(i);
+                        if (stack != null && stack.getItem() instanceof ItemBlock) {
+                            IBlockState faceState = ((ItemBlock) stack.getItem()).block
+                                    .getStateFromMeta(((ItemBlock) stack.getItem()).getMetadata(stack.getMetadata()));
+                            if (Framez.proxy.isFullBlock(faceState)) state = state.withProperty(BlockMotor.PROPERTIES_CAMO[i], faceState);
                         }
                     }
                 }
             }
-
-            double totalConsumed = 0;
-            for (MovingBlock b : blocks) {
-                b.snapshot();
-                int parts = b.getMultiparts();
-                if (parts <= b.getMaxMultiparts()) {
-                    totalConsumed += parts * 10;
-                } else {
-                    if (!blocking.contains(new Vec3i(b))) {
-                        blocking.add(new Vec3i(b));
-                        send = true;
-                    }
-                }
-                totalConsumed += 100;
-                if (b.getTileEntity() != null)
-                    totalConsumed += 200;
-            }
-
-            if (send)
-                sendUpdatePacket();
-            if (blocking.size() > 0)
-                return false;
-
-            double actuallyConsumed = drainPower(totalConsumed, true);
-            if (actuallyConsumed < totalConsumed)
-                return false;
-            drainPower(actuallyConsumed, false);
-
-            Timing.SECONDS = 1;
-            structure = new MovingStructure(this, movement.clone(), 1 / (20 * Timing.SECONDS), blocks);
-            // structure.tick(Phase.START);
-            // structure.tick(Phase.END);
-            MovementScheduler.instance().addStructure(structure);
-
-            return true;
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
-        return false;
-    }
-
-    @Override
-    public Set<MotorSetting> getSettings() {
-
-        return settings;
-    }
-
-    @Override
-    public void configure(MotorSetting setting) {
-
-        if (getWorldObj().isRemote) {
-            NetworkHandler.instance().sendToServer(new PacketMotorSetting(this, setting));
-            return;
-        }
-
-        if (settings.contains(setting)) {
-            settings.remove(setting);
-        } else {
-            for (MotorSetting s : setting.related)
-                settings.remove(s);
-            settings.add(setting);
-        }
-
-        sendUpdatePacket();
-
-        onBlockUpdate();
-    }
-
-    private boolean firstTick = true;
-
-    @Override
-    public void updateEntity() {
-
-        if (firstTick) {
-            onFirstTick();
-            firstTick = false;
-        }
-
-        tick();
-    }
-
-    @Override
-    public void tick() {
-
-        if (structure != null && structure.getProgress() >= 1)
-            structure = null;
-
-        if (scheduled) {
-            if (!isWorking() && canWork())
-                if (!move() && !getSettings().contains(MotorSetting.REDSTONE_PULSE))
-                    ThreadBlockChecking.instance().addMotor(this);
-
-            scheduled = false;
-        }
-    }
-
-    @Override
-    public void onFirstTick() {
-
-    }
-
-    public void onBlockUpdate() {
-
-        boolean lastInput = redstoneInput;
-        redstoneInput = RedstoneHelper.getInput(getWorld(), getX(), getY(), getZ()) > 0;
-
-        if ((lastInput != redstoneInput || !getSettings().contains(MotorSetting.REDSTONE_PULSE))
-                && (getSettings().contains(MotorSetting.REDSTONE_INVERTED) ? !redstoneInput : redstoneInput)) {
-            scheduled = true;
-        } else {
-            ThreadBlockChecking.instance().removeMotor(this);
-        }
-    }
-
-    @Override
-    public ForgeDirection getFace() {
-
-        return face;
-    }
-
-    public boolean setFace(ForgeDirection face) {
-
-        this.face = face;
-        sendUpdatePacket();
-        return true;
-    }
-
-    public boolean rotate(ForgeDirection axis) {
-
-        if (getMovement().rotate(this, axis)) {
-            sendUpdatePacket();
-            return true;
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean debug(World world, int x, int y, int z, ForgeDirection face, EntityPlayer player) {
-
-        if (!world.isRemote)
-            return true;
-
-        player.addChatMessage(new ChatComponentText("Power: " + getEnergyBuffer() + "/" + getEnergyBufferSize()));
-        player.addChatMessage(new ChatComponentText("Face: " + getFace().name().toLowerCase()));
-        getMovement().debug(world, x, y, z, face, player);
-
-        return true;
-    }
-
-    public MovingStructure getStructure() {
-
-        return structure;
-    }
-
-    public void setStructure(MovingStructure structure) {
-
-        this.structure = structure;
-    }
-
-    @Override
-    public double getEnergyBufferSize() {
-
-        return powerStorageSize;
-    }
-
-    @Override
-    public double getEnergyBuffer() {
-
-        return storedPower;
-    }
-
-    @Override
-    public double injectPower(double amount, boolean simulated) {
-
-        double injected = Math.min(getEnergyBufferSize() - getEnergyBuffer(), amount);
-
-        if (simulated)
-            return injected;
-
-        storedPower += injected;
-
-        sendUpdatePacket();
-
-        return injected;
-    }
-
-    @Override
-    public double drainPower(double amount, boolean simulated) {
-
-        double drained = Math.min(getEnergyBuffer(), amount);
-
-        if (simulated)
-            return drained;
-
-        storedPower -= drained;
-
-        sendUpdatePacket();
-
-        return drained;
-    }
-
-    // NBT saving and tile updates
-
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-
-        super.writeToNBT(tag);
-
-        tag.setBoolean("redstoneInput", redstoneInput);
-
-        tag.setInteger("face", getFace().ordinal());
-
-        NBTTagCompound movement = new NBTTagCompound();
-        getMovement().writeToNBT(movement);
-        tag.setTag("movement", movement);
-
-        NBTTagList l = new NBTTagList();
-        for (MotorSetting s : settings)
-            l.appendTag(new NBTTagString(s.ordinal() + ""));
-        tag.setTag("settings", l);
-
-        tag.setDouble("power", getEnergyBuffer());
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-
-        super.readFromNBT(tag);
-
-        redstoneInput = tag.getBoolean("redstoneInput");
-
-        face = ForgeDirection.getOrientation(tag.getInteger("face"));
-
-        getMovement().readFromNBT(tag.getCompoundTag("movement"));
-
-        settings.clear();
-        NBTTagList l = tag.getTagList("settings", new NBTTagString().getId());
-        for (int i = 0; i < l.tagCount(); i++)
-            settings.add(MotorSetting.values()[Integer.parseInt(l.getStringTagAt(i))]);
-
-        storedPower = tag.getDouble("power");
-    }
-
-    protected void writeToPacketNBT(NBTTagCompound tag) {
-
-        tag.setInteger("face", getFace().ordinal());
-
-        NBTTagCompound movement = new NBTTagCompound();
-        getMovement().writeToNBT(movement);
-        tag.setTag("movement", movement);
-
-        NBTTagList l = new NBTTagList();
-        for (MotorSetting s : settings)
-            l.appendTag(new NBTTagString(s.ordinal() + ""));
-        tag.setTag("settings", l);
-
-        if (blocking.size() > 0) {
-            NBTTagList blocking = new NBTTagList();
-            for (Vec3i v : this.blocking) {
-                NBTTagCompound t = new NBTTagCompound();
-                t.setInteger("x", v.getX());
-                t.setInteger("y", v.getY());
-                t.setInteger("z", v.getZ());
-                blocking.appendTag(t);
-            }
-            tag.setTag("blocking", blocking);
-        }
-
-        tag.setDouble("power", getEnergyBuffer());
-    }
-
-    protected void readFromPacketNBT(NBTTagCompound tag) {
-
-        face = ForgeDirection.getOrientation(tag.getInteger("face"));
-
-        getMovement().readFromNBT(tag.getCompoundTag("movement"));
-
-        settings.clear();
-        NBTTagList l = tag.getTagList("settings", new NBTTagString().getId());
-        for (int i = 0; i < l.tagCount(); i++)
-            settings.add(MotorSetting.values()[Integer.parseInt(l.getStringTagAt(i))]);
-
-        blocking = new ArrayList<Vec3i>();
-        if (tag.hasKey("blocking")) {
-            NBTTagList blocking = tag.getTagList("blocking", new NBTTagCompound().getId());
-            for (int i = 0; i < blocking.tagCount(); i++) {
-                NBTTagCompound t = blocking.getCompoundTagAt(i);
-                this.blocking.add(new Vec3i(t.getInteger("x"), t.getInteger("y"), t.getInteger("z")));
-            }
-        }
-
-        storedPower = tag.getDouble("power");
-
-        markForRenderUpdate();
-    }
-
-    @Override
-    public Packet getDescriptionPacket() {
-
-        NBTTagCompound tCompound = new NBTTagCompound();
-        writeToPacketNBT(tCompound);
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tCompound);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-
-        readFromPacketNBT(pkt.func_148857_g());
-    }
-
-    protected void sendUpdatePacket() {
-
-        if (!worldObj.isRemote)
-            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-    }
-
-    protected void markForRenderUpdate() {
-
-        if (worldObj != null)
-            worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
-    }
-
-    protected void notifyNeighborBlockUpdate() {
-
-        worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, getBlockType());
-    }
-
-    @Override
-    @Priority(PriorityEnum.OVERRIDE)
-    public BlockMovementType getMovementType(World world, int x, int y, int z, ForgeDirection side, IMovement movement) {
-
-        if (side == getFace())
-            return BlockMovementType.UNMOVABLE;
-
-        return !isWorking() ? BlockMovementType.MOVABLE : BlockMovementType.UNMOVABLE;
-    }
-
-    @Override
-    public boolean startMoving(IMovingBlock block) {
-
-        return false;
-    }
-
-    @Override
-    public boolean finishMoving(IMovingBlock block) {
-
-        return false;
-    }
-
-    @Override
-    public void onUnload() {
-
-        MovingStructure s = getStructure();
-        if (s != null)
-            while (s.getProgress() < 1) {
-                s.tick(Phase.START);
-                s.tick(Phase.END);
-            }
-    }
-
-    public List<Vec3i> getBlocking() {
-
-        return blocking;
-    }
-
-    @Override
-    public void validate() {
-
-        super.validate();
-        MotorCache.onLoad(this);
-    }
-
-    @Override
-    public void invalidate() {
-
-        super.invalidate();
-        MotorCache.onUnload(this);
-        onUnload();
+        return state;
     }
 
 }

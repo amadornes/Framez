@@ -1,0 +1,23 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"textures": {
+			"layer0": "framez:items/motor_upgrade/upg_base_x16"
+		},
+		"model": "forge:item-layer",
+		"transform": "forge:default-item"
+	},
+	"variants": {
+		"normal": [{}],
+		"inventory_camouflage":   [ { "textures": { "layer1": "framez:items/motor_upgrade/camouflage" } } ],
+		"inventory_telekinetic":  [ { "textures": { "layer1": "framez:items/motor_upgrade/telekinetic" } } ],
+		"inventory_advtrigger":   [ { "textures": { "layer1": "framez:items/motor_upgrade/advanced_triggering" } } ],
+		"inventory_crawling":     [ { "textures": { "layer1": "framez:items/motor_upgrade/crawling" } } ],
+		"inventory_speedreg":     [ { "textures": { "layer1": "framez:items/motor_upgrade/speed_regulation" } } ],
+		"inventory_computerized": [ { "textures": { "layer1": "framez:items/motor_upgrade/computerized" } } ],
+		"inventory_stepinterp":   [ { "textures": { "layer1": "framez:items/motor_upgrade/step_interpolation" } } ],
+		"inventory_soundmuffler":   [ { "textures": { "layer1": "framez:items/motor_upgrade/sound_muffler" } } ],
+		"inventory_extrange":   [ { "textures": { "layer1": "framez:items/motor_upgrade/extended_range" } } ],
+		"inventory_creative":   [ { "textures": { "layer1": "framez:items/motor_upgrade/creative" } } ]
+	}
+}

@@ -1,62 +1,43 @@
-// Motors
-tile.framez:motor.name=Slider DC Motor
+itemGroup.framez=Framez
 
-// Wrench modes
-item.framez:wrench.normal.name=Wrench (Normal)
-item.framez:wrench.rotate.name=Wrench (Rotate)
-item.framez:wrench.debug.name=Wrench (Debug)
-item.framez:wrench.config.name=Wrench (Config & Management)
+// ---------------------------------- //
+//               BLOCKS               //
+// ---------------------------------- //
 
-// Main settings GUI
-gui.framez:click_through_frames=Click-through Frames [WIP]
-gui.framez:simple_frames=Simple Frames (2D)
+tile.framez:metamorphic_stone.name=Metamorphic Stone
+tile.framez:metamorphic_stone.cracked.name=Cracked Metamorphic Stone
+tile.framez:metamorphic_stone.bricks.name=Metamorphic Stone Bricks
+tile.framez:metamorphic_stone.water.name=Aqueous Metamorphic Stone
+tile.framez:metamorphic_stone.fire.name=Fiery Metamorphic Stone
+tile.framez:metamorphic_stone.ice.name=Gelid Metamorphic Stone
 
-// Motor settings GUI
-gui.framez:motor.redstone_pulse.0=Move whilst receiving a redstone signal
-gui.framez:motor.redstone_pulse.1=Move once per pulse
-gui.framez:motor.redstone_inverted.0=Normal redstone handling
-gui.framez:motor.redstone_inverted.1=Inverted redstone handling
-gui.framez:motor.solid.0=Not solid (no strong red. transmission)
-gui.framez:motor.solid.1=Solid (strong redstone transmission)
+// ---------------------------------- //
+//               ITEMS                //
+// ---------------------------------- //
 
-// Frame items
-item.framez:frame.name=Support Frame
+item.framez:motor_upgrade.camouflage.name=Camouflage Upgrade
+item.framez:motor_upgrade.telekinetic.name=Telekinetic Upgrade
+item.framez:motor_upgrade.advtrigger.name=Adv. Triggering Upgrade
+item.framez:motor_upgrade.crawling.name=Crawling Upgrade
+item.framez:motor_upgrade.speedreg.name=Speed Regulation Upgrade
+item.framez:motor_upgrade.computerized.name=Computerized Upgrade
+item.framez:motor_upgrade.stepinterp.name=Step Interpolation Upgrade
+item.framez:motor_upgrade.soundmuffler.name=Sound Muffler Upgrade
+item.framez:motor_upgrade.extrange.name=Extended Range Upgrade
+item.framez:motor_upgrade.creative.name=Creative Upgrade
 
-item.framez:frame.wood.name=Wooden Frame
+item.framez:wrench.name=Wrench
 
-item.framez:frame.iron.name=Iron Frame
-item.framez:frame.copper.name=Copper Frame
-item.framez:frame.tin.name=Tin Frame
-item.framez:frame.silver.name=Silver Frame
+// ---------------------------------- //
+//              VARIABLE              //
+// ---------------------------------- //
 
-item.framez:frame.gold.name=Gold Frame
+var.framez:power_stored=Power Stored
+var.framez:power_storage_size=Max. Power Stored
 
-item.framez:frame.bronze.name=Bronze Frame
-item.framez:frame.invar.name=Invar Frame
+// ---------------------------------- //
+//                GUI                 //
+// ---------------------------------- //
 
-item.framez:frame.electrum.name=Electrum Frame
-
-item.framez:frame.enderium.name=Enderium Frame
-
-// Frame modifiers
-tooltip.framez:modifiers=Modifiers
-
-tooltip.framez:modifier.material=Material
-
-tooltip.framez:modifier.wood.name=Wooden
-
-tooltip.framez:modifier.iron.name=Iron
-tooltip.framez:modifier.copper.name=Copper
-tooltip.framez:modifier.tin.name=Tin
-tooltip.framez:modifier.silver.name=Silver
-
-tooltip.framez:modifier.gold.name=Gold
-
-tooltip.framez:modifier.bronze.name=Bronze
-tooltip.framez:modifier.invar.name=Invar
-
-tooltip.framez:modifier.electrum.name=Electrum
-
-tooltip.framez:modifier.enderium.name=Enderium
-
-tooltip.framez:modifier.simple.name=Simple (2D)
+gui.framez:motor.overview=Overview
+gui.framez:motor.speed=Speed Regulation

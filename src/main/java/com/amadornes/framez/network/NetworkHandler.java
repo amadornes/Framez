@@ -1,30 +1,78 @@
 package com.amadornes.framez.network;
 
-import com.amadornes.framez.ref.ModInfo;
+import com.amadornes.framez.ModInfo;
 
-import cpw.mods.fml.relauncher.Side;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
-public class NetworkHandler extends uk.co.qmunity.lib.network.NetworkHandler {
+public class NetworkHandler {
 
-    private static final NetworkHandler instance = new NetworkHandler();
+    public static final NetworkHandler instance = new NetworkHandler(ModInfo.MODID);
 
-    public static NetworkHandler instance() {
+    public final SimpleNetworkWrapper wrapper;
+    private int lastDiscriminator = 0;
 
-        return instance;
+    public NetworkHandler(String modid) {
+
+        wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(modid);
     }
 
-    private NetworkHandler() {
+    public static void init() {
 
-        super(ModInfo.MODID);
+        instance.registerPacket(PacketShowGUI.class, Side.SERVER);
     }
 
-    public void init() {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void registerPacket(Class packetHandler, Class packetType, Side side) {
 
-        registerPacket(PacketStartMoving.class, Side.CLIENT);
-        registerPacket(PacketBlockSync.class, Side.CLIENT);
-        registerPacket(PacketSingleBlockSync.class, Side.CLIENT);
-        registerPacket(PacketWrenchMode.class, Side.SERVER);
-        registerPacket(PacketMotorSetting.class, Side.SERVER);
+        wrapper.registerMessage(packetHandler, packetType, lastDiscriminator++, side);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void registerPacket(Class packetType, Side side) {
+
+        wrapper.registerMessage(packetType, packetType, lastDiscriminator++, side);
+    }
+
+    public void sendToAll(IMessage packet) {
+
+        wrapper.sendToAll(packet);
+    }
+
+    public void sendTo(IMessage packet, EntityPlayerMP player) {
+
+        wrapper.sendTo(packet, player);
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void sendToAllAround(LocatedPacket packet, World world, double range) {
+
+        sendToAllAround(packet, packet.getTargetPoint(world, range));
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void sendToAllAround(LocatedPacket packet, World world) {
+
+        sendToAllAround(packet, packet.getTargetPoint(world, 64));
+    }
+
+    public void sendToAllAround(IMessage packet, NetworkRegistry.TargetPoint point) {
+
+        wrapper.sendToAllAround(packet, point);
+    }
+
+    public void sendToDimension(IMessage packet, int dimensionId) {
+
+        wrapper.sendToDimension(packet, dimensionId);
+    }
+
+    public void sendToServer(IMessage packet) {
+
+        wrapper.sendToServer(packet);
     }
 
 }

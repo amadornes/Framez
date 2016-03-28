@@ -1,0 +1,26 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"textures": {
+		},
+		"model": "cube_all",
+		"transform": "forge:default-block"
+	},
+	"variants": {
+		"type": {
+			"stone":   { "textures": { "all": "framez:blocks/metamorphic_stone/stone" } },
+			"cracked": { "textures": { "all": "framez:blocks/metamorphic_stone/cracked" } },
+			"brick":   { "textures": { "all": "framez:blocks/metamorphic_stone/bricks" } },
+			"water":   { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } },
+			"fire":    { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } },
+			"ice":     { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } }
+		},
+		"normal": [{}],
+		"inventory0": [ { "textures": { "all": "framez:blocks/metamorphic_stone/stone" } } ],
+		"inventory1": [ { "textures": { "all": "framez:blocks/metamorphic_stone/cracked" } } ],
+		"inventory2": [ { "textures": { "all": "framez:blocks/metamorphic_stone/bricks" } } ],
+		"inventory3": [ { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } } ],
+		"inventory4": [ { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } } ],
+		"inventory5": [ { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } } ]
+	}
+}

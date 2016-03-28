@@ -1,61 +1,108 @@
 package com.amadornes.framez.util;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
-import com.amadornes.framez.api.modifier.IFrameModifier;
-import com.amadornes.framez.api.movement.IFrame;
+import com.amadornes.framez.api.motor.IMotorVariable;
+
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 
 public class FramezUtils {
 
-    public static boolean hasModifier(IFrame frame, IFrameModifier mod) {
+    public static void spawnItemInWorld(World world, ItemStack itemStack, double x, double y, double z) {
 
-        return hasModifier(frame.getModifiers(), mod);
+        if (world.isRemote) return;
+        try {
+            float dX = world.rand.nextFloat() * 0.8F + 0.1F;
+            float dY = world.rand.nextFloat() * 0.8F + 0.1F;
+            float dZ = world.rand.nextFloat() * 0.8F + 0.1F;
+
+            EntityItem entityItem = new EntityItem(world, x + dX, y + dY, z + dZ,
+                    new ItemStack(itemStack.getItem(), itemStack.stackSize, itemStack.getItemDamage()));
+
+            if (itemStack.hasTagCompound()) {
+                entityItem.getEntityItem().setTagCompound((NBTTagCompound) itemStack.getTagCompound().copy());
+            }
+
+            float factor = 0.05F;
+            entityItem.motionX = world.rand.nextGaussian() * factor;
+            entityItem.motionY = world.rand.nextGaussian() * factor + 0.2F;
+            entityItem.motionZ = world.rand.nextGaussian() * factor;
+            world.spawnEntityInWorld(entityItem);
+            itemStack.stackSize = 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
-    public static boolean hasModifier(IFrame frame, Class<? extends IFrameModifier> mod) {
+    /**
+     * This method takes one very long string, and cuts it into lines which have a maxCharPerLine and returns it in a String list. it also
+     * preserves color formats. \n can be used to force a carriage return.
+     *
+     * @author MineMaarten (PneumaticCraft)
+     */
+    public static List<String> split(String text, int maxCharsPerLine) {
 
-        return hasModifier(frame.getModifiers(), mod);
+        StringTokenizer tok = new StringTokenizer(text, " ");
+        StringBuilder output = new StringBuilder(text.length());
+        List<String> textList = new ArrayList<String>();
+        String color = "";
+        int lineLen = 0;
+        while (tok.hasMoreTokens()) {
+            String word = tok.nextToken();
+            boolean doAppend = true;
+            if (word.contains("\u00a7")) {
+                for (int i = 0; i < word.length() - 1; i++) {
+                    if (word.substring(i, i + 2).contains("\u00a7")) {
+                        color = word.substring(i, i + 2);
+                        lineLen -= 2;
+                    }
+                }
+            }
+            if (lineLen + word.length() > maxCharsPerLine || word.contains("\\n")) {
+                if (word.contains("\\n")) {
+                    if (lineLen > 0) output.append(" ");
+                    for (int i = 0; i < word.length(); i++) {
+                        char c = word.charAt(i);
+                        if (c == '\\' && i + 1 < word.length() && Character.toLowerCase(word.charAt(i + 1)) == 'n') {
+                            textList.add(output.toString());
+                            output.delete(0, output.length());
+                            output.append(color);
+                            i++;
+                            lineLen = 0;
+                        } else {
+                            output.append(c);
+                            doAppend = false;
+                            lineLen++;
+                        }
+                    }
+                } else {
+                    textList.add(output.toString());
+                    output.delete(0, output.length());
+                    output.append(color);
+                    lineLen = 0;
+                }
+            } else if (lineLen > 0) {
+                output.append(" ");
+                lineLen++;
+            }
+            if (doAppend) {
+                output.append(word);
+                lineLen += word.length();
+            }
+        }
+        textList.add(output.toString());
+        return textList;
     }
 
-    public static boolean hasModifier(IFrame frame, String mod) {
+    @SuppressWarnings("unchecked")
+    public static <T> String valueToString(IMotorVariable<T> var, Object value) {
 
-        return hasModifier(frame.getModifiers(), mod);
-    }
-
-    public static boolean hasModifier(Collection<? extends IFrameModifier> mods, IFrameModifier mod) {
-
-        if (mods == null)
-            return false;
-
-        for (IFrameModifier m : mods)
-            if (m.equals(mod))
-                return true;
-
-        return false;
-    }
-
-    public static boolean hasModifier(Collection<? extends IFrameModifier> mods, Class<? extends IFrameModifier> mod) {
-
-        if (mods == null)
-            return false;
-
-        for (IFrameModifier m : mods)
-            if (m.getClass().equals(mod))
-                return true;
-
-        return false;
-    }
-
-    public static boolean hasModifier(Collection<? extends IFrameModifier> mods, String mod) {
-
-        if (mods == null)
-            return false;
-
-        for (IFrameModifier m : mods)
-            if (m.getType().equals(mod))
-                return true;
-
-        return false;
+        return var.valueToString((T) value);
     }
 
 }
