@@ -90,16 +90,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     @Override
     public void update() {
 
-        if (!getMotorWorld().isRemote && triggers.get(EnumMotorAction.MOVE_FORWARD).isActive()) {
-            Set<BlockPos> positions = MotorHelper.findMovedBlocks(getMotorWorld(), getMotorPos(), logic.getFace());
-            try {
-                if (logic.canMove(positions)
-                        && logic.getConsumedEnergy(positions, getVariable(TileMotor.MOVEMENT_TIME)) <= getVariable(TileMotor.POWER_STORED))
-                    logic.move(positions);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+        if (!getMotorWorld().isRemote && triggers.get(EnumMotorAction.MOVE_FORWARD).isActive()) move();
     }
 
     public Class<? extends TileMotor> getBaseClass() {
@@ -123,6 +114,28 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public DynamicReference<TileMotor> getSafeReference() {
 
         return reference;
+    }
+
+    private long lastMoveCheck = 0;
+    private boolean couldMove = false;
+    private Set<BlockPos> movedBlockPositions = null;
+
+    @Override
+    public boolean canMove() {
+
+        if (lastMoveCheck == getWorld().getTotalWorldTime()) return couldMove;
+
+        lastMoveCheck = getWorld().getTotalWorldTime();
+        movedBlockPositions = MotorHelper.findMovedBlocks(getMotorWorld(), getMotorPos(), logic.getFace());
+        return couldMove = logic.canMove(movedBlockPositions) && logic.getConsumedEnergy(movedBlockPositions,
+                getVariable(TileMotor.MOVEMENT_TIME)) <= getVariable(TileMotor.POWER_STORED);
+    }
+
+    @Override
+    public DynamicReference<Boolean> move() {
+
+        if (canMove()) return logic.move(movedBlockPositions);
+        return new DynamicReference<Boolean>(false);
     }
 
     @Override

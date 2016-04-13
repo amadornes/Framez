@@ -16,6 +16,10 @@ public interface IMotor {
 
     public DynamicReference<? extends IMotor> getSafeReference();
 
+    public boolean canMove();
+
+    public DynamicReference<Boolean> move();
+
     public IMotorTrigger getTrigger(EnumMotorAction action);
 
     public int getUpgradeSlots();
