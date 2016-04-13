@@ -24,6 +24,12 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     }
 
     @Override
+    public TileMotor getMotor() {
+
+        return motor.get();
+    }
+
+    @Override
     public void setMotor(DynamicReference<TileMotor> motor) {
 
         this.motor = motor;

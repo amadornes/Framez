@@ -1,0 +1,16 @@
+{
+    "textures": {
+    },
+    "elements":[
+    	{
+			"from": [ 6.01, -0.01, 6.01 ],
+			"to": [ 10.01, 16.01, 10.01 ],
+			"faces": {
+				"north": { "texture": "#rod" },
+				"south": { "texture": "#rod" },
+				"west":  { "texture": "#rod" },
+				"east":  { "texture": "#rod" }
+			}
+    	}
+    ]
+}

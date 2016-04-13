@@ -4,11 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.vecmath.Matrix4f;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.amadornes.framez.api.frame.EnumFrameTexture;
 import com.amadornes.framez.api.frame.IFrameMaterial;
 import com.amadornes.framez.client.ClientProxy;
@@ -20,7 +15,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -29,12 +23,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.client.model.IFlexibleBakedModel;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.client.model.ISmartItemModel;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 @SuppressWarnings("deprecation")
-public class ModelFrame implements ISmartMultipartModel, ISmartItemModel, IPerspectiveAwareModel {
+public class ModelFrame implements ISmartMultipartModel, ISmartItemModel, IFlexibleBakedModel {
 
     private final boolean[] properties;
     private final IFrameMaterial[] materials;
@@ -132,13 +125,6 @@ public class ModelFrame implements ISmartMultipartModel, ISmartItemModel, IPersp
     public VertexFormat getFormat() {
 
         return ((IFlexibleBakedModel) ClientProxy.MODEL_FRAME_ORIGINAL).getFormat();
-    }
-
-    @Override
-    public Pair<? extends IFlexibleBakedModel, Matrix4f> handlePerspective(TransformType cameraTransformType) {
-
-        Matrix4f mat = ((IPerspectiveAwareModel) ClientProxy.MODEL_FRAME_ORIGINAL).handlePerspective(cameraTransformType).getRight();
-        return new ImmutablePair<IFlexibleBakedModel, Matrix4f>(this, mat);
     }
 
     @Override

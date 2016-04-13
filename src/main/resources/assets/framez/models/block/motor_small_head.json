@@ -8,10 +8,10 @@
 			"faces": {
 				"down":  { "texture": "#border" },
 				"up":    { "texture": "#border" },
-				"north": { "texture": "#border_la", "cullface": "north" },
-				"south": { "texture": "#border_la", "cullface": "south" },
-				"west":  { "texture": "#border_la", "cullface": "west" },
-				"east":  { "texture": "#border_la", "cullface": "east" }
+				"north": { "texture": "#border_la" },
+				"south": { "texture": "#border_la" },
+				"west":  { "texture": "#border_la" },
+				"east":  { "texture": "#border_la" }
 			}
     	},
     	{

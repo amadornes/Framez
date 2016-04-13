@@ -1,6 +1,8 @@
 package com.amadornes.framez.client;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.IntFunction;
 
 import org.lwjgl.input.Keyboard;
@@ -14,8 +16,13 @@ import com.amadornes.framez.client.model.ModelFramePanel;
 import com.amadornes.framez.client.model.ModelWrapperCamouflage;
 import com.amadornes.framez.client.render.FTESRMotor;
 import com.amadornes.framez.frame.FrameRegistry;
+import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.tile.TileMotor;
+import com.google.common.collect.Maps;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -64,12 +71,14 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public void onModelBake(ModelBakeEvent event) {
 
-        ModelResourceLocation res = new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "motor"), "normal");
-        event.modelRegistry.putObject(res, new ModelWrapperCamouflage(event.modelRegistry.getObject(res)));
+        for (IBlockState state : FramezBlocks.motor.getBlockState().getValidStates()) {
+            ModelResourceLocation res = getModelResourceLocation(state);
+            event.modelRegistry.putObject(res, new ModelWrapperCamouflage(event.modelRegistry.getObject(res)));
+        }
 
         event.modelRegistry.putObject(new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "multipart"),
                 new ModelFrame());
-        res = new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "inventory");
+        ModelResourceLocation res = new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "inventory");
         MODEL_FRAME_ORIGINAL = event.modelRegistry.getObject(res);
         event.modelRegistry.putObject(res, new ModelFrame());
 
@@ -132,6 +141,37 @@ public class ClientProxy extends CommonProxy {
     public boolean isAltDown() {
 
         return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private ModelResourceLocation getModelResourceLocation(IBlockState state) {
+
+        return new ModelResourceLocation(Block.blockRegistry.getNameForObject(state.getBlock()).toString(),
+                getPropertyString(Maps.<IProperty, Comparable> newLinkedHashMap(state.getProperties())));
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private String getPropertyString(Map<IProperty, Comparable> p_178131_1_) {
+
+        StringBuilder stringbuilder = new StringBuilder();
+
+        for (Entry<IProperty, Comparable> entry : p_178131_1_.entrySet()) {
+            if (stringbuilder.length() != 0) {
+                stringbuilder.append(",");
+            }
+
+            IProperty iproperty = entry.getKey();
+            Comparable comparable = entry.getValue();
+            stringbuilder.append(iproperty.getName());
+            stringbuilder.append("=");
+            stringbuilder.append(iproperty.getName(comparable));
+        }
+
+        if (stringbuilder.length() == 0) {
+            stringbuilder.append("normal");
+        }
+
+        return stringbuilder.toString();
     }
 
 }

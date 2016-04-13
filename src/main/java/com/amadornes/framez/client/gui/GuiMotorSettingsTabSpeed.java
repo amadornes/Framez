@@ -14,7 +14,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
 
-    private final DecimalFormat format = new DecimalFormat("#######0.0");
+    private final DecimalFormat format = new DecimalFormat("#######0.000");
 
     private GuiButton button;
     private boolean dragging = false;
@@ -53,7 +53,7 @@ public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
         GlStateManager.pushMatrix();
         GlStateManager.translate(left + 42, top + 45.5, 0);
         GlStateManager.scale(0.75, 0.75, 1.0);
-        drawCenteredString(fontRendererObj, format.format(motor.get().getVariable(TileMotor.MOVEMENT_TIME)), 0, 0, 0xFFFFFFFF);
+        drawCenteredString(fontRendererObj, format.format(motor.get().getVariable(TileMotor.MOVEMENT_TIME)) + "s", 0, 0, 0xFFFFFFFF);
         GlStateManager.popMatrix();
 
         GlStateManager.pushMatrix();
@@ -84,7 +84,7 @@ public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
         if (dragging) {
             button.xPosition = Math.min(Math.max(left + 13, mouseX - xOff), left + xSize - 21);
             double movementTime = ((button.xPosition - (left + 13D)) / (xSize - 34)) * 60D;
-            movementTime = Math.round(movementTime * 10D) / 10D;
+            movementTime = Math.round(movementTime * 1000D) / 1000D;
             motor.get().nativeVariables.put(TileMotor.MOVEMENT_TIME, movementTime);
         }
     }

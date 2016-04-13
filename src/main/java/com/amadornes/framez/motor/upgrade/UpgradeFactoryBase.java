@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.IMotor;
+import com.amadornes.framez.api.motor.IMotorInteractions;
 import com.amadornes.framez.api.motor.IMotorUpgrade;
 import com.amadornes.framez.api.motor.IMotorUpgradeFactory;
 import com.amadornes.jtraits.JTrait;
@@ -17,11 +18,11 @@ public class UpgradeFactoryBase implements IMotorUpgradeFactory {
 
     private String type;
     private IMotorUpgradeCreatorInt creator;
-    private Class<? extends JTrait<? extends IMotor>> trait;
+    private Class<? extends JTrait<? extends IMotorInteractions>> trait;
 
     private ItemStack stack;
 
-    public UpgradeFactoryBase(String type, IMotorUpgradeCreatorInt creator, Class<? extends JTrait<? extends IMotor>> trait) {
+    public UpgradeFactoryBase(String type, IMotorUpgradeCreatorInt creator, Class<? extends JTrait<? extends IMotorInteractions>> trait) {
 
         this.type = type;
         this.creator = creator;
@@ -79,7 +80,7 @@ public class UpgradeFactoryBase implements IMotorUpgradeFactory {
     }
 
     @Override
-    public Class<? extends JTrait<? extends IMotor>> getTrait() {
+    public Class<? extends JTrait<? extends IMotorInteractions>> getTrait() {
 
         return trait;
     }

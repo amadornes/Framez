@@ -4,6 +4,7 @@
 		"textures": {
 	        "border": "framez:blocks/motor/border",
 	        "border_la": "framez:blocks/motor/border_la",
+	        "rod": "framez:blocks/motor/rod",
 	        "center": "framez:blocks/motor/center",
 	        "particle": "framez:blocks/motor/center"
 		},
@@ -12,12 +13,9 @@
 	},
 	"variants": {
 		"normal": [{}],
-		"type=0": [{
-			"model": "framez:motor_linear_actuator",
-			"submodel": {
-				"head": { "model": "framez:motor_linear_actuator_head" }
-			}
-		}],
+		"part=0,type=0": [{ "model": "framez:motor_small_body" }],
+		"part=1,type=0": [{ "model": "framez:motor_small_head" }],
+		"part=2,type=0": [{ "model": "framez:motor_small_rod" }],
 		"inventory": [{}]
 	}
 }

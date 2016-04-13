@@ -26,6 +26,8 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     public EnumFacing getFace();
 
+    public TileMotor getMotor();
+
     public void setMotor(DynamicReference<TileMotor> motor);
 
     public boolean rotate(EnumFacing axis);

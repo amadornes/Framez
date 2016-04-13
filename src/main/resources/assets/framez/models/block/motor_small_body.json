@@ -6,7 +6,7 @@
 			"from": [ -0.01, 3.99, -0.01 ],
 			"to": [ 16.01, 16.01, 16.01 ],
 			"faces": {
-				"down":  { "texture": "#border", "cullface": "down" },
+				"down":  { "texture": "#border" },
 				"up":    { "texture": "#border", "cullface": "up" },
 				"north": { "texture": "#border_la", "cullface": "north" },
 				"south": { "texture": "#border_la", "cullface": "south" },

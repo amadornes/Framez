@@ -1,0 +1,29 @@
+package com.amadornes.framez.api.motor;
+
+import java.util.Map.Entry;
+
+import com.amadornes.framez.api.DynamicReference;
+
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
+
+public interface IMotor {
+
+    public World getMotorWorld();
+
+    public BlockPos getMotorPos();
+
+    public DynamicReference<? extends IMotor> getSafeReference();
+
+    public IMotorTrigger getTrigger(EnumMotorAction action);
+
+    public int getUpgradeSlots();
+
+    public Entry<IMotorUpgrade, ItemStack> getUpgrade(int slot);
+
+    public boolean checkStatus(EnumMotorStatus status);
+
+    public <T> T getVariable(IMotorVariable<T> variable);
+
+}

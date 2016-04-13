@@ -29,6 +29,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 public class BlockMotor extends Block implements ITileEntityProvider {
 
     public static final IProperty<Integer> PROPERTY_LOGIC_TYPE = PropertyInteger.create("type", 0, IMotorLogic.TYPES.length);
+    public static final IProperty<Integer> PROPERTY_PART_TYPE = PropertyInteger.create("part", 0, 2);
     public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_DOWN = new PropertyCamouflage("camo_down");
     public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_UP = new PropertyCamouflage("camo_up");
     public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_NORTH = new PropertyCamouflage("camo_north");
@@ -78,15 +79,15 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     @Override
     protected BlockState createBlockState() {
 
-        return new ExtendedBlockState(this, new IProperty[] { PROPERTY_LOGIC_TYPE }, new IUnlistedProperty[] { PROPERTY_CAMO_DOWN,
-                PROPERTY_CAMO_UP, PROPERTY_CAMO_NORTH, PROPERTY_CAMO_SOUTH, PROPERTY_CAMO_WEST, PROPERTY_CAMO_EAST });
+        return new ExtendedBlockState(this, new IProperty[] { PROPERTY_LOGIC_TYPE, PROPERTY_PART_TYPE }, new IUnlistedProperty[] {
+                PROPERTY_CAMO_DOWN, PROPERTY_CAMO_UP, PROPERTY_CAMO_NORTH, PROPERTY_CAMO_SOUTH, PROPERTY_CAMO_WEST, PROPERTY_CAMO_EAST });
     }
 
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
 
         TileEntity te = world.getTileEntity(pos);
-        if (te != null && te instanceof TileMotor) return ((TileMotor) te).getActualState(state);
+        if (te != null && te instanceof TileMotor) return ((TileMotor) te).getActualState(state.withProperty(PROPERTY_PART_TYPE, 0));
         return state;
     }
 
@@ -107,7 +108,7 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     @Override
     public IBlockState getStateFromMeta(int meta) {
 
-        return getDefaultState().withProperty(PROPERTY_LOGIC_TYPE, meta);
+        return getDefaultState().withProperty(PROPERTY_LOGIC_TYPE, meta).withProperty(PROPERTY_PART_TYPE, 0);
     }
 
     @Override
