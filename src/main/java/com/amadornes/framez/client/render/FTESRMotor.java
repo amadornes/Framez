@@ -1,7 +1,7 @@
 package com.amadornes.framez.client.render;
 
 import com.amadornes.framez.Framez;
-import com.amadornes.framez.motor.IMotorLogic;
+import com.amadornes.framez.motor.logic.IMotorLogic;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.client.renderer.WorldRenderer;

@@ -1,17 +1,14 @@
 package com.amadornes.framez.item;
 
-import com.amadornes.framez.ModInfo;
-
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemWrench extends Item {
+public class ItemWrench extends ItemFramez {
 
     public ItemWrench() {
 
-        setUnlocalizedName(ModInfo.MODID + ":wrench");
+        super("wrench");
     }
 
     @Override

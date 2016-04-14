@@ -21,17 +21,17 @@ import com.amadornes.framez.api.motor.IMotorUpgrade;
 import com.amadornes.framez.api.motor.IMotorUpgradeFactory;
 import com.amadornes.framez.api.motor.IMotorVariable;
 import com.amadornes.framez.block.BlockMotor;
-import com.amadornes.framez.motor.IMotorLogic;
 import com.amadornes.framez.motor.MotorHelper;
-import com.amadornes.framez.motor.MotorLogicLinearActuator;
 import com.amadornes.framez.motor.MotorTriggerConstant;
 import com.amadornes.framez.motor.MotorTriggerRedstone;
 import com.amadornes.framez.motor.SimpleMotorVariable;
+import com.amadornes.framez.motor.logic.IMotorLogic;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ITickable;
@@ -67,12 +67,12 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
         if (reference == null) {
             this.reference = new DynamicReference<TileMotor>(this);
-            this.logic = new MotorLogicLinearActuator();// TODO: Set to null here
+            this.logic = null;
         } else {
             this.reference = reference;
             this.logic = reference.get().logic;
         }
-        this.logic.setMotor(this.reference);
+        if (this.logic != null) this.logic.setMotor(this.reference);
 
         triggers.put(EnumMotorAction.MOVE_FORWARD, new MotorTriggerRedstone(this, false));
         triggers.put(EnumMotorAction.STOP, new MotorTriggerRedstone(this, true));
@@ -96,6 +96,13 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public Class<? extends TileMotor> getBaseClass() {
 
         return TileMotor.class;
+    }
+
+    public TileMotor setLogic(IMotorLogic logic) {
+
+        this.logic = logic;
+        this.logic.setMotor(this.reference);
+        return this;
     }
 
     @Override
@@ -256,7 +263,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
     public IBlockState getActualState(IBlockState state) {
 
-        return state.withProperty(BlockMotor.PROPERTY_LOGIC_TYPE, logic.getID());
+        return state.withProperty(BlockMotor.PROPERTY_LOGIC_TYPE, logic == null ? 0 : logic.getID());
     }
 
     public IExtendedBlockState getExtendedState(IExtendedBlockState state) {
@@ -277,6 +284,29 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
             }
         }
         return state;
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound tag) {
+
+        super.writeToNBT(tag);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+
+        super.readFromNBT(tag);
+    }
+
+    @Override
+    public void markDirty() {
+
+        if (getWorld() != null) {
+            Class<? extends IMotorLogic> logicClass = IMotorLogic.TYPES[getBlockMetadata()];
+            if (getLogic() == null || logicClass.isAssignableFrom(getLogic().getClass())) {
+                setLogic(IMotorLogic.create(getBlockMetadata()));
+            }
+        }
     }
 
 }

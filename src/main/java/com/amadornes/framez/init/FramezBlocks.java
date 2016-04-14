@@ -7,6 +7,8 @@ import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.block.BlockMetamorphicStone;
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.item.ItemBlockMetamorphicStone;
+import com.amadornes.framez.item.ItemBlockMotor;
+import com.amadornes.framez.motor.logic.IMotorLogic;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.block.Block;
@@ -27,20 +29,22 @@ public class FramezBlocks {
 
     public static void register() {
 
-        registerBlock(motor, "motor");
+        registerBlock(motor, ItemBlockMotor.class, "motor", IMotorLogic.TYPES.length);
         GameRegistry.registerTileEntity(TileMotor.class, ModInfo.MODID + ":motor");
-        // TODO: Update model registration
-        registerBlock(metamorphic_stone, ItemBlockMetamorphicStone.class, "metamorphic_stone", 0, 1, 2, 3, 4, 5);
+        registerBlock(metamorphic_stone, ItemBlockMetamorphicStone.class, "metamorphic_stone", 6);
     }
 
-    private static void registerBlock(Block block, String name, int... variants) {
+    @SuppressWarnings("unused")
+    private static void registerBlock(Block block, String name, int variants) {
 
         registerBlock(block, ItemBlock.class, name, variants);
     }
 
-    private static void registerBlock(Block block, Class<? extends ItemBlock> itemblock, String name, int... variants) {
+    private static void registerBlock(Block block, Class<? extends ItemBlock> itemblock, String name, int variants) {
 
-        registerBlock(block, itemblock, name, i -> i + "", variants);
+        int[] vars = new int[variants];
+        for (int i = 0; i < variants; vars[i] = i++);
+        registerBlock(block, itemblock, name, i -> i + "", vars);
     }
 
     private static void registerBlock(Block block, Class<? extends ItemBlock> itemblock, String name, IntFunction<String> i2s,

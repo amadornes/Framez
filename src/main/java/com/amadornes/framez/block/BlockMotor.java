@@ -2,7 +2,7 @@ package com.amadornes.framez.block;
 
 import com.amadornes.framez.client.gui.GuiMotorSettings;
 import com.amadornes.framez.init.FramezItems;
-import com.amadornes.framez.motor.IMotorLogic;
+import com.amadornes.framez.motor.logic.IMotorLogic;
 import com.amadornes.framez.tile.TileMotor;
 import com.amadornes.framez.util.PropertyCamouflage;
 
@@ -47,7 +47,7 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
 
-        return new TileMotor();
+        return new TileMotor().setLogic(IMotorLogic.create(meta));
     }
 
     @Override
@@ -137,6 +137,12 @@ public class BlockMotor extends Block implements ITileEntityProvider {
 
         // Full block? I guess? Meh, who cares
         return false;
+    }
+
+    @Override
+    public int damageDropped(IBlockState state) {
+
+        return getMetaFromState(state);
     }
 
 }

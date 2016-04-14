@@ -3,7 +3,7 @@ package com.amadornes.framez.client.render;
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.client.ModelTransformer;
 import com.amadornes.framez.client.ModelTransformer.IVertexTransformer;
-import com.amadornes.framez.motor.MotorLogicLinearActuator;
+import com.amadornes.framez.motor.logic.MotorLogicLinearActuator;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.block.state.IBlockState;

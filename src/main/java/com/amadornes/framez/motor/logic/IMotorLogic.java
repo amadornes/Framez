@@ -1,4 +1,4 @@
-package com.amadornes.framez.motor;
+package com.amadornes.framez.motor.logic;
 
 import java.util.Set;
 
@@ -13,9 +13,19 @@ import net.minecraftforge.common.util.INBTSerializable;
 public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     @SuppressWarnings("unchecked")
-    public static final Class<IMotorLogic>[] TYPES = new Class[] { MotorLogicLinearActuator.class };
-    public static final String[] TYPE_NAMES = new String[] { "linear_actuator" };
-    public static final String[] TYPE_FTESRS = new String[] { "RenderLinearActuator" };
+    public static final Class<IMotorLogic>[] TYPES = new Class[] { MotorLogicLinearActuator.class, MotorLogicRotator.class };
+    public static final String[] TYPE_NAMES = new String[] { "linear_actuator", "rotator" };
+    public static final String[] TYPE_FTESRS = new String[] { "RenderLinearActuator", "RenderRotator" };
+
+    public static IMotorLogic create(int meta) {
+
+        try {
+            return TYPES[meta].newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public default int getID() {
 

@@ -1,6 +1,6 @@
 package com.amadornes.framez.client.render;
 
-import com.amadornes.framez.motor.IMotorLogic;
+import com.amadornes.framez.motor.logic.IMotorLogic;
 
 import net.minecraft.client.renderer.WorldRenderer;
 

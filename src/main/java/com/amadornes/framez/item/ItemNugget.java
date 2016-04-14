@@ -3,20 +3,17 @@ package com.amadornes.framez.item;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.amadornes.framez.ModInfo;
-
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public class ItemNugget extends Item {
+public class ItemNugget extends ItemFramez {
 
     public static List<String> NUGGET_TYPES = new ArrayList<String>();
 
     public ItemNugget() {
 
-        setUnlocalizedName(ModInfo.MODID + ":nugget");
-
+        super("nugget");
         NUGGET_TYPES.add("iron");
     }
 

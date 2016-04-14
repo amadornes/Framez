@@ -14,7 +14,19 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-public class ItemFrame extends ItemMultiPart {
+public class ItemFrame extends ItemMultiPart implements IFramezItem {
+
+    @Override
+    public String getName() {
+
+        return "frame";
+    }
+
+    @Override
+    public boolean isBlock() {
+
+        return false;
+    }
 
     @Override
     public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {

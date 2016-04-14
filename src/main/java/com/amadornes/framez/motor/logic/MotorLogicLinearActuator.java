@@ -1,4 +1,4 @@
-package com.amadornes.framez.motor;
+package com.amadornes.framez.motor.logic;
 
 import java.util.Set;
 

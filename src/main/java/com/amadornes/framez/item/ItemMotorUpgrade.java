@@ -3,7 +3,6 @@ package com.amadornes.framez.item;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.api.motor.IMotorUpgradeFactory;
 import com.amadornes.framez.motor.MotorRegistry;
 import com.amadornes.framez.util.ICapabiltyLambda;
@@ -13,11 +12,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class ItemMotorUpgrade extends Item {
+public class ItemMotorUpgrade extends ItemFramez {
 
     public ItemMotorUpgrade() {
 
-        setUnlocalizedName(ModInfo.MODID + ":motor_upgrade");
+        super("motor_upgrade");
     }
 
     @Override
