@@ -5,6 +5,7 @@ import javax.vecmath.Vector3f;
 
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.client.ModelTransformer;
+import com.amadornes.framez.client.ModelTransformer.IVertexFormatTransformer;
 import com.amadornes.framez.client.ModelTransformer.IVertexTransformer;
 import com.amadornes.framez.motor.logic.MotorLogicRotator;
 import com.amadornes.framez.tile.TileMotor;
@@ -32,54 +33,32 @@ public class RenderRotator extends RenderMotor<MotorLogicRotator> {
         wr.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
         state = motor.getMotorWorld().getBlockState(pos);
         state = state.getBlock().getActualState(state, motor.getMotorWorld(), pos).withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
+        IVertexTransformer transformer = new IVertexTransformer() {
+
+            @Override
+            public float[] transform(EnumType type, EnumUsage usage, float... data) {
+
+                if (usage == EnumUsage.POSITION) {
+                    Vector3f pos = new Vector3f(data);
+                    pos.sub(new Vector3f(0.5F, 0.5F, 0.5F));
+                    Matrix4f mat = new Matrix4f();
+                    mat.rotY((float) Math.toRadians(angle));
+                    mat.transform(pos);
+                    pos.add(new Vector3f(0.5F, 0.5F, 0.5F));
+                    pos.get(data);
+                }
+
+                return data;
+            }
+        };
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),
-                ModelTransformer.transform(brd.getBlockModelShapes().getModelForState(state), new IVertexTransformer() {
-
-                    @Override
-                    public float[] transform(EnumType type, EnumUsage usage, float... data) {
-
-                        if (usage == EnumUsage.POSITION) {
-                            Vector3f pos = new Vector3f(data);
-                            pos.sub(new Vector3f(0.5F, 0.5F, 0.5F));
-                            Matrix4f mat = new Matrix4f();
-                            mat.rotY((float) Math.toRadians(angle));
-                            mat.transform(pos);
-                            pos.add(new Vector3f(0.5F, 0.5F, 0.5F));
-                            pos.get(data);
-                            // if (data[1] <= 0.0) {
-                            // data[1] = 0.25F;
-                            // } else if (data[1] >= 1.0) {
-                            // data[1] = (float) (0.25F - extension);
-                            // }
-                        }
-
-                        return data;
-                    }
-                }, wr.getVertexFormat()), state, pos, wr);
-        brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(), ModelTransformer
-                .transform(brd.getBlockModelShapes().getModelForState(Blocks.sandstone.getDefaultState()), new IVertexTransformer() {
-
-                    @Override
-                    public float[] transform(EnumType type, EnumUsage usage, float... data) {
-
-                        if (usage == EnumUsage.POSITION) {
-                            Vector3f pos = new Vector3f(data);
-                            pos.sub(new Vector3f(0.5F, 0.5F, 0.5F));
-                            Matrix4f mat = new Matrix4f();
-                            mat.rotY((float) Math.toRadians(angle));
-                            mat.transform(pos);
-                            pos.add(new Vector3f(0.5F, 0.5F, 0.5F));
-                            pos.get(data);
-                            // if (data[1] <= 0.0) {
-                            // data[1] = 0.25F;
-                            // } else if (data[1] >= 1.0) {
-                            // data[1] = (float) (0.25F - extension);
-                            // }
-                        }
-
-                        return data;
-                    }
-                }, wr.getVertexFormat()), Blocks.sandstone.getDefaultState(), pos.down(), wr);
+                ModelTransformer.transform(brd.getBlockModelShapes().getModelForState(state), transformer,
+                        IVertexFormatTransformer.COMPUTE_NORMALS, wr.getVertexFormat()),
+                state, pos, wr);
+        brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),
+                ModelTransformer.transform(brd.getBlockModelShapes().getModelForState(Blocks.sandstone.getDefaultState()), transformer,
+                        IVertexFormatTransformer.COMPUTE_NORMALS, wr.getVertexFormat()),
+                Blocks.sandstone.getDefaultState(), pos.down(), wr);
 
         wr.setTranslation(0, 0, 0);
     }

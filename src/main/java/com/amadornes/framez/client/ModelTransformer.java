@@ -1,5 +1,6 @@
 package com.amadornes.framez.client;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -9,16 +10,18 @@ import javax.vecmath.Vector3f;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.client.model.IColoredBakedQuad;
 import net.minecraftforge.client.model.IFlexibleBakedModel;
-import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 @SuppressWarnings({ "deprecation", "unchecked" })
 public class ModelTransformer {
@@ -31,71 +34,42 @@ public class ModelTransformer {
     public static IBakedModel transform(IBakedModel model, IVertexTransformer transformer, IVertexFormatTransformer vfTransformer,
             VertexFormat original) {
 
-        VertexFormat format = vfTransformer.getNewFormat(original);
-        int[] map = LightUtil.mapFormats(original, format);
+        VertexFormat newFormat = vfTransformer.getNewFormat(original);
         List<BakedQuad>[] quads = new List[7];
         for (int i = 0; i < quads.length; i++) {
             quads[i] = new ArrayList<BakedQuad>();
             for (BakedQuad quad : (i == 6 ? model.getGeneralQuads() : model.getFaceQuads(EnumFacing.getFront(i))))
-                quads[i].add(transform(quad, transformer, vfTransformer, original, format, map));
+                quads[i].add(transform(quad, transformer, vfTransformer, original, newFormat));
         }
-        return new TransformedModel(model, quads, format);
+        return new TransformedModel(model, quads, newFormat);
     }
 
     private static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer, IVertexFormatTransformer vfTransformer,
-            final VertexFormat original, final VertexFormat format, int[] map) {
+            final VertexFormat original, final VertexFormat format) {
 
-        final float[][][] unpackedData = new float[4][original.getElementCount()][4];
-        quad.pipe(new IVertexConsumer() {
-
-            int vertices = 0;
-            int elements = 0;
-
-            @Override
-            public void setQuadTint(int tint) {
-
-            }
-
-            @Override
-            public void setQuadOrientation(EnumFacing orientation) {
-
-            }
-
-            @Override
-            public void setQuadColored() {
-
-            }
-
-            @Override
-            public void put(int element, float... data) {
-
-                for (int i = 0; i < 4; i++) {
-                    if (i < data.length) unpackedData[vertices][element][i] = data[i];
-                    else unpackedData[vertices][element][i] = 0;
-                }
-                elements++;
-                if (elements == original.getElementCount()) {
-                    vertices++;
-                    elements = 0;
+        // TODO: Optimize
+        Field f = ReflectionHelper.findField(UnpackedBakedQuad.class, "unpackedData");
+        f.setAccessible(true);
+        UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
+        if (quad.hasTintIndex()) builder.setQuadTint(quad.getTintIndex());
+        if (quad instanceof IColoredBakedQuad) builder.setQuadColored();
+        builder.setQuadOrientation(quad.getFace());
+        LightUtil.putBakedQuad(builder, quad);
+        UnpackedBakedQuad unpackedQuad = builder.build();
+        try {
+            float[][][] unpackedData = (float[][][]) f.get(unpackedQuad);
+            int count = format.getElementCount();
+            for (int v = 0; v < 4; v++) {
+                for (int e = 0; e < count; e++) {
+                    VertexFormatElement element = format.getElement(e);
+                    unpackedData[v][e] = transformer.transform(element.getType(), element.getUsage(), unpackedData[v][e]);
                 }
             }
-
-            @Override
-            public VertexFormat getVertexFormat() {
-
-                return original;
-            }
-        });
-
-        float[][][] newData = new float[4][format.getElementCount()][4];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < original.getElementCount(); j++) {
-                VertexFormatElement element = original.getElement(j);
-                newData[i][map[j]] = transformer.transform(element.getType(), element.getUsage(), unpackedData[i][j]);
-            }
+            vfTransformer.remap(original, unpackedData);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        return new UnpackedBakedQuad(vfTransformer.remap(original, newData), quad.getTintIndex(), quad.getFace(), format);
+        return unpackedQuad;
     }
 
     private static final class TransformedModel implements IBakedModel, IFlexibleBakedModel {
@@ -192,11 +166,11 @@ public class ModelTransformer {
             @Override
             public VertexFormat getNewFormat(VertexFormat original) {
 
-                if (original.hasNormal()) return original;
+                if (original.hasColor()) return original;
                 VertexFormat format = formats.get(original);
                 if (format != null) return format;
                 formats.put(original, format = new VertexFormat(original));
-                format.addElement(new VertexFormatElement(0, EnumType.FLOAT, EnumUsage.NORMAL, 3));
+                format.addElement(DefaultVertexFormats.COLOR_4UB);
                 return format;
             }
 
@@ -204,24 +178,52 @@ public class ModelTransformer {
             public float[][][] remap(VertexFormat original, float[][][] data) {
 
                 VertexFormat format = getNewFormat(original);
-                int posIndex = 0, normalIndex = 0;
+                int posIndex = 0, colorIndex = 0;
                 for (int i = 0; i < format.getElementCount(); i++) {
                     if (format.getElement(i).isPositionElement()) posIndex = i;
-                    if (format.getElement(i).getUsage() == EnumUsage.NORMAL) normalIndex = i;
+                    if (format.getElement(i).getUsage() == EnumUsage.COLOR) colorIndex = i;
                 }
                 Vector3f a = new Vector3f(data[0][posIndex][0], data[0][posIndex][1], data[0][posIndex][2]);
                 Vector3f b = new Vector3f(data[1][posIndex][0], data[1][posIndex][1], data[1][posIndex][2]);
                 Vector3f c = new Vector3f(data[2][posIndex][0], data[2][posIndex][1], data[2][posIndex][2]);
                 a.sub(b);
                 c.sub(b);
-                b.cross(a, c);
+                b.cross(c, a);
+                b.normalize();
+                float brightness = getBrightness(b);
                 for (int i = 0; i < 4; i++) {
-                    data[i][normalIndex][0] = b.x;
-                    data[i][normalIndex][1] = b.y;
-                    data[i][normalIndex][2] = b.z;
+                    data[i][colorIndex][0] = brightness;
+                    data[i][colorIndex][1] = brightness;
+                    data[i][colorIndex][2] = brightness;
                 }
 
                 return data;
+            }
+
+            private float getBrightness(Vector3f normal) {
+
+                float x = getFaceBrightness(EnumFacing.getFacingFromVector(normal.x, 0, 0));
+                float y = getFaceBrightness(EnumFacing.getFacingFromVector(0, normal.y, 0));
+                float z = getFaceBrightness(EnumFacing.getFacingFromVector(0, 0, normal.z));
+                return x * normal.x * normal.x + y * normal.y * normal.y + z * normal.z * normal.z;
+            }
+
+            private float getFaceBrightness(EnumFacing facing) {
+
+                switch (facing) {
+                case DOWN:
+                    return 0.5F;
+                case UP:
+                    return 1.0F;
+                case NORTH:
+                case SOUTH:
+                    return 0.8F;
+                case WEST:
+                case EAST:
+                    return 0.6F;
+                default:
+                    return 1.0F;
+                }
             }
 
         };
