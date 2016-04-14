@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import com.amadornes.framez.ModInfo;
+import com.amadornes.framez.init.FramezCreativeTab;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -24,14 +27,12 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import com.amadornes.framez.ModInfo;
-import com.amadornes.framez.init.FramezCreativeTab;
 
 public class BlockMetamorphicStone extends Block {
 
@@ -195,6 +196,12 @@ public class BlockMetamorphicStone extends Block {
     public IBlockState getStateFromMeta(int meta) {
 
         return getDefaultState().withProperty(TYPE, EnumMetamorphicStoneType.VALUES[meta]);
+    }
+
+    @Override
+    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+
+        return layer == EnumWorldBlockLayer.CUTOUT;
     }
 
     public static enum EnumMetamorphicStoneType implements IStringSerializable {
