@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.AxisDirection;
+import net.minecraft.world.IBlockAccess;
 
 public class MotorLogicLinearActuator implements IMotorLogic {
 
@@ -53,7 +54,8 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     @Override
     public boolean canMove(Set<BlockPos> blocks) {
 
-        Structure structure = Structure.discover(motor.get().getMotorWorld(), motor.get().getMotorPos(), EnumSet.of(getFace()), false);
+        Structure structure = Structure.discover(new IBlockAccess[] { motor.get().getMotorWorld() }, motor.get().getMotorPos(),
+                (w, p) -> w.getBlockState(p).getBlock().isAir(w, p), EnumSet.of(getFace()), false);
 
         return false;
     }

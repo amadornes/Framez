@@ -3,6 +3,7 @@ package com.amadornes.framez.movement;
 import java.util.ArrayDeque;
 import java.util.EnumSet;
 import java.util.Queue;
+import java.util.function.BiPredicate;
 
 import com.amadornes.framez.api.frame.IFrame;
 import com.amadornes.framez.api.frame.IStickable;
@@ -20,13 +21,14 @@ import net.minecraft.world.IBlockAccess;
 
 public final class Structure {
 
-    public static Structure discover(IBlockAccess world, BlockPos pos, EnumSet<EnumFacing> directions, boolean isMotorSticky) {
+    public static Structure discover(IBlockAccess[] worlds, BlockPos pos, BiPredicate<IBlockAccess, BlockPos> ignored,
+            EnumSet<EnumFacing> directions, boolean isMotorSticky) {
 
         Graph<StructureNode> graph = new Graph<StructureNode>();
         Queue<StructureNode> nodes = new ArrayDeque<StructureNode>();
         AdvancedMutableBlockPos mutablePos = new AdvancedMutableBlockPos();
 
-        StructureNode start = new StructureNode(world, pos, directions, isMotorSticky);
+        StructureNode start = new StructureNode(worlds[0], pos, directions, isMotorSticky);
         nodes.add(start);
         graph.addVertex(start);
 
@@ -35,10 +37,15 @@ public final class Structure {
             node = nodes.poll();
             for (EnumFacing face : EnumFacing.VALUES) {
                 if (node.isSticky(face) && !graph.getVertices().contains(mutablePos.set(node.pos.offset(face)))) {
-                    StructureNode neighbor = new StructureNode(world, mutablePos.getImmutable());
-                    if (neighbor.canStickTo(face.getOpposite())) {
-                        graph.addEdge(node, neighbor);
-                        nodes.add(neighbor);
+                    for (IBlockAccess world : worlds) {
+                        if (!ignored.test(world, mutablePos)) {
+                            StructureNode neighbor = new StructureNode(world, mutablePos.getImmutable());
+                            if (neighbor.canStickTo(face.getOpposite())) {
+                                graph.addEdge(node, neighbor);
+                                nodes.add(neighbor);
+                            }
+                            break;
+                        }
                     }
                 }
             }
