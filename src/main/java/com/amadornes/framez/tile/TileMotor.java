@@ -70,7 +70,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
             this.logic = null;
         } else {
             this.reference = reference;
-            this.logic = reference.get().logic;
+            this.logic = reference.get().getLogic();
         }
         if (this.logic != null) this.logic.setMotor(this.reference);
 
@@ -130,6 +130,8 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     @Override
     public boolean canMove() {
 
+        IMotorLogic logic = getLogic();
+        if (logic == null) return false;
         if (lastMoveCheck == getWorld().getTotalWorldTime()) return couldMove;
 
         lastMoveCheck = getWorld().getTotalWorldTime();
@@ -141,7 +143,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     @Override
     public DynamicReference<Boolean> move() {
 
-        if (canMove()) return logic.move(movedBlockPositions);
+        if (canMove()) return getLogic().move(movedBlockPositions);
         return new DynamicReference<Boolean>(false);
     }
 
@@ -241,7 +243,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
     public void copyFrom(TileMotor motor) {
 
-        this.logic = motor.logic;
+        this.logic = motor.getLogic();
 
         this.triggers.putAll(motor.triggers);
         for (int i = 0; i < getUpgradeSlots(); i++)
@@ -252,6 +254,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
     public IMotorLogic getLogic() {
 
+        if (logic == null) getBlockMetadata();
         return logic;
     }
 
@@ -263,7 +266,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
     public IBlockState getActualState(IBlockState state) {
 
-        return state.withProperty(BlockMotor.PROPERTY_LOGIC_TYPE, logic == null ? 0 : logic.getID());
+        return state.withProperty(BlockMotor.PROPERTY_LOGIC_TYPE, getLogic() == null ? 0 : getLogic().getID());
     }
 
     public IExtendedBlockState getExtendedState(IExtendedBlockState state) {
@@ -301,12 +304,21 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     @Override
     public void markDirty() {
 
+        super.markDirty();
+        getBlockMetadata();
+    }
+
+    @Override
+    public int getBlockMetadata() {
+
+        int meta = super.getBlockMetadata();
         if (getWorld() != null) {
-            Class<? extends IMotorLogic> logicClass = IMotorLogic.TYPES[getBlockMetadata()];
-            if (getLogic() == null || logicClass.isAssignableFrom(getLogic().getClass())) {
-                setLogic(IMotorLogic.create(getBlockMetadata()));
+            Class<? extends IMotorLogic> logicClass = IMotorLogic.TYPES[meta];
+            if (logic == null || logicClass.isAssignableFrom(logic.getClass())) {
+                setLogic(IMotorLogic.create(meta));
             }
         }
+        return meta;
     }
 
 }

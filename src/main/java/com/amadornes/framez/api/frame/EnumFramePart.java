@@ -2,18 +2,18 @@ package com.amadornes.framez.api.frame;
 
 public enum EnumFramePart {
 
-    BORDER(1.0),
-    CROSS(0.7),
-    BINDING(0.3);
+    BORDER(1.0F),
+    CROSS(0.7F),
+    BINDING(0.3F);
 
-    private final double multiplier;
+    private final float multiplier;
 
-    private EnumFramePart(double multiplier) {
+    private EnumFramePart(float multiplier) {
 
         this.multiplier = multiplier;
     }
 
-    public double getDefaultWeightMultiplier() {
+    public float getDefaultWeightMultiplier() {
 
         return multiplier;
     }

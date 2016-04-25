@@ -14,11 +14,11 @@ import net.minecraftforge.oredict.OreDictionary;
 public class FrameMaterialBasic implements IFrameMaterial {
 
     private final String type;
-    private final double weight;
+    private final float weight;
     private final int minMovTime, maxCarriedBlock, maxCarriedParts;
     private List<ItemStack> oredictEntries;
 
-    public FrameMaterialBasic(String type, double weight, int minMovTime, int maxCarriedBlock, int maxCarriedParts, String oredictName) {
+    public FrameMaterialBasic(String type, float weight, int minMovTime, int maxCarriedBlock, int maxCarriedParts, String oredictName) {
 
         this.type = type;
         this.weight = weight;
@@ -41,7 +41,7 @@ public class FrameMaterialBasic implements IFrameMaterial {
     }
 
     @Override
-    public double getWeight(EnumFramePart part) {
+    public float getWeight(EnumFramePart part) {
 
         return weight * part.getDefaultWeightMultiplier();
     }

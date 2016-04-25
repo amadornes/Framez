@@ -5,14 +5,19 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
+import com.amadornes.framez.api.frame.IFrame;
 import com.amadornes.framez.api.frame.IFrameMaterial;
+import com.amadornes.framez.api.frame.IStickable;
+import com.amadornes.framez.api.frame.ISticky;
 import com.amadornes.framez.frame.FrameRegistry;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.util.PropertyMaterial;
 
 import mcmultipart.MCMultiPartMod;
+import mcmultipart.microblock.IMicroblock;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.Multipart;
+import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -24,14 +29,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties.PropertyAdapter;
 
 @SuppressWarnings("unchecked")
-public class PartFrame extends Multipart {
+public class PartFrame extends Multipart implements IFrame {
 
     public static final IUnlistedProperty<Boolean>[] PROPERTIES_BOOL = new IUnlistedProperty[12];
     public static final IUnlistedProperty<IFrameMaterial>[] PROPERTIES_MATERIAL = new IUnlistedProperty[3];
@@ -47,16 +54,40 @@ public class PartFrame extends Multipart {
 
     private BitSet properties = new BitSet(PROPERTIES_BOOL.length);
     private IFrameMaterial[] materials = new IFrameMaterial[PROPERTIES_MATERIAL.length];
+    private ISticky[] stickySides = new ISticky[6];
+    private IStickable[] stickableSides = new IStickable[6];
 
     public PartFrame() {
 
         Iterator<IFrameMaterial> it = FrameRegistry.INSTANCE.materials.values().iterator();
         for (int i = 0; i < materials.length; i++)
             materials[i] = it.next();
+        initStickiness();
     }
 
     public PartFrame(IFrameMaterial[] materials) {
+
         this.materials = materials;
+        initStickiness();
+    }
+
+    private void initStickiness() {
+
+        for (int i = 0; i < 6; i++) {
+            EnumFacing facing = EnumFacing.getFront(i);
+            stickySides[i] = () -> checkStickiness(facing);
+            stickableSides[i] = () -> checkStickiness(facing);
+        }
+    }
+
+    private boolean checkStickiness(EnumFacing facing) {
+
+        if (getContainer() != null) {
+            IMultipart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(facing));
+            if (part != null && part instanceof IMicroblock) return ((IMicroblock) part).getSize() != 1;
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -98,9 +129,9 @@ public class PartFrame extends Multipart {
 
         ItemStack stack = new ItemStack(FramezItems.frame);
         NBTTagCompound tag = new NBTTagCompound();
-        tag.setString("border", materials[0].getType());
-        tag.setString("cross", materials[1].getType());
-        tag.setString("binding", materials[2].getType());
+        tag.setString("border", getBorderMaterial().getType());
+        tag.setString("cross", getCrossMaterial().getType());
+        tag.setString("binding", getBindingMaterial().getType());
         stack.setTagCompound(tag);
         return stack;
     }
@@ -186,6 +217,42 @@ public class PartFrame extends Multipart {
         super.readUpdatePacket(buf);
         for (int i = 0; i < materials.length; i++)
             materials[i] = FrameRegistry.INSTANCE.materials.get(buf.readStringFromBuffer(512));
+    }
+
+    @Override
+    public IFrameMaterial getBorderMaterial() {
+
+        return materials[0];
+    }
+
+    @Override
+    public IFrameMaterial getCrossMaterial() {
+
+        return materials[1];
+    }
+
+    @Override
+    public IFrameMaterial getBindingMaterial() {
+
+        return materials[2];
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+
+        if (capability == IFrame.CAPABILITY_FRAME && facing == null) return true;
+        if (capability == ISticky.CAPABILITY_STICKY && facing != null) return true;
+        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null) return true;
+        return false;
+    }
+
+    @Override
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+
+        if (capability == IFrame.CAPABILITY_FRAME && facing == null) return (T) this;
+        if (capability == ISticky.CAPABILITY_STICKY && facing != null) return (T) stickySides[facing.ordinal()];
+        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null) return (T) stickableSides[facing.ordinal()];
+        return null;
     }
 
 }

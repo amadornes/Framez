@@ -3,6 +3,7 @@ package com.amadornes.framez;
 import com.amadornes.framez.frame.FrameMaterialBasic;
 import com.amadornes.framez.frame.FrameRegistry;
 import com.amadornes.framez.init.FramezBlocks;
+import com.amadornes.framez.init.FramezCapabilities;
 import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.init.FramezOredict;
 import com.amadornes.framez.init.FramezParts;
@@ -63,6 +64,7 @@ public class Framez {
         FramezBlocks.register();
         FramezParts.register();
 
+        FramezCapabilities.register();
         FramezOredict.register();
         FramezRecipes.register();
 

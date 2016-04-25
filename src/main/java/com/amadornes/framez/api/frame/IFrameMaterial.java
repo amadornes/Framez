@@ -9,7 +9,7 @@ public interface IFrameMaterial {
 
     public boolean canBeUsedAs(EnumFramePart part);
 
-    public double getWeight(EnumFramePart part);
+    public float getWeight(EnumFramePart part);
 
     public int getMinMovementTime();
 

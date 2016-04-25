@@ -1,10 +1,10 @@
 package com.amadornes.framez.motor.logic;
 
+import java.util.EnumSet;
 import java.util.Set;
 
 import com.amadornes.framez.api.DynamicReference;
-import com.amadornes.framez.movement.BlockTranslation;
-import com.amadornes.framez.movement.IMovementSystem;
+import com.amadornes.framez.movement.Structure;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -53,15 +53,14 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     @Override
     public boolean canMove(Set<BlockPos> blocks) {
 
-        return IMovementSystem.SYSTEM.canMove(motor.get().getMotorWorld(), blocks,
-                new BlockTranslation(new BlockPos(0, 0, 0).offset(face)));
+        Structure structure = Structure.discover(motor.get().getMotorWorld(), motor.get().getMotorPos(), EnumSet.of(getFace()), false);
+
+        return false;
     }
 
     @Override
     public DynamicReference<Boolean> move(Set<BlockPos> blocks) {
 
-        IMovementSystem.SYSTEM.startMoving(motor.get().getMotorWorld(), blocks, 0,
-                new BlockTranslation(new BlockPos(0, 0, 0).offset(face)));
         return new DynamicReference<Boolean>(true);
     }
 
