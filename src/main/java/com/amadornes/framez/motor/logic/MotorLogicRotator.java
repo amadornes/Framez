@@ -3,10 +3,12 @@ package com.amadornes.framez.motor.logic;
 import java.util.Set;
 
 import com.amadornes.framez.api.DynamicReference;
+import com.amadornes.framez.movement.IMovement;
+import com.amadornes.framez.movement.MovingBlock;
+import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.AxisDirection;
 
@@ -47,19 +49,19 @@ public class MotorLogicRotator implements IMotorLogic {
     }
 
     @Override
-    public double getConsumedEnergy(Set<BlockPos> blocks, double energyApplied) {
+    public double getConsumedEnergy(MovingStructure structure, double energyApplied) {
 
         return 0; // TODO: Determine consumed energy
     }
 
     @Override
-    public boolean canMove(Set<BlockPos> blocks) {
+    public boolean canMove(MovingStructure structure) {
 
         return false;
     }
 
     @Override
-    public DynamicReference<Boolean> move(Set<BlockPos> blocks) {
+    public DynamicReference<Boolean> move(MovingStructure structure) {
 
         return new DynamicReference<Boolean>(false);
     }
@@ -73,6 +75,12 @@ public class MotorLogicRotator implements IMotorLogic {
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
 
+    }
+
+    @Override
+    public IMovement getMovement(Set<MovingBlock> blocks) {
+
+        return null;
     }
 
 }

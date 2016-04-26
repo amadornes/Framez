@@ -1,6 +1,8 @@
 package com.amadornes.framez.api;
 
-public final class DynamicReference<T> {
+import com.google.common.base.Supplier;
+
+public final class DynamicReference<T> implements Supplier<T> {
 
     private T value;
 
@@ -8,6 +10,7 @@ public final class DynamicReference<T> {
         this.value = value;
     }
 
+    @Override
     public T get() {
 
         return value;

@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.function.IntFunction;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import com.amadornes.framez.CommonProxy;
 import com.amadornes.framez.ModInfo;
@@ -24,6 +25,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -41,6 +43,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ClientProxy extends CommonProxy {
 
     public static IBakedModel MODEL_FRAME_BORDER, MODEL_FRAME_CROSS, MODEL_FRAME_ORIGINAL;
+    public static IBakedModel MODEL_ITEM_BORDER, MODEL_ITEM_CROSS, MODEL_ITEM_BINDING;
+    public static int BLOCK_TEXTURE_WIDTH, BLOCK_TEXTURE_HEIGHT;
 
     @Override
     public void preInit() {
@@ -76,17 +80,26 @@ public class ClientProxy extends CommonProxy {
             event.modelRegistry.putObject(res, new ModelWrapperCamouflage(event.modelRegistry.getObject(res)));
         }
 
-        event.modelRegistry.putObject(new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "multipart"),
-                new ModelFrame());
-        ModelResourceLocation res = new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "inventory");
-        MODEL_FRAME_ORIGINAL = event.modelRegistry.getObject(res);
-        event.modelRegistry.putObject(res, new ModelFrame());
+        // Dynamic frame part model
+        {
+            event.modelRegistry.putObject(new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "multipart"),
+                    new ModelFrame());
+            ModelResourceLocation modelLoc = new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "inventory");
+            MODEL_FRAME_ORIGINAL = event.modelRegistry.getObject(modelLoc);
+            event.modelRegistry.putObject(modelLoc, new ModelFrame());
+        }
 
-        res = new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame_panel"), "inventory0");
-        event.modelRegistry.putObject(res, new ModelFramePanel(event.modelRegistry.getObject(res)));
-        res = new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame_panel"), "inventory1");
-        event.modelRegistry.putObject(res, new ModelFramePanel(event.modelRegistry.getObject(res)));
+        // Dynamic frame panel items
+        {
+            ResourceLocation resLoc = new ResourceLocation(ModInfo.MODID, "frame_panel");
+            MODEL_ITEM_BINDING = event.modelRegistry.getObject(new ModelResourceLocation(resLoc, "inventory0"));
+            MODEL_ITEM_CROSS = event.modelRegistry.getObject(new ModelResourceLocation(resLoc, "inventory1"));
+            MODEL_ITEM_BORDER = event.modelRegistry.getObject(new ModelResourceLocation(resLoc, "inventory2"));
+            event.modelRegistry.putObject(new ModelResourceLocation(resLoc, "inventory0"), new ModelFramePanel());
+            event.modelRegistry.putObject(new ModelResourceLocation(resLoc, "inventory1"), new ModelFramePanel());
+        }
 
+        // Dynamic frame block models
         try {
             MODEL_FRAME_BORDER = event.modelLoader.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_border")).bake(
                     TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
@@ -100,11 +113,19 @@ public class ClientProxy extends CommonProxy {
     }
 
     @SubscribeEvent
-    public void onTextureStitch(TextureStitchEvent.Pre event) {
+    public void onTextureStitchPre(TextureStitchEvent.Pre event) {
 
         for (IFrameMaterial mat : FrameRegistry.INSTANCE.materials.values())
             for (EnumFrameTexture tex : EnumFrameTexture.VALUES)
                 if (mat.canBeUsedAs(tex.getPart())) event.map.registerSprite(mat.getTexture(tex));
+    }
+
+    @SubscribeEvent
+    public void onTextureStitchPost(TextureStitchEvent.Post event) {
+
+        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+        BLOCK_TEXTURE_WIDTH = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
+        BLOCK_TEXTURE_HEIGHT = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
     }
 
     @Override

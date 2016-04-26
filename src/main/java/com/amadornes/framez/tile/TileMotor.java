@@ -1,12 +1,13 @@
 package com.amadornes.framez.tile;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,6 +28,7 @@ import com.amadornes.framez.motor.MotorTriggerRedstone;
 import com.amadornes.framez.motor.SimpleMotorVariable;
 import com.amadornes.framez.motor.logic.IMotorLogic;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
+import com.amadornes.framez.movement.MovingStructure;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemBlock;
@@ -34,6 +36,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -49,6 +52,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public static final IMotorVariable<Double> POWER_STORAGE_SIZE = new SimpleMotorVariable<Double>("var.framez:power_storage_size",
             d -> d + " kJ");
     public static final IMotorVariable<Double> MOVEMENT_TIME = new SimpleMotorVariable<Double>();
+    public static final IMotorVariable<EnumSet<EnumFacing>> STICKY_FACES = new SimpleMotorVariable<EnumSet<EnumFacing>>();
 
     public final DynamicReference<TileMotor> reference;
     private IMotorLogic logic;
@@ -56,7 +60,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public final Map<EnumMotorAction, IMotorTrigger> triggers = new HashMap<EnumMotorAction, IMotorTrigger>();
     public final Pair<IMotorUpgrade, ItemStack>[] upgrades = new Pair[getUpgradeSlots()];
     public final Map<EnumMotorStatus, Boolean> statuses = new HashMap<EnumMotorStatus, Boolean>();
-    public final Map<IMotorVariable<?>, Object> nativeVariables = new HashMap<IMotorVariable<?>, Object>();
+    public final Map<IMotorVariable<?>, Supplier<Object>> nativeVariables = new HashMap<IMotorVariable<?>, Supplier<Object>>();
 
     public TileMotor() {
 
@@ -82,9 +86,10 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         for (EnumMotorStatus status : EnumMotorStatus.VALUES)
             statuses.put(status, status == EnumMotorStatus.STOPPED);
 
-        nativeVariables.put(TileMotor.POWER_STORED, 0.0D);
-        nativeVariables.put(TileMotor.POWER_STORAGE_SIZE, 0.0D);
-        nativeVariables.put(TileMotor.MOVEMENT_TIME, 0.0D);
+        nativeVariables.put(TileMotor.POWER_STORED, () -> 0.0D);
+        nativeVariables.put(TileMotor.POWER_STORAGE_SIZE, () -> 0.0D);
+        nativeVariables.put(TileMotor.MOVEMENT_TIME, () -> 0.0D);
+        nativeVariables.put(TileMotor.STICKY_FACES, () -> EnumSet.of(getLogic().getFace()));
     }
 
     @Override
@@ -125,7 +130,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
     private long lastMoveCheck = 0;
     private boolean couldMove = false;
-    private Set<BlockPos> movedBlockPositions = null;
+    private MovingStructure movedStructure = null;
 
     @Override
     public boolean canMove() {
@@ -135,15 +140,16 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         if (lastMoveCheck == getWorld().getTotalWorldTime()) return couldMove;
 
         lastMoveCheck = getWorld().getTotalWorldTime();
-        movedBlockPositions = MotorHelper.findMovedBlocks(getMotorWorld(), getMotorPos(), logic.getFace());
-        return couldMove = logic.canMove(movedBlockPositions) && logic.getConsumedEnergy(movedBlockPositions,
-                getVariable(TileMotor.MOVEMENT_TIME)) <= getVariable(TileMotor.POWER_STORED);
+        movedStructure = MovingStructure.discover(getMotorPos(), (w, p) -> w.getBlockState(p).getBlock().isAir(w, p), getStickyFaces(),
+                false, s -> logic.getMovement(s), () -> getMotorWorld());
+        return couldMove = logic.canMove(movedStructure)
+                && logic.getConsumedEnergy(movedStructure, getVariable(TileMotor.MOVEMENT_TIME)) <= getVariable(TileMotor.POWER_STORED);
     }
 
     @Override
     public DynamicReference<Boolean> move() {
 
-        if (canMove()) return getLogic().move(movedBlockPositions);
+        if (canMove()) return getLogic().move(movedStructure);
         return new DynamicReference<Boolean>(false);
     }
 
@@ -175,7 +181,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public <T> T getVariable(IMotorVariable<T> variable) {
 
         List<IMotorUpgrade> sortedUpgrades = new ArrayList<IMotorUpgrade>();
-        T value = (T) nativeVariables.get(variable);
+        T value = (T) nativeVariables.get(variable).get();
         boolean foundValue = nativeVariables.containsKey(variable);
         for (Pair<IMotorUpgrade, ItemStack> pair : upgrades) {
             if (pair != null) {
@@ -199,6 +205,11 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
             if (p != null) for (IMotorVariable<?> var : p.getKey().getProvidedVariables().keySet())
                 variables.put(var, getVariable(var));
         return variables;
+    }
+
+    private EnumSet<EnumFacing> getStickyFaces() {
+
+        return getVariable(STICKY_FACES);
     }
 
     @Override

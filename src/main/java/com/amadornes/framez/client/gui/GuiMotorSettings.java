@@ -14,7 +14,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiMotorSettings extends GuiScreen {
 
-    private final int xSize = 200, ySize = 123;
+    private final int xSize = 200, ySize = 135;
 
     private final GuiMotorSettingsTab[] tabs;
     private int tab = 0;
@@ -48,8 +48,8 @@ public class GuiMotorSettings extends GuiScreen {
 
         mc.renderEngine.bindTexture(new ResourceLocation(ModInfo.MODID, "textures/gui/motor_settings.png"));
         drawTexturedModalRect(left, top, 0, 0, xSize, ySize);
-        for (int i = 0; i < 4; i++)
-            drawTexturedModalRect(left + xSize - 3, top + 5 + 29 * i, xSize + (tab == i ? 24 : 0), 27 * i, 24, 27);
+        for (int i = 0; i < 5; i++)
+            drawTexturedModalRect(left + xSize - 3, top + 6 + (24 + 1) * i, xSize + (tab == i ? 24 : 0), 24 * i, 24, 24);
 
         tabs[tab].drawScreen(mouseX, mouseY, partialTicks);
     }
@@ -79,8 +79,8 @@ public class GuiMotorSettings extends GuiScreen {
         }
 
         for (int i = 0; i < 4; i++) {
-            int x = left + xSize, y = top + 5 + 29 * i;
-            if (mouseX >= x && mouseX < x + 24 && mouseY >= y && mouseY < y + 27) {
+            int x = left + xSize - 1, y = top + 6 + (24 + 1) * i;
+            if (mouseX >= x && mouseX < x + 22 && mouseY >= y && mouseY < y + 24) {
                 tab = i;
                 mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
                 return;

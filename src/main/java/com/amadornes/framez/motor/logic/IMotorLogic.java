@@ -3,10 +3,12 @@ package com.amadornes.framez.motor.logic;
 import java.util.Set;
 
 import com.amadornes.framez.api.DynamicReference;
+import com.amadornes.framez.movement.IMovement;
+import com.amadornes.framez.movement.MovingBlock;
+import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -42,10 +44,12 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     public boolean rotate(EnumFacing axis);
 
-    public double getConsumedEnergy(Set<BlockPos> blocks, double energyApplied);
+    public double getConsumedEnergy(MovingStructure structure, double energyApplied);
 
-    public boolean canMove(Set<BlockPos> blocks);
+    public boolean canMove(MovingStructure structure);
 
-    public DynamicReference<Boolean> move(Set<BlockPos> blocks);
+    public DynamicReference<Boolean> move(MovingStructure structure);
+
+    public IMovement getMovement(Set<MovingBlock> blocks);
 
 }

@@ -38,7 +38,7 @@ public class FramezItems {
         registerItem(upgrade, "upgrade", i -> "_" + new ArrayList<String>(MotorRegistry.INSTANCE.internalUpgrades.keySet()).get(i),
                 MotorRegistry.INSTANCE.internalUpgrades.size());
         registerItem(nugget, "nugget", i -> "_" + ItemNugget.NUGGET_TYPES.get(i), ItemNugget.NUGGET_TYPES.size());
-        registerItem(frame_panel, "frame_panel", 2);
+        registerItem(frame_panel, "frame_panel", 3);
     }
 
     private static void registerItem(Item item, String name, int variantCount) {

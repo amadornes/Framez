@@ -33,7 +33,7 @@ public class GuiMotorSettingsTabUpgrades extends GuiMotorSettingsTab {
         GuiButton10 b;
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
-                buttonList.add(b = new GuiButton10(buttonList.size(), left + 55 + x * 36, top + 31 + y * 36, 18, "..."));
+                buttonList.add(b = new GuiButton10(buttonList.size(), left + 55 + x * 36, top + 35 + y * 36, 18, "..."));
                 b.enabled = false;
             }
         }
@@ -53,7 +53,7 @@ public class GuiMotorSettingsTabUpgrades extends GuiMotorSettingsTab {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 int sX = left + 56 + x * 36;
-                int sY = top + 12 + y * 36;
+                int sY = top + 16 + y * 36;
                 Entry<IMotorUpgrade, ItemStack> e = motor.get().getUpgrade(x * 3 + y);
                 if (e != null) {
                     RenderHelper.enableGUIStandardItemLighting();
@@ -90,7 +90,7 @@ public class GuiMotorSettingsTabUpgrades extends GuiMotorSettingsTab {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 int sX = left + 56 + x * 36;
-                int sY = top + 12 + y * 36;
+                int sY = top + 16 + y * 36;
                 if (mouseX >= sX && mouseX < sX + 16 && mouseY >= sY && mouseY < sY + 16) {
                     NetworkHandler.instance.sendToServer(new PacketShowGUI(x * 3 + y, motor.getPos()));
                     return;

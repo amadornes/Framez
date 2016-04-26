@@ -34,7 +34,7 @@ public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
         int top = (height - ySize) / 2;
 
         int sliderX = (int) (left + 13 + ((xSize - 34) * motor.get().getVariable(TileMotor.MOVEMENT_TIME) / 60D));
-        buttonList.add(button = new GuiButton16(0, sliderX, top + 21, 8, ""));
+        buttonList.add(button = new GuiButton16(0, sliderX, top + 25, 8, ""));
     }
 
     @Override
@@ -48,10 +48,10 @@ public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
 
         drawString(fontRendererObj, I18n.format("gui.framez:motor.speed") + ":", left + 8, top + 8, 0xFFFFFFFF);
 
-        drawString(fontRendererObj, "Energy Applied:", left + 8, top + 87, 0xFFFFFFFF);
+        drawString(fontRendererObj, "Energy Applied:", left + 8, top + 91, 0xFFFFFFFF);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(left + 42, top + 45.5, 0);
+        GlStateManager.translate(left + 42, top + 49.5, 0);
         GlStateManager.scale(0.75, 0.75, 1.0);
         drawCenteredString(fontRendererObj, format.format(motor.get().getVariable(TileMotor.MOVEMENT_TIME)) + "s", 0, 0, 0xFFFFFFFF);
         GlStateManager.popMatrix();
@@ -83,9 +83,8 @@ public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
 
         if (dragging) {
             button.xPosition = Math.min(Math.max(left + 13, mouseX - xOff), left + xSize - 21);
-            double movementTime = ((button.xPosition - (left + 13D)) / (xSize - 34)) * 60D;
-            movementTime = Math.round(movementTime * 1000D) / 1000D;
-            motor.get().nativeVariables.put(TileMotor.MOVEMENT_TIME, movementTime);
+            double movementTime = Math.round((((button.xPosition - (left + 13D)) / (xSize - 34)) * 60D) * 1000D) / 1000D;
+            motor.get().nativeVariables.put(TileMotor.MOVEMENT_TIME, () -> movementTime);
         }
     }
 

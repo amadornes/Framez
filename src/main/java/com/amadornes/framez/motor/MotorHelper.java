@@ -1,9 +1,7 @@
 package com.amadornes.framez.motor;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,9 +14,6 @@ import com.amadornes.jtraits.JTrait;
 import com.amadornes.jtraits.MixinFactory;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.IBlockAccess;
 
 public class MotorHelper {
 
@@ -64,14 +59,6 @@ public class MotorHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static Set<BlockPos> findMovedBlocks(IBlockAccess world, BlockPos pos, EnumFacing... directions) {
-
-        Set<BlockPos> blocks = new HashSet<BlockPos>();
-        for (EnumFacing dir : directions)
-            blocks.add(pos.offset(dir));
-        return blocks;
     }
 
 }

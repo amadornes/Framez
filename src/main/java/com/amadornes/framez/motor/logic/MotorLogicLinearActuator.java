@@ -1,17 +1,16 @@
 package com.amadornes.framez.motor.logic;
 
-import java.util.EnumSet;
 import java.util.Set;
 
 import com.amadornes.framez.api.DynamicReference;
-import com.amadornes.framez.movement.Structure;
+import com.amadornes.framez.movement.IMovement;
+import com.amadornes.framez.movement.MovingBlock;
+import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.AxisDirection;
-import net.minecraft.world.IBlockAccess;
 
 public class MotorLogicLinearActuator implements IMotorLogic {
 
@@ -46,22 +45,19 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     }
 
     @Override
-    public double getConsumedEnergy(Set<BlockPos> blocks, double energyApplied) {
+    public double getConsumedEnergy(MovingStructure structure, double energyApplied) {
 
         return 0; // TODO: Determine consumed energy
     }
 
     @Override
-    public boolean canMove(Set<BlockPos> blocks) {
-
-        Structure structure = Structure.discover(new IBlockAccess[] { motor.get().getMotorWorld() }, motor.get().getMotorPos(),
-                (w, p) -> w.getBlockState(p).getBlock().isAir(w, p), EnumSet.of(getFace()), false);
+    public boolean canMove(MovingStructure structure) {
 
         return false;
     }
 
     @Override
-    public DynamicReference<Boolean> move(Set<BlockPos> blocks) {
+    public DynamicReference<Boolean> move(MovingStructure structure) {
 
         return new DynamicReference<Boolean>(true);
     }
@@ -75,6 +71,12 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
 
+    }
+
+    @Override
+    public IMovement getMovement(Set<MovingBlock> blocks) {
+
+        return null;// TODO Implement movement
     }
 
 }
