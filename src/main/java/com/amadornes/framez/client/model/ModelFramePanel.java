@@ -48,7 +48,9 @@ public class ModelFramePanel implements ISmartItemModel {
     public List<BakedQuad> getGeneralQuads() {
 
         List<BakedQuad> quads = new ArrayList<BakedQuad>();
-        quads.addAll(AdvancedModelRextexturer.retexture(ClientProxy.MODEL_ITEM_CROSS, getTexture(materials[1], EnumFrameTexture.CROSS))
+        quads.addAll(AdvancedModelRextexturer
+                .retexture(ClientProxy.MODEL_ITEM_CROSS,
+                        getTexture(materials[1], materials[0] != null ? EnumFrameTexture.CROSS_SMALL : EnumFrameTexture.CROSS))
                 .getGeneralQuads());
         quads.addAll(AdvancedModelRextexturer.retexture(ClientProxy.MODEL_ITEM_BINDING, getTexture(materials[2], EnumFrameTexture.BINDING))
                 .getGeneralQuads());

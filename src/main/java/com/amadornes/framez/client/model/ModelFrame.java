@@ -56,11 +56,10 @@ public class ModelFrame implements ISmartMultipartModel, ISmartItemModel, IFlexi
                         Minecraft.getMinecraft().getTextureMapBlocks()
                                 .getAtlasSprite(materials[0].getTexture(EnumFrameTexture.BORDER).toString())).makeBakedModel()
                                         .getFaceQuads(face));
-        quads.addAll(
-                new SimpleBakedModel.Builder(ClientProxy.MODEL_FRAME_CROSS,
-                        Minecraft.getMinecraft().getTextureMapBlocks()
-                                .getAtlasSprite(materials[1].getTexture(EnumFrameTexture.CROSS).toString())).makeBakedModel()
-                                        .getFaceQuads(face));
+        quads.addAll(new SimpleBakedModel.Builder(ClientProxy.MODEL_FRAME_CROSS,
+                Minecraft.getMinecraft().getTextureMapBlocks()
+                        .getAtlasSprite(materials[1].getTexture(EnumFrameTexture.CROSS_SMALL).toString())).makeBakedModel()
+                                .getFaceQuads(face));
         quads.addAll(
                 new SimpleBakedModel.Builder(ClientProxy.MODEL_FRAME_CROSS,
                         Minecraft.getMinecraft().getTextureMapBlocks()

@@ -71,9 +71,9 @@ public class FrameMaterialBasic implements IFrameMaterial {
     }
 
     @Override
-    public ResourceLocation getTexture(EnumFrameTexture part) {
+    public ResourceLocation getTexture(EnumFrameTexture texture) {
 
-        return new ResourceLocation(ModInfo.MODID, "blocks/frame/" + type + "/" + part.name().toLowerCase());
+        return new ResourceLocation(ModInfo.MODID, "blocks/frame/" + type + "/" + texture.name().toLowerCase());
     }
 
 }

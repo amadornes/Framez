@@ -19,6 +19,6 @@ public interface IFrameMaterial {
 
     public boolean isMaterialItem(ItemStack stack);
 
-    public ResourceLocation getTexture(EnumFrameTexture part);
+    public ResourceLocation getTexture(EnumFrameTexture texture);
 
 }

@@ -3,14 +3,23 @@ package com.amadornes.framez.client.model;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.vecmath.Matrix4f;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.amadornes.framez.client.ClientProxy;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.client.model.IFlexibleBakedModel;
+import net.minecraftforge.client.model.IPerspectiveAwareModel;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
 public class AdvancedModelRextexturer {
@@ -23,7 +32,7 @@ public class AdvancedModelRextexturer {
         for (int i = 0; i < 6; i++)
             faceQuads[i] = (List) Arrays
                     .asList(model.getFaceQuads(EnumFacing.getFront(i)).stream().map(q -> new AdvancedBreakingFour(q, texture)).toArray());
-        return new IBakedModel() {
+        IBakedModel result = new IPerspectiveAwareModel() {
 
             @Override
             public boolean isGui3d() {
@@ -66,7 +75,21 @@ public class AdvancedModelRextexturer {
 
                 return faceQuads[face.ordinal()];
             }
+
+            @Override
+            public VertexFormat getFormat() {
+
+                return model instanceof IFlexibleBakedModel ? ((IFlexibleBakedModel) model).getFormat() : DefaultVertexFormats.BLOCK;
+            }
+
+            @Override
+            public Pair<? extends IFlexibleBakedModel, Matrix4f> handlePerspective(TransformType cameraTransformType) {
+
+                return model instanceof IPerspectiveAwareModel ? ((IPerspectiveAwareModel) model).handlePerspective(cameraTransformType)
+                        : Pair.of(this, null);
+            }
         };
+        return result;
     }
 
     private static class AdvancedBreakingFour extends BakedQuad {

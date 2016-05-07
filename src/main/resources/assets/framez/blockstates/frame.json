@@ -7,16 +7,14 @@
 	        "cross": "framez:blocks/frame/wood/cross",
 	        "particle": "framez:blocks/frame/wood/cross"
 		},
-		"model": "framez:frame",
+		"model": "framez:frame_border",
 		"uvlock": true,
 		"transform": "forge:default-block"
 	},
 	"variants": {
 		"multipart": [{
-			"model": "framez:frame"
 		}],
 		"inventory": [{
-			"model": "framez:frame",
 			"transform": "forge:default-block"
 		}]
 	}
