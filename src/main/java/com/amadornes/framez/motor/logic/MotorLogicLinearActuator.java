@@ -61,7 +61,7 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     }
 
     @Override
-    public DynamicReference<Boolean> move(MovingStructure structure) {
+    public void move(MovingStructure structure) {
 
         for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
             BlockData data = block.getKey().toBlockData();
@@ -69,7 +69,17 @@ public class MotorLogicLinearActuator implements IMotorLogic {
             data = BlockData.fromNBT(data.serializeNBT());// TODO: Make it so this isn't required?
             data.place(block.getKey().getWorld(), block.getValue(), 3);
         }
-        return new DynamicReference<Boolean>(false);
+    }
+
+    @Override
+    public void onMovementComplete() {
+
+    }
+
+    @Override
+    public IMovement getMovement(Set<MovingBlock> blocks) {
+
+        return new MovementTranslation(face);
     }
 
     @Override
@@ -81,12 +91,6 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
 
-    }
-
-    @Override
-    public IMovement getMovement(Set<MovingBlock> blocks) {
-
-        return new MovementTranslation(face);
     }
 
 }

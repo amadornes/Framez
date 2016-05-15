@@ -48,7 +48,9 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     public boolean canMove(MovingStructure structure);
 
-    public DynamicReference<Boolean> move(MovingStructure structure);
+    public void move(MovingStructure structure);
+
+    public void onMovementComplete();
 
     public IMovement getMovement(Set<MovingBlock> blocks);
 

@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 
 public class RenderRotator extends RenderMotor<MotorLogicRotator> {
@@ -54,11 +53,6 @@ public class RenderRotator extends RenderMotor<MotorLogicRotator> {
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),
                 ModelTransformer.transform(brd.getBlockModelShapes().getModelForState(state), transformer, state, 0L), state, pos, wr,
                 false);
-        brd.getBlockModelRenderer()
-                .renderModel(motor.getMotorWorld(), ModelTransformer
-                        .transform(brd.getBlockModelShapes().getModelForState(Blocks.SANDSTONE.getDefaultState()), transformer, null, 0),
-                        Blocks.SANDSTONE.getDefaultState(), pos.down(), wr, false);
-
         wr.setTranslation(0, 0, 0);
     }
 

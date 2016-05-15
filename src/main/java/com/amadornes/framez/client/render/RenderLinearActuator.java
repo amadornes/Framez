@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 
 public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> {
@@ -23,7 +22,8 @@ public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> 
     public void renderMotor(MotorLogicLinearActuator logic, double x, double y, double z, float partialTicks, int destroyStage,
             VertexBuffer wr) {
 
-        final double extension = (Math.sin(System.currentTimeMillis() / 400D) + 1) / 2D;
+        double t = 1000;
+        final double extension = Math.abs((System.currentTimeMillis() / t) % 2 - 1);
         TileMotor motor = logic.getMotor();
         BlockPos pos = motor.getMotorPos();
         BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
@@ -32,12 +32,7 @@ public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> 
         state = motor.getMotorWorld().getBlockState(pos);
         state = state.getBlock().getActualState(state, motor.getMotorWorld(), pos).withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
         IBakedModel model = brd.getBlockModelShapes().getModelForState(state);
-        // TODO: if (model instanceof ISmartBlockModel)
-        // model = ((ISmartBlockModel) model).handleBlockState(state.getBlock().getExtendedState(state, motor.getMotorWorld(), pos));
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(), model, state, pos, wr, false);
-        brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),
-                brd.getBlockModelShapes().getModelForState(Blocks.SANDSTONE.getDefaultState()), Blocks.SANDSTONE.getDefaultState(),
-                pos.down(), wr, false);
         wr.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
         state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 2);
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),

@@ -62,7 +62,9 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public final Map<EnumMotorStatus, Boolean> statuses = new HashMap<EnumMotorStatus, Boolean>();
     public final Map<IMotorVariable<?>, Supplier<Object>> nativeVariables = new HashMap<IMotorVariable<?>, Supplier<Object>>();
 
+    private EnumMotorAction currentAction = EnumMotorAction.STOP;
     private DynamicReference<Boolean> moving = null;
+    private int currentMovementTicks = -1;
 
     public TileMotor() {
 
@@ -92,12 +94,39 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         nativeVariables.put(TileMotor.POWER_STORAGE_SIZE, () -> 0.0D);
         nativeVariables.put(TileMotor.MOVEMENT_TIME, () -> 0.0D);
         nativeVariables.put(TileMotor.STICKY_FACES, () -> EnumSet.of(getLogic().getFace()));
+
+        if (reference != null) {
+            currentAction = reference.get().currentAction;
+            moving = reference.get().moving;
+            currentMovementTicks = reference.get().currentMovementTicks;
+        }
     }
 
     @Override
     public void update() {
 
-        if (!getMotorWorld().isRemote && triggers.get(EnumMotorAction.MOVE_FORWARD).isActive()) move();
+        if (moving != null) {
+            if (moving.get()) {
+                currentMovementTicks++;
+            } else {
+                getLogic().onMovementComplete();
+                currentMovementTicks = 0;
+                moving.set(false);
+                moving = null;
+            }
+        }
+        if (!getMotorWorld().isRemote) {
+            EnumMotorAction newAction = currentAction;
+            int activeTriggers = 0;
+            for (EnumMotorAction action : EnumMotorAction.VALUES) {
+                if (triggers.get(action).isActive()) {
+                    newAction = action;
+                    activeTriggers++;
+                }
+            }
+            if (activeTriggers == 1) currentAction = newAction;
+            if (currentAction.isMoving()) move(currentAction);
+        }
     }
 
     public Class<? extends TileMotor> getBaseClass() {
@@ -140,9 +169,15 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         return moving != null && moving.get();
     }
 
-    @Override
-    public boolean canMove() {
+    public int getCurrentMovementTicks() {
 
+        return currentMovementTicks;
+    }
+
+    @Override
+    public boolean canMove(EnumMotorAction action) {
+
+        if (action == EnumMotorAction.STOP) return false;
         IMotorLogic logic = getLogic();
         if (logic == null) return false;
         if (isMoving()) return false;
@@ -156,10 +191,15 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     }
 
     @Override
-    public DynamicReference<Boolean> move() {
+    public DynamicReference<Boolean> move(EnumMotorAction action) {
 
-        if (canMove()) return moving = getLogic().move(movedStructure);
-        return moving = new DynamicReference<Boolean>(false);
+        if (action == EnumMotorAction.STOP) return null;
+        if (canMove(action)) {
+            getLogic().move(movedStructure);
+            currentMovementTicks = 0;
+            return moving = new DynamicReference<Boolean>(true);
+        }
+        return null;
     }
 
     @Override
@@ -339,6 +379,12 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
             }
         }
         return meta;
+    }
+
+    @Override
+    public boolean hasFastRenderer() {
+
+        return true;
     }
 
 }

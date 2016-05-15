@@ -67,7 +67,7 @@ public class MotorLogicRotator implements IMotorLogic {
     }
 
     @Override
-    public DynamicReference<Boolean> move(MovingStructure structure) {
+    public void move(MovingStructure structure) {
 
         for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
             BlockData data = block.getKey().toBlockData();
@@ -77,7 +77,17 @@ public class MotorLogicRotator implements IMotorLogic {
                     new BlockRotation(face.getAxis(), direction == AxisDirection.POSITIVE ? RotationAngle.CCW_90 : RotationAngle.CW_90));
             data.place(block.getKey().getWorld(), block.getValue(), 3);
         }
-        return new DynamicReference<Boolean>(false);
+    }
+
+    @Override
+    public void onMovementComplete() {
+
+    }
+
+    @Override
+    public IMovement getMovement(Set<MovingBlock> blocks) {
+
+        return new MovementRotation();
     }
 
     @Override
@@ -89,12 +99,6 @@ public class MotorLogicRotator implements IMotorLogic {
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
 
-    }
-
-    @Override
-    public IMovement getMovement(Set<MovingBlock> blocks) {
-
-        return new MovementRotation();
     }
 
 }

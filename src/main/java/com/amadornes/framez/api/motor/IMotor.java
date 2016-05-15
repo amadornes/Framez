@@ -18,9 +18,9 @@ public interface IMotor {
 
     public boolean isMoving();
 
-    public boolean canMove();
+    public boolean canMove(EnumMotorAction action);
 
-    public DynamicReference<Boolean> move();
+    public DynamicReference<Boolean> move(EnumMotorAction action);
 
     public IMotorTrigger getTrigger(EnumMotorAction action);
 
