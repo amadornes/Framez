@@ -1,62 +1,176 @@
-// Motors
-tile.framez:motor.name=Slider DC Motor
+itemGroup.framez=Framez
 
-// Wrench modes
+// ---------------------------------- //
+//               BLOCKS               //
+// ---------------------------------- //
+
+tile.framez:metamorphic_stone.name=Metamorphic Stone
+tile.framez:metamorphic_stone.cracked.name=Cracked Metamorphic Stone
+tile.framez:metamorphic_stone.bricks.name=Metamorphic Stone Bricks
+tile.framez:metamorphic_stone.water.name=Aqueous Metamorphic Stone
+tile.framez:metamorphic_stone.fire.name=Fiery Metamorphic Stone
+tile.framez:metamorphic_stone.ice.name=Gelid Metamorphic Stone
+
+tile.framez:stopper.0.name=Frame Stopper
+tile.framez:stopper.1.name=Redstone Frame Stopper
+tile.framez:stopper.2.name=Redstone Frame Stopper
+
+tile.framez:motor_slider.name=%s Frame Slider
+tile.framez:motor_rotator.name=%s Frame Rotator
+tile.framez:motor_linearactuator.name=%s Frame Linear Actuator
+tile.framez:motor_blinkdrive.name=%s Frame Blink Drive
+
+tile.framez:frame.name=%s Frame
+
+// ---------------------------------- //
+//               ITEMS                //
+// ---------------------------------- //
+
 item.framez:wrench.normal.name=Wrench (Normal)
 item.framez:wrench.rotate.name=Wrench (Rotate)
 item.framez:wrench.debug.name=Wrench (Debug)
 item.framez:wrench.config.name=Wrench (Config & Management)
 
-// Main settings GUI
-gui.framez:click_through_frames=Click-through Frames [WIP]
-gui.framez:simple_frames=Simple Frames (2D)
+item.framez:wrench.silky.normal.name=§eSilky Wrench (Normal)§r
+item.framez:wrench.silky.rotate.name=§eSilky Wrench (Rotate)§r
+item.framez:wrench.silky.debug.name=§eSilky Wrench (Debug)§r
+item.framez:wrench.silky.config.name=§eSilky Wrench (Config & Management)§r
 
-// Motor settings GUI
+item.framez:crafting.name=%mat.adj% %type%
+item.framez:crafting.cross.name=Cross
+item.framez:crafting.panel.name=Panel
+item.framez:crafting.blocked.name=Blocked Panel
+
+item.framez:iron_nugget.name=Iron Nugget
+item.framez:specorium_love.name=Specorium Love Ingot
+
+item.framez:motorcore.name=Frame Motor Core
+item.framez:motorcore_slider.name=Frame Slider Core
+item.framez:motorcore_rotator.name=Frame Rotator Core
+item.framez:motorcore_linearactuator.name=Frame Linear Actuator Core
+item.framez:motorcore_blinkdrive.name=Frame Blink Drive Core
+
+// ---------------------------------- //
+//              TOOLTIPS              //
+// ---------------------------------- //
+
+tooltip.framez:shift=%sHold %sShift%s for Details
+tooltip.framez:ctrl=%sHold %sCtrl%s for More Details
+
+tooltip.framez:frame.modifiers=Modifiers
+tooltip.framez:frame.nomodifiers=No Modifiers
+tooltip.framez:frame.parts=Frame Parts
+tooltip.framez:frame.noparts=No Frame Parts
+tooltip.framez:frame.material=Material
+tooltip.framez:frame.blocked=Blocked Sides
+tooltip.framez:frame.hidden=Hidden Sides
+tooltip.framez:frame.stats=Stats
+tooltip.framez:frame.stat.max_moved_blocks=Max. Moved Blocks
+tooltip.framez:frame.stat.max_multiparts=Max. Multiparts
+tooltip.framez:frame.stat.min_movement_time=Min. Movement Time
+tooltip.framez:frame.stat.min_movement_time.warp=Warp
+
+tooltip.framez:wrench=Just your average, normal wrench.\nCtrl+Scroll to switch through the different modes.
+tooltip.framez:wrench.silky=Can be used to break a frame and keep its blocked sides stored. Also works with some multiparts.\nCtrl+Scroll to switch through the different modes.
+tooltip.framez:upgrade.bouncy=Allows a slider motor to move in one direction while it's powered and in the oposite when unpowered.\nVery useful un conjunction with stoppers.
+tooltip.framez:upgrade.camouflage=Allows you to camouflage a motor as almost any block in the game.
+tooltip.framez:stopper.0=Stops a line of frames from moving when it's reached and grabs it again when going in the opposite direction.\nAlso works as a microblock
+tooltip.framez:stopper.1=Stops a line of frames from moving when it's reached and grabs it again when going in the opposite direction.\nThis only happens if it's receiving a redstone signal.\nDoesn't have a microblock version
+tooltip.framez:motor_blinkdrive=Don't blink. Don't even blink.\nBlink and you're dead.
+tooltip.framez:metamorphic_stone.water=Acts as a water source block.\nTurns flowing lava into stone and lava sources into obsidian.
+tooltip.framez:metamorphic_stone.fire=Acts as a lava source block.\nTurns flowing water into cobblestone and water sources into stone.
+tooltip.framez:metamorphic_stone.ice=Freezes water on contact.\nTurns flowing water into ice and water sources into packed ice.
+
+// ---------------------------------- //
+//              MATERIALS             //
+// ---------------------------------- //
+
+material.framez:wood.name=Wood
+material.framez:iron.name=Iron
+material.framez:copper.name=Copper
+material.framez:tin.name=Tin
+material.framez:silver.name=Silver
+material.framez:gold.name=Gold
+material.framez:bronze.name=Bronze
+material.framez:invar.name=Invar
+material.framez:electrum.name=Electrum
+material.framez:enderium.name=Enderium
+
+material.framez:wood.adj=Wooden
+material.framez:iron.adj=Iron
+material.framez:copper.adj=Copper
+material.framez:tin.adj=Tin
+material.framez:silver.adj=Silver
+material.framez:gold.adj=Gold
+material.framez:bronze.adj=Bronze
+material.framez:invar.adj=Invar
+material.framez:electrum.adj=Electrum
+material.framez:enderium.adj=Enderium
+
+// ---------------------------------- //
+//              UPGRADES              //
+// ---------------------------------- //
+
+upgrade.framez:computer.name=Computer Upgrade
+upgrade.framez:camouflage.name=Camouflage Upgrade
+upgrade.framez:bouncy.name=Bouncy Upgrade
+upgrade.framez:momentum_conservation.name=Momentum Conservation Upgrade [WIP]
+
+upgrade.framez:computer=Computer Upgrade
+
+// ---------------------------------- //
+//              MODIFIERS             //
+// ---------------------------------- //
+
+modifier.framez:dc=DC
+modifier.framez:eu=Electric
+modifier.framez:rf=Fluctuating
+modifier.framez:eu$rf=Electro-fluctuating
+modifier.framez:rf$eu=Electro-fluctuating
+modifier.framez:mana=Botanist's
+modifier.framez:pc=Pneumatic
+
+// ---------------------------------- //
+//                GUI                 //
+// ---------------------------------- //
+
+gui.framez:click_through_frames=Click-through Frames [WIP]
+
 gui.framez:motor.redstone_pulse.0=Move whilst receiving a redstone signal
 gui.framez:motor.redstone_pulse.1=Move once per pulse
-gui.framez:motor.redstone_inverted.0=Normal redstone handling
-gui.framez:motor.redstone_inverted.1=Inverted redstone handling
-gui.framez:motor.solid.0=Not solid (no strong red. transmission)
-gui.framez:motor.solid.1=Solid (strong redstone transmission)
+gui.framez:motor.redstone_inverted.normal=Normal redstone handling
+gui.framez:motor.redstone_inverted.inverted=Inverted redstone handling
+gui.framez:motor.redstone_inverted.none=Always on
 
-// Frame items
-item.framez:frame.name=Support Frame
+// ---------------------------------- //
+//                MISC                //
+// ---------------------------------- //
 
-item.framez:frame.wood.name=Wooden Frame
+misc.framez:direction.0=Down
+misc.framez:direction.1=Up
+misc.framez:direction.2=North
+misc.framez:direction.3=South
+misc.framez:direction.4=West
+misc.framez:direction.5=East
+misc.framez:direction.6=Center
 
-item.framez:frame.iron.name=Iron Frame
-item.framez:frame.copper.name=Copper Frame
-item.framez:frame.tin.name=Tin Frame
-item.framez:frame.silver.name=Silver Frame
+misc.framez:side.0=Bottom
+misc.framez:side.1=Top
+misc.framez:side.2=North
+misc.framez:side.3=South
+misc.framez:side.4=West
+misc.framez:side.5=East
+misc.framez:side.6=Center
+misc.framez:side.short.0=B
+misc.framez:side.short.1=T
+misc.framez:side.short.2=N
+misc.framez:side.short.3=S
+misc.framez:side.short.4=W
+misc.framez:side.short.5=E
+misc.framez:side.short.6=C
 
-item.framez:frame.gold.name=Gold Frame
-
-item.framez:frame.bronze.name=Bronze Frame
-item.framez:frame.invar.name=Invar Frame
-
-item.framez:frame.electrum.name=Electrum Frame
-
-item.framez:frame.enderium.name=Enderium Frame
-
-// Frame modifiers
-tooltip.framez:modifiers=Modifiers
-
-tooltip.framez:modifier.material=Material
-
-tooltip.framez:modifier.wood.name=Wooden
-
-tooltip.framez:modifier.iron.name=Iron
-tooltip.framez:modifier.copper.name=Copper
-tooltip.framez:modifier.tin.name=Tin
-tooltip.framez:modifier.silver.name=Silver
-
-tooltip.framez:modifier.gold.name=Gold
-
-tooltip.framez:modifier.bronze.name=Bronze
-tooltip.framez:modifier.invar.name=Invar
-
-tooltip.framez:modifier.electrum.name=Electrum
-
-tooltip.framez:modifier.enderium.name=Enderium
-
-tooltip.framez:modifier.simple.name=Simple (2D)
+misc.framez:direction=Direction
+misc.framez:face=Face
+misc.framez:distance=Distance
+misc.framez:none=None
+misc.framez:support=Support
