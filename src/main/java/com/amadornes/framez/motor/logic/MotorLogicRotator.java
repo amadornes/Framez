@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.amadornes.blockdata.BlockData;
+import com.amadornes.blockdata.BlockRotation;
 import com.amadornes.blockdata.RotationAngle;
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.movement.IMovement;
@@ -72,7 +73,8 @@ public class MotorLogicRotator implements IMotorLogic {
             BlockData data = block.getKey().toBlockData();
             data.remove(block.getKey().getWorld(), block.getKey().getPos(), 3);
             data = BlockData.fromNBT(data.serializeNBT());// TODO: Make it so this isn't required?
-            data = data.withRotation(face.getAxis(), direction == AxisDirection.POSITIVE ? RotationAngle.CCW_90 : RotationAngle.CW_90);
+            data = data.withRotation(
+                    new BlockRotation(face.getAxis(), direction == AxisDirection.POSITIVE ? RotationAngle.CCW_90 : RotationAngle.CW_90));
             data.place(block.getKey().getWorld(), block.getValue(), 3);
         }
         return new DynamicReference<Boolean>(false);
