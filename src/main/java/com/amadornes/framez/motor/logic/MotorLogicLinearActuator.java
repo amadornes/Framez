@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.amadornes.blockdata.BlockData;
 import com.amadornes.framez.api.DynamicReference;
+import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.movement.IMovement;
 import com.amadornes.framez.movement.MovementTranslation;
 import com.amadornes.framez.movement.MovingBlock;
@@ -55,13 +56,13 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     }
 
     @Override
-    public boolean canMove(MovingStructure structure) {
+    public boolean canMove(MovingStructure structure, EnumMotorAction action) {
 
         return true;
     }
 
     @Override
-    public void move(MovingStructure structure) {
+    public void move(MovingStructure structure, EnumMotorAction action) {
 
         for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
             BlockData data = block.getKey().toBlockData();

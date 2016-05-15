@@ -186,7 +186,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         lastMoveCheck = getWorld().getTotalWorldTime();
         movedStructure = MovingStructure.discover(getMotorPos(), (w, p) -> w.getBlockState(p).getBlock().isAir(w.getBlockState(p), w, p),
                 getStickyFaces(), false, s -> logic.getMovement(s), () -> getMotorWorld());
-        return couldMove = (movedStructure != null && logic.canMove(movedStructure)
+        return couldMove = (movedStructure != null && logic.canMove(movedStructure, action)
                 && logic.getConsumedEnergy(movedStructure, getVariable(TileMotor.MOVEMENT_TIME)) <= getVariable(TileMotor.POWER_STORED));
     }
 
@@ -195,7 +195,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
         if (action == EnumMotorAction.STOP) return null;
         if (canMove(action)) {
-            getLogic().move(movedStructure);
+            getLogic().move(movedStructure, action);
             currentMovementTicks = 0;
             return moving = new DynamicReference<Boolean>(true);
         }

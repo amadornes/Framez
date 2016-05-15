@@ -3,6 +3,7 @@ package com.amadornes.framez.motor.logic;
 import java.util.Set;
 
 import com.amadornes.framez.api.DynamicReference;
+import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.movement.IMovement;
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
@@ -46,9 +47,9 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     public double getConsumedEnergy(MovingStructure structure, double energyApplied);
 
-    public boolean canMove(MovingStructure structure);
+    public boolean canMove(MovingStructure structure, EnumMotorAction action);
 
-    public void move(MovingStructure structure);
+    public void move(MovingStructure structure, EnumMotorAction action);
 
     public void onMovementComplete();
 
