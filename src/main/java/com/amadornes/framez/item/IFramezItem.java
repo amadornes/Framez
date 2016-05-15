@@ -9,7 +9,7 @@ import com.amadornes.framez.util.FramezUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -42,8 +42,8 @@ public interface IFramezItem {
         if (!hasTooltip(stack, player, unlocalized, localized, advanced)) return;
 
         if (!Framez.proxy.isShiftDown()) {
-            tooltip.add(I18n.format("tooltip." + ModInfo.MODID + ":shift", EnumChatFormatting.GRAY,
-                    EnumChatFormatting.YELLOW + "" + EnumChatFormatting.ITALIC, EnumChatFormatting.RESET + "" + EnumChatFormatting.GRAY));
+            tooltip.add(I18n.format("tooltip." + ModInfo.MODID + ":shift", TextFormatting.GRAY,
+                    TextFormatting.YELLOW + "" + TextFormatting.ITALIC, TextFormatting.RESET + "" + TextFormatting.GRAY));
         } else {
             addTipInformation(stack, player, tooltip, localized, advanced);
         }

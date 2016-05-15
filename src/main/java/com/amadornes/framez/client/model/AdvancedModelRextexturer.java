@@ -9,30 +9,30 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.amadornes.framez.client.ClientProxy;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.FaceBakery;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.model.IFlexibleBakedModel;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
 public class AdvancedModelRextexturer {
 
-    public static IBakedModel retexture(IBakedModel model, TextureAtlasSprite texture) {
+    public static IBakedModel retexture(IBlockState state, long rand, IBakedModel model, TextureAtlasSprite texture) {
 
-        List<BakedQuad> generalQuads = (List) Arrays
-                .asList(model.getGeneralQuads().stream().map(q -> new AdvancedBreakingFour(q, texture)).toArray());
-        List<BakedQuad>[] faceQuads = new List[6];
-        for (int i = 0; i < 6; i++)
-            faceQuads[i] = (List) Arrays
-                    .asList(model.getFaceQuads(EnumFacing.getFront(i)).stream().map(q -> new AdvancedBreakingFour(q, texture)).toArray());
         IBakedModel result = new IPerspectiveAwareModel() {
+
+            @Override
+            public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+
+                return (List) Arrays
+                        .asList(model.getQuads(state, side, rand).stream().map(q -> new AdvancedBreakingFour(q, texture)).toArray());
+            }
 
             @Override
             public boolean isGui3d() {
@@ -65,28 +65,16 @@ public class AdvancedModelRextexturer {
             }
 
             @Override
-            public List<BakedQuad> getGeneralQuads() {
-
-                return generalQuads;
-            }
-
-            @Override
-            public List<BakedQuad> getFaceQuads(EnumFacing face) {
-
-                return faceQuads[face.ordinal()];
-            }
-
-            @Override
-            public VertexFormat getFormat() {
-
-                return model instanceof IFlexibleBakedModel ? ((IFlexibleBakedModel) model).getFormat() : DefaultVertexFormats.BLOCK;
-            }
-
-            @Override
-            public Pair<? extends IFlexibleBakedModel, Matrix4f> handlePerspective(TransformType cameraTransformType) {
+            public Pair<? extends IBakedModel, Matrix4f> handlePerspective(TransformType cameraTransformType) {
 
                 return model instanceof IPerspectiveAwareModel ? ((IPerspectiveAwareModel) model).handlePerspective(cameraTransformType)
                         : Pair.of(this, null);
+            }
+
+            @Override
+            public ItemOverrideList getOverrides() {
+
+                return model.getOverrides();
             }
         };
         return result;
@@ -99,7 +87,8 @@ public class AdvancedModelRextexturer {
         public AdvancedBreakingFour(BakedQuad quad, TextureAtlasSprite textureIn) {
 
             super(Arrays.copyOf(quad.getVertexData(), quad.getVertexData().length), quad.getTintIndex(),
-                    FaceBakery.getFacingFromVertexData(quad.getVertexData()));
+                    FaceBakery.getFacingFromVertexData(quad.getVertexData()), textureIn, quad.shouldApplyDiffuseLighting(),
+                    quad.getFormat());
             this.texture = textureIn;
             this.remapQuad();
         }

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import net.minecraft.block.properties.IProperty;
 
 public class PropetyString implements IProperty<String> {
@@ -39,6 +41,12 @@ public class PropetyString implements IProperty<String> {
     public String getName(String value) {
 
         return value.toLowerCase();
+    }
+
+    @Override
+    public Optional<String> parseValue(String value) {
+
+        return Optional.of(value);
     }
 
 }

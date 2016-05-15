@@ -4,7 +4,7 @@ import com.amadornes.framez.Framez;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class PacketShowGUI extends Packet<PacketShowGUI> {
 

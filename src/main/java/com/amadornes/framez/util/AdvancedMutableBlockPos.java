@@ -2,7 +2,7 @@ package com.amadornes.framez.util;
 
 import com.amadornes.framez.movement.MovingBlock;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public final class AdvancedMutableBlockPos extends BlockPos {
 
@@ -47,7 +47,7 @@ public final class AdvancedMutableBlockPos extends BlockPos {
     }
 
     @Override
-    public BlockPos getImmutable() {
+    public BlockPos toImmutable() {
 
         return new BlockPos(this);
     }

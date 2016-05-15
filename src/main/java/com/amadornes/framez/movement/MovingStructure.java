@@ -1,7 +1,9 @@
 package com.amadornes.framez.movement;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -16,8 +18,8 @@ import com.amadornes.framez.util.Graph;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -80,7 +82,7 @@ public class MovingStructure implements IMovingStructure {
                 if (node.isSticky(face) && !graph.getVertices().contains(mutablePos.set(node.pos.offset(face)))) {
                     for (Supplier<World> world : worlds) {
                         if (!ignored.test(world.get(), mutablePos)) {
-                            MovingBlock neighbor = new MovingBlock(world, mutablePos.getImmutable());
+                            MovingBlock neighbor = new MovingBlock(world, mutablePos.toImmutable());
                             if (neighbor.canStickTo(face.getOpposite())) {
                                 graph.addEdge(node, neighbor);
                                 nodes.add(neighbor);
@@ -93,8 +95,14 @@ public class MovingStructure implements IMovingStructure {
         }
 
         Graph<MovingBlock> optimalPath = graph.getMST(start);
+        Set<MovingBlock> blocks = optimalPath.getVertices();
+        IMovement movement = movementSupplier.apply(blocks);
+        Map<MovingBlock, BlockPos> blockMap = new HashMap<MovingBlock, BlockPos>();
+        for (MovingBlock b : blocks)
+            if (b != start) blockMap.put(b, movement.transform(b.getPos()));
 
-        return null;// TODO: Create MovingStructure from graphs
+        if (blockMap.isEmpty()) return null;
+        return new MovingStructure(blockMap, Collections.emptySet()); // TODO: Implement movement issues
     }
 
 }

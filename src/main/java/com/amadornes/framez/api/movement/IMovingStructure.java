@@ -3,7 +3,7 @@ package com.amadornes.framez.api.movement;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public interface IMovingStructure {
 

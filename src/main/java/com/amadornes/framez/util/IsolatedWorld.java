@@ -3,8 +3,8 @@ package com.amadornes.framez.util;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -43,7 +43,7 @@ public class IsolatedWorld implements IBlockAccess {
     public IBlockState getBlockState(BlockPos pos) {
 
         if (this.position.equals(pos)) return world.getBlockState(pos);
-        return Blocks.air.getDefaultState();
+        return Blocks.AIR.getDefaultState();
     }
 
     @Override

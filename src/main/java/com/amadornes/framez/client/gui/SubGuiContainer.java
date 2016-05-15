@@ -53,13 +53,13 @@ public abstract class SubGuiContainer extends GuiContainer {
 
         this.checkHotbarKeys(keyCode);
 
-        if (this.theSlot != null && this.theSlot.getHasStack()) {
-            if (keyCode == this.mc.gameSettings.keyBindPickBlock.getKeyCode()) {
-                this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, 0, 3);
-            } else if (keyCode == this.mc.gameSettings.keyBindDrop.getKeyCode()) {
-                this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, 4);
-            }
-        }
+        // if (this.theSlot != null && this.theSlot.getHasStack()) {
+        // if (keyCode == this.mc.gameSettings.keyBindPickBlock.getKeyCode()) {
+        // this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, 0, ClickType.SWAP);// TODO: Check this. It's probably broken!
+        // } else if (keyCode == this.mc.gameSettings.keyBindDrop.getKeyCode()) {
+        // this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, isCtrlKeyDown() ? 1 : ClickType.PICKUP, ClickType.CLONE);
+        // }
+        // }
     }
 
 }

@@ -13,7 +13,7 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -24,11 +24,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -38,7 +38,7 @@ public class BlockMetamorphicStone extends Block {
 
     public BlockMetamorphicStone() {
 
-        super(Material.iron);
+        super(Material.IRON);
         setHardness(1.5F);
         setResistance(30);
         setUnlocalizedName(ModInfo.MODID + ":metamorphic_stone");
@@ -97,29 +97,29 @@ public class BlockMetamorphicStone extends Block {
         EnumMetamorphicStoneType type = state.getValue(TYPE);
         IBlockState fluidState = world.getBlockState(pos);
         if (type == EnumMetamorphicStoneType.WATER) {
-            if (world.getBlockState(pos).getBlock().getMaterial() == Material.lava) {
+            if (fluidState.getBlock().getMaterial(fluidState) == Material.LAVA) {
                 int lavaMeta = fluidState.getValue(BlockLiquid.LEVEL);
-                if (lavaMeta == 0) world.setBlockState(pos, Blocks.obsidian.getDefaultState());
-                else if (lavaMeta <= 4) world.setBlockState(pos, Blocks.stone.getDefaultState());
+                if (lavaMeta == 0) world.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState());
+                else if (lavaMeta <= 4) world.setBlockState(pos, Blocks.STONE.getDefaultState());
             }
         } else if (type == EnumMetamorphicStoneType.FIRE) {
-            if (world.getBlockState(pos).getBlock().getMaterial() == Material.water) {
+            if (fluidState.getBlock().getMaterial(fluidState) == Material.WATER) {
                 int waterMeta = fluidState.getValue(BlockLiquid.LEVEL);
-                if (waterMeta == 0) world.setBlockState(pos, Blocks.stone.getDefaultState());
-                else world.setBlockState(pos, Blocks.cobblestone.getDefaultState());
+                if (waterMeta == 0) world.setBlockState(pos, Blocks.STONE.getDefaultState());
+                else world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
             }
         } else if (type == EnumMetamorphicStoneType.ICE) {
-            if (world.getBlockState(pos).getBlock().getMaterial() == Material.water) {
+            if (fluidState.getBlock().getMaterial(fluidState) == Material.WATER) {
                 int waterMeta = fluidState.getValue(BlockLiquid.LEVEL);
-                if (waterMeta == 0) world.setBlockState(pos, Blocks.packed_ice.getDefaultState());
-                else world.setBlockState(pos, Blocks.ice.getDefaultState());
+                if (waterMeta == 0) world.setBlockState(pos, Blocks.PACKED_ICE.getDefaultState());
+                else world.setBlockState(pos, Blocks.ICE.getDefaultState());
             }
         }
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World world, BlockPos pos, IBlockState state, Random rand) {
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
 
         for (EnumFacing side : EnumFacing.VALUES)
             spawnFancyParticles(world, pos, side, state, new AxisAlignedBB(0, 0, 0, 1, 1, 1), rand);
@@ -169,8 +169,8 @@ public class BlockMetamorphicStone extends Block {
             } else if (type == EnumMetamorphicStoneType.FIRE) {
                 entity.setFire(5);
             } else if (type == EnumMetamorphicStoneType.ICE) {
-                if (entity instanceof EntityLivingBase)
-                    ((EntityLivingBase) entity).addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 1, 0, true, false));
+                if (entity instanceof EntityLivingBase) ((EntityLivingBase) entity)
+                        .addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("slowness"), 1, 0, true, false));
             }
         }
 
@@ -181,9 +181,9 @@ public class BlockMetamorphicStone extends Block {
     public static final IProperty<?>[] PROPERTIES = new IProperty[] { TYPE };
 
     @Override
-    protected BlockState createBlockState() {
+    protected BlockStateContainer createBlockState() {
 
-        return new BlockState(this, PROPERTIES);
+        return new BlockStateContainer(this, PROPERTIES);
     }
 
     @Override
@@ -199,9 +199,9 @@ public class BlockMetamorphicStone extends Block {
     }
 
     @Override
-    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+    public boolean canRenderInLayer(BlockRenderLayer layer) {
 
-        return layer == EnumWorldBlockLayer.CUTOUT;
+        return layer == BlockRenderLayer.CUTOUT;
     }
 
     public static enum EnumMetamorphicStoneType implements IStringSerializable {

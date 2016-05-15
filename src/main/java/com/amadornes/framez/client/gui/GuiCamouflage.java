@@ -12,24 +12,17 @@ import org.lwjgl.util.vector.Vector3f;
 import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.IMotor;
-import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.container.ContainerCamouflage;
-import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
-import com.amadornes.framez.util.IsolatedWorld;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.ISmartBlockModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -126,34 +119,35 @@ public class GuiCamouflage extends SubGuiContainer {
                 GlStateManager.multMatrix(buf);
                 GlStateManager.translate(-0.5, -0.5, -0.5);
 
-                mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-                mc.renderEngine.getTexture(TextureMap.locationBlocksTexture).setBlurMipmap(false, false);
-                IMotor motor = upgrade.motor.get();
-                WorldRenderer wr = Tessellator.getInstance().getWorldRenderer();
-                wr.begin(7, DefaultVertexFormats.BLOCK);
-                wr.setTranslation(-motor.getMotorPos().getX(), -motor.getMotorPos().getY(), -motor.getMotorPos().getZ());
-                IBlockState state = FramezBlocks.motor.getActualState(motor.getMotorWorld().getBlockState(motor.getMotorPos()),
-                        motor.getMotorWorld(), motor.getMotorPos());
-                IBakedModel model;
-
-                state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 0);
-                model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
-                model = model instanceof ISmartBlockModel ? ((ISmartBlockModel) model)
-                        .handleBlockState(FramezBlocks.motor.getExtendedState(state, motor.getMotorWorld(), motor.getMotorPos())) : model;
-
-                mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
-                        IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, state, motor.getMotorPos(), wr);
-
-                state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
-                model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
-                model = model instanceof ISmartBlockModel ? ((ISmartBlockModel) model).handleBlockState(state) : model;
-
-                mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
-                        IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, state, motor.getMotorPos(), wr);
-
-                wr.setTranslation(0, 0, 0);
-                Tessellator.getInstance().draw();
-                mc.renderEngine.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap();
+                // TODO: Re-enable camouflage GUI
+                // mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                // mc.renderEngine.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+                // IMotor motor = upgrade.motor.get();
+                // VertexBuffer wr = Tessellator.getInstance().getBuffer();
+                // wr.begin(7, DefaultVertexFormats.BLOCK);
+                // wr.setTranslation(-motor.getMotorPos().getX(), -motor.getMotorPos().getY(), -motor.getMotorPos().getZ());
+                // IBlockState state = FramezBlocks.motor.getActualState(motor.getMotorWorld().getBlockState(motor.getMotorPos()),
+                // motor.getMotorWorld(), motor.getMotorPos());
+                // IBakedModel model;
+                //
+                // state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 0);
+                // model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+                // model = model instanceof ISmartBlockModel ? ((ISmartBlockModel) model)
+                // .handleBlockState(FramezBlocks.motor.getExtendedState(state, motor.getMotorWorld(), motor.getMotorPos())) : model;
+                //
+                // mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
+                // IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, state, motor.getMotorPos(), wr);
+                //
+                // state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
+                // model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+                // model = model instanceof ISmartBlockModel ? ((ISmartBlockModel) model).handleBlockState(state) : model;
+                //
+                // mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
+                // IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, state, motor.getMotorPos(), wr);
+                //
+                // wr.setTranslation(0, 0, 0);
+                // Tessellator.getInstance().draw();
+                // mc.renderEngine.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap();
             }
             GlStateManager.popMatrix();
 
@@ -166,7 +160,7 @@ public class GuiCamouflage extends SubGuiContainer {
 
                 GlStateManager.disableTexture2D();
                 GL11.glLineWidth(2);
-                WorldRenderer wr = Tessellator.getInstance().getWorldRenderer();
+                VertexBuffer wr = Tessellator.getInstance().getBuffer();
                 wr.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
                 {
                     wr.pos(0, 0, 0).color(0.0F, 1.0F, 0.0F, 1.0F).endVertex();

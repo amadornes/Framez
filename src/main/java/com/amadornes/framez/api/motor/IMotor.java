@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 import com.amadornes.framez.api.DynamicReference;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public interface IMotor {
@@ -15,6 +15,8 @@ public interface IMotor {
     public BlockPos getMotorPos();
 
     public DynamicReference<? extends IMotor> getSafeReference();
+
+    public boolean isMoving();
 
     public boolean canMove();
 

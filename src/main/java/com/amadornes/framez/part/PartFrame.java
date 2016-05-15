@@ -21,16 +21,17 @@ import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -93,28 +94,28 @@ public class PartFrame extends Multipart implements IFrame {
     @Override
     public void addSelectionBoxes(List<AxisAlignedBB> list) {
 
-        list.add(AxisAlignedBB.fromBounds(0 / 16D, 14 / 16D, 0 / 16D, 16 / 16D, 16 / 16D, 2 / 16D));
-        list.add(AxisAlignedBB.fromBounds(0 / 16D, 14 / 16D, 14 / 16D, 16 / 16D, 16 / 16D, 16 / 16D));
-        list.add(AxisAlignedBB.fromBounds(0 / 16D, 14 / 16D, 0 / 16D, 2 / 16D, 16 / 16D, 16 / 16D));
-        list.add(AxisAlignedBB.fromBounds(14 / 16D, 14 / 16D, 0 / 16D, 16 / 16D, 16 / 16D, 16 / 16D));
+        list.add(new AxisAlignedBB(0 / 16D, 14 / 16D, 0 / 16D, 16 / 16D, 16 / 16D, 2 / 16D));
+        list.add(new AxisAlignedBB(0 / 16D, 14 / 16D, 14 / 16D, 16 / 16D, 16 / 16D, 16 / 16D));
+        list.add(new AxisAlignedBB(0 / 16D, 14 / 16D, 0 / 16D, 2 / 16D, 16 / 16D, 16 / 16D));
+        list.add(new AxisAlignedBB(14 / 16D, 14 / 16D, 0 / 16D, 16 / 16D, 16 / 16D, 16 / 16D));
 
-        list.add(AxisAlignedBB.fromBounds(0 / 16D, 0 / 16D, 0 / 16D, 2 / 16D, 16 / 16D, 2 / 16D));
-        list.add(AxisAlignedBB.fromBounds(14 / 16D, 0 / 16D, 0 / 16D, 16 / 16D, 16 / 16D, 2 / 16D));
-        list.add(AxisAlignedBB.fromBounds(0 / 16D, 0 / 16D, 14 / 16D, 2 / 16D, 16 / 16D, 16 / 16D));
-        list.add(AxisAlignedBB.fromBounds(14 / 16D, 0 / 16D, 14 / 16D, 16 / 16D, 16 / 16D, 16 / 16D));
+        list.add(new AxisAlignedBB(0 / 16D, 0 / 16D, 0 / 16D, 2 / 16D, 16 / 16D, 2 / 16D));
+        list.add(new AxisAlignedBB(14 / 16D, 0 / 16D, 0 / 16D, 16 / 16D, 16 / 16D, 2 / 16D));
+        list.add(new AxisAlignedBB(0 / 16D, 0 / 16D, 14 / 16D, 2 / 16D, 16 / 16D, 16 / 16D));
+        list.add(new AxisAlignedBB(14 / 16D, 0 / 16D, 14 / 16D, 16 / 16D, 16 / 16D, 16 / 16D));
 
-        list.add(AxisAlignedBB.fromBounds(0 / 16D, 0 / 16D, 0 / 16D, 16 / 16D, 2 / 16D, 2 / 16D));
-        list.add(AxisAlignedBB.fromBounds(0 / 16D, 0 / 16D, 14 / 16D, 16 / 16D, 2 / 16D, 16 / 16D));
-        list.add(AxisAlignedBB.fromBounds(0 / 16D, 0 / 16D, 0 / 16D, 2 / 16D, 2 / 16D, 16 / 16D));
-        list.add(AxisAlignedBB.fromBounds(14 / 16D, 0 / 16D, 0 / 16D, 16 / 16D, 2 / 16D, 16 / 16D));
+        list.add(new AxisAlignedBB(0 / 16D, 0 / 16D, 0 / 16D, 16 / 16D, 2 / 16D, 2 / 16D));
+        list.add(new AxisAlignedBB(0 / 16D, 0 / 16D, 14 / 16D, 16 / 16D, 2 / 16D, 16 / 16D));
+        list.add(new AxisAlignedBB(0 / 16D, 0 / 16D, 0 / 16D, 2 / 16D, 2 / 16D, 16 / 16D));
+        list.add(new AxisAlignedBB(14 / 16D, 0 / 16D, 0 / 16D, 16 / 16D, 2 / 16D, 16 / 16D));
 
-        list.add(AxisAlignedBB.fromBounds(1 / 16D, 1 / 16D, 1 / 16D, 15 / 16D, 15 / 16D, 15 / 16D));
+        list.add(new AxisAlignedBB(1 / 16D, 1 / 16D, 1 / 16D, 15 / 16D, 15 / 16D, 15 / 16D));
     }
 
     @Override
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
 
-        AxisAlignedBB bb = AxisAlignedBB.fromBounds(0, 0, 0, 1, 1, 1);
+        AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
         if (bb.intersectsWith(mask)) list.add(bb);
     }
 
@@ -149,19 +150,19 @@ public class PartFrame extends Multipart implements IFrame {
     }
 
     @Override
-    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+    public boolean canRenderInLayer(BlockRenderLayer layer) {
 
-        return layer == EnumWorldBlockLayer.CUTOUT;
+        return layer == BlockRenderLayer.CUTOUT;
     }
 
     @Override
-    public BlockState createBlockState() {
+    public BlockStateContainer createBlockState() {
 
         return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], Arrays.copyOf(PROPERTIES, PROPERTIES.length));
     }
 
     @Override
-    public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
+    public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 
         if (!player.isSneaking() && stack != null) return false;
 
@@ -169,7 +170,7 @@ public class PartFrame extends Multipart implements IFrame {
         properties.flip(i + (player.isSneaking() ? 6 : 0));
         markRenderUpdate();
 
-        return super.onActivated(player, stack, hit);
+        return super.onActivated(player, hand, stack, hit);
     }
 
     @Override

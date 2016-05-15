@@ -7,7 +7,6 @@ import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
@@ -82,7 +81,8 @@ public class GuiMotorSettings extends GuiScreen {
             int x = left + xSize - 1, y = top + 6 + (24 + 1) * i;
             if (mouseX >= x && mouseX < x + 22 && mouseY >= y && mouseY < y + 24) {
                 tab = i;
-                mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                // TODO: Click sound
+                // mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
                 return;
             }
         }

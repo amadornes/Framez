@@ -1,8 +1,9 @@
 package com.amadornes.framez.item;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 
 public class ItemWrench extends ItemFramez {
 
@@ -12,7 +13,7 @@ public class ItemWrench extends ItemFramez {
     }
 
     @Override
-    public boolean doesSneakBypassUse(World world, BlockPos pos, EntityPlayer player) {
+    public boolean doesSneakBypassUse(ItemStack stack, IBlockAccess world, BlockPos pos, EntityPlayer player) {
 
         return true;
     }

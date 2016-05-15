@@ -11,14 +11,17 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -41,7 +44,7 @@ public class BlockMotor extends Block implements ITileEntityProvider {
 
     public BlockMotor() {
 
-        super(Material.iron);
+        super(Material.IRON);
     }
 
     @Override
@@ -51,24 +54,23 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public int getRenderType() {
+    public EnumBlockRenderType getRenderType(IBlockState state) {
 
-        return 3;
+        return EnumBlockRenderType.MODEL;
     }
 
     @Override
-    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+    public boolean canRenderInLayer(BlockRenderLayer layer) {
 
-        return layer == EnumWorldBlockLayer.CUTOUT;
+        return layer == BlockRenderLayer.CUTOUT;
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX,
-            float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack stack,
+            EnumFacing side, float hitX, float hitY, float hitZ) {
 
         // TODO: Wrench API!
-        if (player.isSneaking() && player.getCurrentEquippedItem() != null
-                && player.getCurrentEquippedItem().getItem() == FramezItems.wrench) {
+        if (player.isSneaking() && stack != null && stack.getItem() == FramezItems.wrench) {
             if (world.isRemote)
                 Minecraft.getMinecraft().displayGuiScreen(new GuiMotorSettings(((TileMotor) world.getTileEntity(pos)).getSafeReference()));
             return true;
@@ -77,7 +79,7 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     }
 
     @Override
-    protected BlockState createBlockState() {
+    protected BlockStateContainer createBlockState() {
 
         return new ExtendedBlockState(this, new IProperty[] { PROPERTY_LOGIC_TYPE, PROPERTY_PART_TYPE }, new IUnlistedProperty[] {
                 PROPERTY_CAMO_DOWN, PROPERTY_CAMO_UP, PROPERTY_CAMO_NORTH, PROPERTY_CAMO_SOUTH, PROPERTY_CAMO_WEST, PROPERTY_CAMO_EAST });
@@ -112,28 +114,28 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public boolean isBlockNormalCube() {
+    public boolean isBlockNormalCube(IBlockState state) {
 
         // Ambient occlusion
         return true;
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube(IBlockState state) {
 
         // Block face clipping
         return false;
     }
 
     @Override
-    public boolean isFullCube() {
+    public boolean isFullCube(IBlockState state) {
 
         // Solidity
         return true;
     }
 
     @Override
-    public boolean isFullBlock() {
+    public boolean isFullBlock(IBlockState state) {
 
         // Full block? I guess? Meh, who cares
         return false;

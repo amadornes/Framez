@@ -35,9 +35,9 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.items.IItemHandler;
@@ -61,6 +61,8 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public final Pair<IMotorUpgrade, ItemStack>[] upgrades = new Pair[getUpgradeSlots()];
     public final Map<EnumMotorStatus, Boolean> statuses = new HashMap<EnumMotorStatus, Boolean>();
     public final Map<IMotorVariable<?>, Supplier<Object>> nativeVariables = new HashMap<IMotorVariable<?>, Supplier<Object>>();
+
+    private DynamicReference<Boolean> moving = null;
 
     public TileMotor() {
 
@@ -133,24 +135,31 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     private MovingStructure movedStructure = null;
 
     @Override
+    public boolean isMoving() {
+
+        return moving != null && moving.get();
+    }
+
+    @Override
     public boolean canMove() {
 
         IMotorLogic logic = getLogic();
         if (logic == null) return false;
+        if (isMoving()) return false;
         if (lastMoveCheck == getWorld().getTotalWorldTime()) return couldMove;
 
         lastMoveCheck = getWorld().getTotalWorldTime();
-        movedStructure = MovingStructure.discover(getMotorPos(), (w, p) -> w.getBlockState(p).getBlock().isAir(w, p), getStickyFaces(),
-                false, s -> logic.getMovement(s), () -> getMotorWorld());
-        return couldMove = logic.canMove(movedStructure)
-                && logic.getConsumedEnergy(movedStructure, getVariable(TileMotor.MOVEMENT_TIME)) <= getVariable(TileMotor.POWER_STORED);
+        movedStructure = MovingStructure.discover(getMotorPos(), (w, p) -> w.getBlockState(p).getBlock().isAir(w.getBlockState(p), w, p),
+                getStickyFaces(), false, s -> logic.getMovement(s), () -> getMotorWorld());
+        return couldMove = (movedStructure != null && logic.canMove(movedStructure)
+                && logic.getConsumedEnergy(movedStructure, getVariable(TileMotor.MOVEMENT_TIME)) <= getVariable(TileMotor.POWER_STORED));
     }
 
     @Override
     public DynamicReference<Boolean> move() {
 
-        if (canMove()) return getLogic().move(movedStructure);
-        return new DynamicReference<Boolean>(false);
+        if (canMove()) return moving = getLogic().move(movedStructure);
+        return moving = new DynamicReference<Boolean>(false);
     }
 
     @Override

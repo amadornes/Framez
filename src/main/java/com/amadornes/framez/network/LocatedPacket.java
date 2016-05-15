@@ -2,7 +2,7 @@ package com.amadornes.framez.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
@@ -39,7 +39,7 @@ public abstract class LocatedPacket<T extends LocatedPacket<T>> extends Packet<T
 
     public TargetPoint getTargetPoint(World world, double range) {
 
-        return new NetworkRegistry.TargetPoint(world.provider.getDimensionId(), pos.getX(), pos.getY(), pos.getZ(), range);
+        return new NetworkRegistry.TargetPoint(world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), range);
     }
 
 }

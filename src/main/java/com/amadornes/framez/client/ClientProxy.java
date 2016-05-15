@@ -1,6 +1,5 @@
 package com.amadornes.framez.client;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.IntFunction;
@@ -13,7 +12,6 @@ import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.api.frame.EnumFrameTexture;
 import com.amadornes.framez.api.frame.IFrameMaterial;
 import com.amadornes.framez.client.model.ModelFrame;
-import com.amadornes.framez.client.model.ModelFramePanel;
 import com.amadornes.framez.client.model.ModelWrapperCamouflage;
 import com.amadornes.framez.client.render.FTESRMotor;
 import com.amadornes.framez.frame.FrameRegistry;
@@ -25,10 +23,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -36,7 +34,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.TRSRTransformation;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -77,37 +76,37 @@ public class ClientProxy extends CommonProxy {
 
         for (IBlockState state : FramezBlocks.motor.getBlockState().getValidStates()) {
             ModelResourceLocation res = getModelResourceLocation(state);
-            event.modelRegistry.putObject(res, new ModelWrapperCamouflage(event.modelRegistry.getObject(res)));
+            event.getModelRegistry().putObject(res, new ModelWrapperCamouflage(event.getModelRegistry().getObject(res)));
         }
 
         // Dynamic frame part model
         {
-            event.modelRegistry.putObject(new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "multipart"),
+            event.getModelRegistry().putObject(new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "multipart"),
                     new ModelFrame());
             ModelResourceLocation modelLoc = new ModelResourceLocation(new ResourceLocation(ModInfo.MODID, "frame"), "inventory");
-            MODEL_FRAME_ORIGINAL = event.modelRegistry.getObject(modelLoc);
-            event.modelRegistry.putObject(modelLoc, new ModelFrame());
+            MODEL_FRAME_ORIGINAL = event.getModelRegistry().getObject(modelLoc);
+            event.getModelRegistry().putObject(modelLoc, new ModelFrame());
         }
 
         // Dynamic frame panel items
         {
             ResourceLocation resLoc = new ResourceLocation(ModInfo.MODID, "frame_panel");
-            MODEL_ITEM_BINDING = event.modelRegistry.getObject(new ModelResourceLocation(resLoc, "inventory0"));
-            MODEL_ITEM_CROSS = event.modelRegistry.getObject(new ModelResourceLocation(resLoc, "inventory1"));
-            MODEL_ITEM_BORDER = event.modelRegistry.getObject(new ModelResourceLocation(resLoc, "inventory2"));
-            event.modelRegistry.putObject(new ModelResourceLocation(resLoc, "inventory0"), new ModelFramePanel());
-            event.modelRegistry.putObject(new ModelResourceLocation(resLoc, "inventory1"), new ModelFramePanel());
+            MODEL_ITEM_BINDING = event.getModelRegistry().getObject(new ModelResourceLocation(resLoc, "inventory0"));
+            MODEL_ITEM_CROSS = event.getModelRegistry().getObject(new ModelResourceLocation(resLoc, "inventory1"));
+            MODEL_ITEM_BORDER = event.getModelRegistry().getObject(new ModelResourceLocation(resLoc, "inventory2"));
+            // event.getModelRegistry().putObject(new ModelResourceLocation(resLoc, "inventory0"), new ModelFramePanel());
+            // event.getModelRegistry().putObject(new ModelResourceLocation(resLoc, "inventory1"), new ModelFramePanel());
         }
 
         // Dynamic frame block models
         try {
-            MODEL_FRAME_BORDER = event.modelLoader.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_border")).bake(
+            MODEL_FRAME_BORDER = ModelLoaderRegistry.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_border")).bake(
                     TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
                     r -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:stone"));
-            MODEL_FRAME_CROSS = event.modelLoader.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_cross")).bake(
+            MODEL_FRAME_CROSS = ModelLoaderRegistry.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_cross")).bake(
                     TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
                     r -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:stone"));
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -117,13 +116,13 @@ public class ClientProxy extends CommonProxy {
 
         for (IFrameMaterial mat : FrameRegistry.INSTANCE.materials.values())
             for (EnumFrameTexture tex : EnumFrameTexture.VALUES)
-                if (mat.canBeUsedAs(tex.getPart())) event.map.registerSprite(mat.getTexture(tex));
+                if (mat.canBeUsedAs(tex.getPart())) event.getMap().registerSprite(mat.getTexture(tex));
     }
 
     @SubscribeEvent
     public void onTextureStitchPost(TextureStitchEvent.Post event) {
 
-        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         BLOCK_TEXTURE_WIDTH = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
         BLOCK_TEXTURE_HEIGHT = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
     }
@@ -167,7 +166,7 @@ public class ClientProxy extends CommonProxy {
     @SuppressWarnings("rawtypes")
     private ModelResourceLocation getModelResourceLocation(IBlockState state) {
 
-        return new ModelResourceLocation(Block.blockRegistry.getNameForObject(state.getBlock()).toString(),
+        return new ModelResourceLocation(Block.REGISTRY.getNameForObject(state.getBlock()).toString(),
                 getPropertyString(Maps.<IProperty, Comparable> newLinkedHashMap(state.getProperties())));
     }
 

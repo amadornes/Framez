@@ -9,18 +9,19 @@ import com.amadornes.framez.tile.TileMotor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> {
 
     @Override
     public void renderMotor(MotorLogicLinearActuator logic, double x, double y, double z, float partialTicks, int destroyStage,
-            WorldRenderer wr) {
+            VertexBuffer wr) {
 
         final double extension = (Math.sin(System.currentTimeMillis() / 400D) + 1) / 2D;
         TileMotor motor = logic.getMotor();
@@ -33,17 +34,17 @@ public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> 
         IBakedModel model = brd.getBlockModelShapes().getModelForState(state);
         // TODO: if (model instanceof ISmartBlockModel)
         // model = ((ISmartBlockModel) model).handleBlockState(state.getBlock().getExtendedState(state, motor.getMotorWorld(), pos));
-        brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(), model, state, pos, wr);
+        brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(), model, state, pos, wr, false);
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),
-                brd.getBlockModelShapes().getModelForState(Blocks.sandstone.getDefaultState()), Blocks.sandstone.getDefaultState(),
-                pos.down(), wr);
+                brd.getBlockModelShapes().getModelForState(Blocks.SANDSTONE.getDefaultState()), Blocks.SANDSTONE.getDefaultState(),
+                pos.down(), wr, false);
         wr.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
         state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 2);
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),
                 ModelTransformer.transform(brd.getBlockModelShapes().getModelForState(state), new IVertexTransformer() {
 
                     @Override
-                    public float[] transform(EnumType type, EnumUsage usage, float... data) {
+                    public float[] transform(BakedQuad quad, EnumType type, EnumUsage usage, float... data) {
 
                         if (usage == EnumUsage.POSITION) {
                             if (data[1] <= 0.0) {
@@ -55,7 +56,7 @@ public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> 
 
                         return data;
                     }
-                }, wr.getVertexFormat()), state, pos, wr);
+                }, state, 0L), state, pos, wr, false);
 
         wr.setTranslation(0, 0, 0);
     }

@@ -1,10 +1,10 @@
 package com.amadornes.framez.init;
 
+import com.amadornes.framez.ModInfo;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-
-import com.amadornes.framez.ModInfo;
 
 public class FramezCreativeTab extends CreativeTabs {
 
@@ -18,7 +18,7 @@ public class FramezCreativeTab extends CreativeTabs {
     @Override
     public Item getTabIconItem() {
 
-        return Items.apple;
+        return Items.APPLE;
     }
 
     // @Override
