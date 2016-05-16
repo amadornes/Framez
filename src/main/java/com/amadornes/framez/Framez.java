@@ -1,5 +1,6 @@
 package com.amadornes.framez;
 
+import com.amadornes.framez.api.motor.IMotorInteractions;
 import com.amadornes.framez.frame.FrameMaterialBasic;
 import com.amadornes.framez.frame.FrameRegistry;
 import com.amadornes.framez.init.FramezBlocks;
@@ -13,9 +14,12 @@ import com.amadornes.framez.motor.upgrade.UpgradeBase;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
 import com.amadornes.framez.motor.upgrade.UpgradeCreative;
 import com.amadornes.framez.motor.upgrade.UpgradeFactoryBase;
+import com.amadornes.framez.motor.upgrade.UpgradeFactoryBase.IMotorUpgradeCreatorInt;
 import com.amadornes.framez.network.GuiHandler;
 import com.amadornes.framez.network.NetworkHandler;
+import com.amadornes.jtraits.JTrait;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -26,7 +30,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
-@Mod(modid = "framez", name = "Framez", version = "1.0.0")
+@Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION)
 public class Framez {
 
     @Instance
@@ -43,20 +47,16 @@ public class Framez {
         FrameRegistry.INSTANCE.registerMaterial(new FrameMaterialBasic("iron", 20, 40, 3, 3, "nuggetIron"));
         FrameRegistry.INSTANCE.registerMaterial(new FrameMaterialBasic("gold", 20, 40, 3, 3, "nuggetGold"));
 
-        MotorRegistry.INSTANCE
-                .registerUpgradeInternal(new UpgradeFactoryBase("camouflage", (m, s) -> new UpgradeCamouflage(m, s, "camouflage")));
-        MotorRegistry.INSTANCE
-                .registerUpgradeInternal(new UpgradeFactoryBase("telekinetic", (m, s) -> new UpgradeBase(m, s, "telekinetic")));
-        MotorRegistry.INSTANCE.registerUpgradeInternal(new UpgradeFactoryBase("advTrigger", (m, s) -> new UpgradeBase(m, s, "advTrigger")));
-        MotorRegistry.INSTANCE.registerUpgradeInternal(new UpgradeFactoryBase("crawling", (m, s) -> new UpgradeBase(m, s, "crawling")));
-        MotorRegistry.INSTANCE.registerUpgradeInternal(new UpgradeFactoryBase("speedReg", (m, s) -> new UpgradeBase(m, s, "speedReg")));
-        MotorRegistry.INSTANCE
-                .registerUpgradeInternal(new UpgradeFactoryBase("computerized", (m, s) -> new UpgradeBase(m, s, "computerized")));
-        MotorRegistry.INSTANCE.registerUpgradeInternal(new UpgradeFactoryBase("stepInterp", (m, s) -> new UpgradeBase(m, s, "stepInterp")));
-        MotorRegistry.INSTANCE
-                .registerUpgradeInternal(new UpgradeFactoryBase("soundMuffler", (m, s) -> new UpgradeBase(m, s, "soundMuffler")));
-        MotorRegistry.INSTANCE.registerUpgradeInternal(new UpgradeFactoryBase("extRange", (m, s) -> new UpgradeBase(m, s, "extRange")));
-        MotorRegistry.INSTANCE.registerUpgradeInternal(new UpgradeFactoryBase("creative", (m, s) -> new UpgradeCreative(m, s, "creative")));
+        registerUpgrade("camouflage", (m, s) -> new UpgradeCamouflage(m, s));
+        registerUpgrade("telekinetic", (m, s) -> new UpgradeBase(m, s));
+        registerUpgrade("advTrigger", (m, s) -> new UpgradeBase(m, s));
+        registerUpgrade("crawling", (m, s) -> new UpgradeBase(m, s));
+        registerUpgrade("speedReg", (m, s) -> new UpgradeBase(m, s));
+        registerUpgrade("computerized", (m, s) -> new UpgradeBase(m, s));
+        registerUpgrade("stepInterp", (m, s) -> new UpgradeBase(m, s));
+        registerUpgrade("soundMuffler", (m, s) -> new UpgradeBase(m, s));
+        registerUpgrade("extRange", (m, s) -> new UpgradeBase(m, s));
+        registerUpgrade("creative", (m, s) -> new UpgradeCreative(m, s));
 
         FramezItems.initialize();
         FramezItems.register();
@@ -84,6 +84,19 @@ public class Framez {
     public void postInit(FMLPostInitializationEvent event) {
 
         proxy.postInit();
+    }
+
+    private void registerUpgrade(String name, IMotorUpgradeCreatorInt creator) {
+
+        registerUpgrade(name, creator, null);
+    }
+
+    private void registerUpgrade(String name, IMotorUpgradeCreatorInt creator,
+            Class<? extends JTrait<? extends IMotorInteractions>> trait) {
+
+        ResourceLocation type = new ResourceLocation(ModInfo.MODID, name);
+        MotorRegistry.INSTANCE.registerUpgradeInternal(type,
+                new UpgradeFactoryBase(type, (m, s) -> creator.createUpgrade(m, s).setType(type), trait));
     }
 
 }

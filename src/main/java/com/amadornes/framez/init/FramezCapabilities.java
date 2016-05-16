@@ -3,6 +3,7 @@ package com.amadornes.framez.init;
 import com.amadornes.framez.api.frame.IFrame;
 import com.amadornes.framez.api.frame.IStickable;
 import com.amadornes.framez.api.frame.ISticky;
+import com.amadornes.framez.api.motor.IMotor;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
@@ -14,6 +15,7 @@ public class FramezCapabilities {
 
     public static void register() {
 
+        CapabilityManager.INSTANCE.register(IMotor.class, new NullStorage<IMotor>(), () -> null);
         CapabilityManager.INSTANCE.register(IFrame.class, new NullStorage<IFrame>(), () -> null);
         CapabilityManager.INSTANCE.register(ISticky.class, new NullStorage<ISticky>(), () -> (ISticky) () -> false);
         CapabilityManager.INSTANCE.register(IStickable.class, new NullStorage<IStickable>(), () -> (IStickable) () -> true);

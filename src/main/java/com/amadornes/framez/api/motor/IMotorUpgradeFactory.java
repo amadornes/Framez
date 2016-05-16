@@ -15,8 +15,6 @@ public interface IMotorUpgradeFactory {
     @CapabilityInject(IMotorUpgradeFactory.class)
     public static final Capability<IMotorUpgradeFactory> CAPABILITY_ITEM_UPGRADE = null;
 
-    public String getType();
-
     public List<ItemStack> getCraftingItems();
 
     public boolean isUpgradeStack(ItemStack stack);

@@ -101,7 +101,7 @@ public class MovingStructure implements IMovingStructure {
         for (MovingBlock b : blocks)
             if (b != start) blockMap.put(b, movement.transform(b.getPos()));
 
-        if (blockMap.isEmpty()) return null;
+        // if (blockMap.isEmpty()) return null;
         return new MovingStructure(blockMap, Collections.emptySet()); // TODO: Implement movement issues
     }
 

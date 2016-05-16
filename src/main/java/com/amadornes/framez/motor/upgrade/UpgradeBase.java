@@ -15,23 +15,29 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 
 public class UpgradeBase implements IMotorUpgrade {
 
     public final DynamicReference<? extends IMotor> motor;
     protected final int slot;
-    private final String type;
+    private ResourceLocation type;
 
-    public UpgradeBase(DynamicReference<? extends IMotor> motor, int slot, String type) {
+    public UpgradeBase(DynamicReference<? extends IMotor> motor, int slot) {
 
         this.motor = motor;
         this.slot = slot;
+    }
+
+    public UpgradeBase setType(ResourceLocation type) {
+
         this.type = type;
+        return this;
     }
 
     @Override
-    public String getType() {
+    public ResourceLocation getType() {
 
         return type;
     }

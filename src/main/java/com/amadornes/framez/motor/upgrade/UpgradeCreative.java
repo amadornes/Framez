@@ -7,9 +7,9 @@ import com.amadornes.framez.tile.TileMotor;
 
 public class UpgradeCreative extends UpgradeBase {
 
-    public UpgradeCreative(DynamicReference<? extends IMotor> motor, int slot, String type) {
+    public UpgradeCreative(DynamicReference<? extends IMotor> motor, int slot) {
 
-        super(motor, slot, type);
+        super(motor, slot);
     }
 
     @Override

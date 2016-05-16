@@ -3,6 +3,8 @@ package com.amadornes.framez.client.render;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
+import com.amadornes.framez.api.motor.EnumMotorAction;
+import com.amadornes.framez.api.motor.EnumMotorStatus;
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.client.ModelTransformer;
 import com.amadornes.framez.client.ModelTransformer.IVertexTransformer;
@@ -23,8 +25,18 @@ public class RenderRotator extends RenderMotor<MotorLogicRotator> {
     @Override
     public void renderMotor(MotorLogicRotator logic, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer wr) {
 
-        double t = 10;
-        final double angle = (System.currentTimeMillis() % (t * 360)) / t;
+        int ticks = logic.getMotor().getCurrentMovementTicks();
+        int totalTicks = logic.getMotor().getVariable(TileMotor.MOVEMENT_TIME);
+        double progress = (ticks + partialTicks) / (double) totalTicks;
+        final double angle;
+        if (logic.getMotor().checkStatus(EnumMotorStatus.MOVING) && logic.getAction() != null) {
+            if (ticks == -1) {
+                progress = 1;
+            }
+            angle = (logic.getAction() == EnumMotorAction.MOVE_BACKWARD ? progress : -progress) * 90;
+        } else {
+            angle = 0;
+        }
         TileMotor motor = logic.getMotor();
         BlockPos pos = motor.getMotorPos();
         BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();

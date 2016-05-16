@@ -13,36 +13,32 @@ import com.amadornes.jtraits.JTrait;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 public class UpgradeFactoryBase implements IMotorUpgradeFactory {
 
-    private String type;
+    private ResourceLocation type;
     private IMotorUpgradeCreatorInt creator;
     private Class<? extends JTrait<? extends IMotorInteractions>> trait;
 
     private ItemStack stack;
 
-    public UpgradeFactoryBase(String type, IMotorUpgradeCreatorInt creator, Class<? extends JTrait<? extends IMotorInteractions>> trait) {
+    public UpgradeFactoryBase(ResourceLocation type, IMotorUpgradeCreatorInt creator,
+            Class<? extends JTrait<? extends IMotorInteractions>> trait) {
 
         this.type = type;
         this.creator = creator;
         this.trait = trait;
     }
 
-    public UpgradeFactoryBase(String name, IMotorUpgradeCreatorInt creator) {
+    public UpgradeFactoryBase(ResourceLocation type, IMotorUpgradeCreatorInt creator) {
 
-        this(name, creator, null);
+        this(type, creator, null);
     }
 
     public void setStack(ItemStack stack) {
 
         this.stack = stack;
-    }
-
-    @Override
-    public String getType() {
-
-        return type;
     }
 
     @Override
@@ -62,7 +58,7 @@ public class UpgradeFactoryBase implements IMotorUpgradeFactory {
 
         for (int i = 0; i < motor.get().getUpgradeSlots(); i++) {
             Entry<IMotorUpgrade, ItemStack> upgrade = motor.get().getUpgrade(i);
-            if (upgrade != null && upgrade.getKey().getType().equals(getType())) return false;
+            if (upgrade != null && upgrade.getKey().getType().equals(type)) return false;
         }
         return true;
     }
@@ -87,7 +83,7 @@ public class UpgradeFactoryBase implements IMotorUpgradeFactory {
 
     public static interface IMotorUpgradeCreatorInt {
 
-        public IMotorUpgrade createUpgrade(DynamicReference<? extends IMotor> motor, int slot);
+        public UpgradeBase createUpgrade(DynamicReference<? extends IMotor> motor, int slot);
 
     }
 

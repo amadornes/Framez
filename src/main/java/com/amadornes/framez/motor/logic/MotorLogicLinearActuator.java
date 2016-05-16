@@ -1,11 +1,16 @@
 package com.amadornes.framez.motor.logic;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import com.amadornes.blockdata.BlockData;
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.EnumMotorAction;
+import com.amadornes.framez.api.motor.IMotorAction;
+import com.amadornes.framez.motor.MotorTrigger;
+import com.amadornes.framez.motor.MotorTriggerRedstone;
 import com.amadornes.framez.movement.IMovement;
 import com.amadornes.framez.movement.MovementTranslation;
 import com.amadornes.framez.movement.MovingBlock;
@@ -21,6 +26,23 @@ public class MotorLogicLinearActuator implements IMotorLogic {
 
     private DynamicReference<TileMotor> motor;
     private EnumFacing face = EnumFacing.DOWN;
+    private EnumMotorAction action = EnumMotorAction.STOP;
+
+    public MotorLogicLinearActuator() {
+
+    }
+
+    @Override
+    public IMotorAction initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap) {
+
+        triggers.put(EnumMotorAction.MOVE_FORWARD, new MotorTrigger(new MotorTriggerRedstone(motor), false));
+        triggers.put(EnumMotorAction.MOVE_BACKWARD, new MotorTrigger(new MotorTriggerRedstone(motor), true));
+
+        actionIdMap.add(EnumMotorAction.MOVE_FORWARD);
+        actionIdMap.add(EnumMotorAction.MOVE_BACKWARD);
+
+        return EnumMotorAction.MOVE_BACKWARD;
+    }
 
     @Override
     public EnumFacing getFace() {
@@ -41,6 +63,12 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     }
 
     @Override
+    public BlockPos getStructureSearchLocation(IMotorAction action) {
+
+        return action == EnumMotorAction.MOVE_BACKWARD ? motor.get().getMotorPos().offset(getFace()) : motor.get().getMotorPos();
+    }
+
+    @Override
     public boolean rotate(EnumFacing axis) {
 
         EnumFacing oldFace = face;
@@ -56,14 +84,15 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     }
 
     @Override
-    public boolean canMove(MovingStructure structure, EnumMotorAction action) {
+    public boolean canMove(MovingStructure structure, IMotorAction action) {
 
-        return true;
+        return action != this.action;
     }
 
     @Override
-    public void move(MovingStructure structure, EnumMotorAction action) {
+    public void move(MovingStructure structure, IMotorAction action) {
 
+        this.action = (EnumMotorAction) action;
         for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
             BlockData data = block.getKey().toBlockData();
             data.remove(block.getKey().getWorld(), block.getKey().getPos(), 3);
@@ -78,20 +107,30 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     }
 
     @Override
-    public IMovement getMovement(Set<MovingBlock> blocks) {
+    public IMovement getMovement(Set<MovingBlock> blocks, IMotorAction action) {
 
-        return new MovementTranslation(face);
+        return new MovementTranslation(action == EnumMotorAction.MOVE_BACKWARD ? face.getOpposite() : face);
     }
 
     @Override
     public NBTTagCompound serializeNBT() {
 
-        return new NBTTagCompound();
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("face", face.ordinal());
+        tag.setInteger("action", action.ordinal());
+        return tag;
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
+    public void deserializeNBT(NBTTagCompound tag) {
 
+        face = EnumFacing.getFront(tag.getInteger("face"));
+        action = EnumMotorAction.VALUES[tag.getInteger("action")];
+    }
+
+    public EnumMotorAction getAction() {
+
+        return action;
     }
 
 }

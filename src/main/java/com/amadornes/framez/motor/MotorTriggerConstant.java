@@ -2,25 +2,48 @@ package com.amadornes.framez.motor;
 
 import com.amadornes.framez.api.motor.IMotorTrigger;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+
 public class MotorTriggerConstant implements IMotorTrigger {
 
-    private final boolean state;
-
-    public MotorTriggerConstant(boolean state) {
-
-        this.state = state;
+    public MotorTriggerConstant() {
     }
 
     @Override
-    public String getUnlocalizedName() {
+    public String getUnlocalizedName(boolean inverted) {
 
-        return "framez:trigger." + (state ? "always" : "never");
+        return "trigger.framez:" + (inverted ? "never" : "always");
     }
 
     @Override
     public boolean isActive() {
 
-        return state;
+        return true;
+    }
+
+    @Override
+    public boolean canBeInverted() {
+
+        return true;
+    }
+
+    @Override
+    public ItemStack getIconStack() {
+
+        return new ItemStack(Blocks.REDSTONE_BLOCK);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return getClass().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        return obj == this || obj instanceof MotorTriggerConstant;
     }
 
 }

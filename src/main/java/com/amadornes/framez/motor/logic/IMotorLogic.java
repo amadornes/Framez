@@ -1,9 +1,12 @@
 package com.amadornes.framez.motor.logic;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.amadornes.framez.api.DynamicReference;
-import com.amadornes.framez.api.motor.EnumMotorAction;
+import com.amadornes.framez.api.motor.IMotorAction;
+import com.amadornes.framez.motor.MotorTrigger;
 import com.amadornes.framez.movement.IMovement;
 import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
@@ -11,6 +14,7 @@ import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
@@ -37,22 +41,26 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
         return -1;
     }
 
+    public IMotorAction initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap);
+
     public EnumFacing getFace();
 
     public TileMotor getMotor();
 
     public void setMotor(DynamicReference<TileMotor> motor);
 
+    public BlockPos getStructureSearchLocation(IMotorAction action);
+
     public boolean rotate(EnumFacing axis);
 
     public double getConsumedEnergy(MovingStructure structure, double energyApplied);
 
-    public boolean canMove(MovingStructure structure, EnumMotorAction action);
+    public boolean canMove(MovingStructure structure, IMotorAction action);
 
-    public void move(MovingStructure structure, EnumMotorAction action);
+    public void move(MovingStructure structure, IMotorAction action);
 
     public void onMovementComplete();
 
-    public IMovement getMovement(Set<MovingBlock> blocks);
+    public IMovement getMovement(Set<MovingBlock> blocks, IMotorAction action);
 
 }

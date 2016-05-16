@@ -50,7 +50,7 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
 
-        return new TileMotor().setLogic(IMotorLogic.create(meta));
+        return new TileMotor(IMotorLogic.create(meta));
     }
 
     @Override

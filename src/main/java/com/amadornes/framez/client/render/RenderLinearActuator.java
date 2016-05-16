@@ -1,5 +1,6 @@
 package com.amadornes.framez.client.render;
 
+import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.client.ModelTransformer;
 import com.amadornes.framez.client.ModelTransformer.IVertexTransformer;
@@ -22,8 +23,18 @@ public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> 
     public void renderMotor(MotorLogicLinearActuator logic, double x, double y, double z, float partialTicks, int destroyStage,
             VertexBuffer wr) {
 
-        double t = 1000;
-        final double extension = Math.abs((System.currentTimeMillis() / t) % 2 - 1);
+        int ticks = logic.getMotor().getCurrentMovementTicks();
+        int totalTicks = logic.getMotor().getVariable(TileMotor.MOVEMENT_TIME);
+        double progress = (ticks + partialTicks) / (double) totalTicks;
+        final double extension;
+        if (logic.getAction() != null) {
+            if (ticks == -1) {
+                progress = 1;
+            }
+            extension = (logic.getAction() == EnumMotorAction.MOVE_BACKWARD ? 1 - progress : progress);
+        } else {
+            extension = 0;
+        }
         TileMotor motor = logic.getMotor();
         BlockPos pos = motor.getMotorPos();
         BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();

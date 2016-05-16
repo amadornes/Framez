@@ -18,9 +18,9 @@ public class UpgradeCamouflage extends UpgradeBase implements IItemHandlerModifi
 
     private ItemStack[] slots = new ItemStack[6];
 
-    public UpgradeCamouflage(DynamicReference<? extends IMotor> motor, int slot, String type) {
+    public UpgradeCamouflage(DynamicReference<? extends IMotor> motor, int slot) {
 
-        super(motor, slot, type);
+        super(motor, slot);
     }
 
     @Override
