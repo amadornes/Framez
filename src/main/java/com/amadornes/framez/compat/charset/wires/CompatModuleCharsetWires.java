@@ -138,13 +138,11 @@ public class CompatModuleCharsetWires implements IModule {
 
         private final BundledReceiverExtension extension;
         private final int color;
-        private final ItemStack iconStack;
 
         public BundledTrigger(BundledReceiverExtension extension, int color) {
 
             this.extension = extension;
             this.color = color;
-            this.iconStack = new ItemStack(Item.getByNameOrId("CharsetWires:wire"), 1, color + 1);
         }
 
         @Override
@@ -168,7 +166,7 @@ public class CompatModuleCharsetWires implements IModule {
         @Override
         public ItemStack getIconStack() {
 
-            return iconStack;
+            return new ItemStack(Item.getByNameOrId("CharsetWires:wire"), 1, (color + 1) * 2);
         }
 
     }
