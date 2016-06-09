@@ -13,10 +13,12 @@ import com.amadornes.framez.motor.MotorRegistry;
 import com.amadornes.framez.motor.upgrade.UpgradeBase;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
 import com.amadornes.framez.motor.upgrade.UpgradeCreative;
+import com.amadornes.framez.motor.upgrade.UpgradeDank;
 import com.amadornes.framez.motor.upgrade.UpgradeFactoryBase;
 import com.amadornes.framez.motor.upgrade.UpgradeFactoryBase.IMotorUpgradeCreatorInt;
 import com.amadornes.framez.network.GuiHandler;
 import com.amadornes.framez.network.NetworkHandler;
+import com.amadornes.framez.world.WorldGenerationHandler;
 import com.amadornes.jtraits.JTrait;
 
 import net.minecraft.util.ResourceLocation;
@@ -29,6 +31,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION)
 public class Framez {
@@ -57,6 +60,7 @@ public class Framez {
         registerUpgrade("soundMuffler", (m, s) -> new UpgradeBase(m, s));
         registerUpgrade("extRange", (m, s) -> new UpgradeBase(m, s));
         registerUpgrade("creative", (m, s) -> new UpgradeCreative(m, s));
+        registerUpgrade("dank", (m, s) -> new UpgradeDank(m, s));
 
         FramezItems.initialize();
         FramezItems.register();
@@ -67,6 +71,8 @@ public class Framez {
         FramezCapabilities.register();
         FramezOredict.register();
         FramezRecipes.register();
+
+        GameRegistry.registerWorldGenerator(new WorldGenerationHandler(), 0);
 
         proxy.preInit();
     }

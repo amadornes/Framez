@@ -13,14 +13,14 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class FrameMaterialBasic implements IFrameMaterial {
 
-    private final String type;
+    private final ResourceLocation type;
     private final float weight;
     private final int minMovTime, maxCarriedBlock, maxCarriedParts;
     private List<ItemStack> oredictEntries;
 
     public FrameMaterialBasic(String type, float weight, int minMovTime, int maxCarriedBlock, int maxCarriedParts, String oredictName) {
 
-        this.type = type;
+        this.type = new ResourceLocation(ModInfo.MODID, type);
         this.weight = weight;
         this.minMovTime = minMovTime;
         this.maxCarriedBlock = maxCarriedBlock;
@@ -29,7 +29,7 @@ public class FrameMaterialBasic implements IFrameMaterial {
     }
 
     @Override
-    public String getType() {
+    public ResourceLocation getType() {
 
         return type;
     }
@@ -73,7 +73,8 @@ public class FrameMaterialBasic implements IFrameMaterial {
     @Override
     public ResourceLocation getTexture(EnumFrameTexture texture) {
 
-        return new ResourceLocation(ModInfo.MODID, "blocks/frame/" + type + "/" + texture.name().toLowerCase());
+        return new ResourceLocation(type.getResourceDomain(),
+                "blocks/frame/" + type.getResourcePath() + "/" + texture.name().toLowerCase());
     }
 
 }

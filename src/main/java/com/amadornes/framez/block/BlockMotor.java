@@ -1,7 +1,7 @@
 package com.amadornes.framez.block;
 
+import com.amadornes.framez.api.item.IFramezWrench;
 import com.amadornes.framez.client.gui.GuiMotorSettings;
-import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.motor.logic.IMotorLogic;
 import com.amadornes.framez.tile.TileMotor;
 import com.amadornes.framez.util.PropertyCamouflage;
@@ -69,13 +69,36 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack stack,
             EnumFacing side, float hitX, float hitY, float hitZ) {
 
-        // TODO: Wrench API!
-        if (player.isSneaking() && stack != null && stack.getItem() == FramezItems.wrench) {
+        return false;
+    }
+
+    @Override
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+
+        ItemStack stack = player.getHeldItemMainhand();
+        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null) && world.isRemote)
+            Minecraft.getMinecraft().displayGuiScreen(new GuiMotorSettings(((TileMotor) world.getTileEntity(pos)).getSafeReference()));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World worldIn, BlockPos pos) {
+
+        ItemStack stack = player.getHeldItemMainhand();
+        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null)) return 0;
+        return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+    }
+
+    @Override
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+
+        ItemStack stack = player.getHeldItemMainhand();
+        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null)) {
             if (world.isRemote)
                 Minecraft.getMinecraft().displayGuiScreen(new GuiMotorSettings(((TileMotor) world.getTileEntity(pos)).getSafeReference()));
-            return true;
+            return false;
         }
-        return false;
+        return super.removedByPlayer(state, world, pos, player, willHarvest);
     }
 
     @Override

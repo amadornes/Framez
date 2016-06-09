@@ -9,7 +9,6 @@ import com.amadornes.framez.api.frame.IFrame;
 import com.amadornes.framez.api.frame.IStickable;
 import com.amadornes.framez.api.frame.ISticky;
 import com.amadornes.framez.api.movement.IMovingBlock;
-import com.amadornes.framez.frame.FrameHelper;
 import com.amadornes.framez.frame.FrameRegistry;
 import com.amadornes.framez.util.Graph.INode;
 
@@ -67,7 +66,7 @@ public class MovingBlock implements INode, IMovingBlock {
     @Override
     public int getMaxNeighbors() {
 
-        return directions != null ? directions.size() : FrameHelper.getMaxCarriedBlocks(frame);
+        return 6;// TODO: Re-enable directions != null ? directions.size() : FrameHelper.getMaxCarriedBlocks(frame);
     }
 
     public boolean isSticky(EnumFacing face) {

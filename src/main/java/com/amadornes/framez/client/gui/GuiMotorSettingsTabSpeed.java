@@ -43,17 +43,17 @@ public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
         int left = (width - xSize) / 2;
         int top = (height - ySize) / 2;
 
-        mc.renderEngine.bindTexture(new ResourceLocation(ModInfo.MODID, "textures/gui/motor_settings_speed.png"));
+        mc.renderEngine.bindTexture(new ResourceLocation(ModInfo.MODID, "textures/gui/motor_tab_speed.png"));
         drawTexturedModalRect(left, top, 0, 0, xSize, ySize);
 
-        drawString(fontRendererObj, I18n.format("gui.framez:motor.speed") + ":", left + 8, top + 8, 0xFFFFFFFF);
+        drawString(fontRendererObj, I18n.format("gui.framez:motor.speed") + ":", left + 8, top + 8, 0xFFFFFF);
 
-        drawString(fontRendererObj, "Energy Applied:", left + 8, top + 91, 0xFFFFFFFF);
+        drawString(fontRendererObj, "Energy Applied:", left + 8, top + 91, 0xFFFFFF);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(left + 42, top + 49.5, 0);
         GlStateManager.scale(0.75, 0.75, 1.0);
-        drawCenteredString(fontRendererObj, format.format(motor.get().getVariable(TileMotor.MOVEMENT_TIME)) + "s", 0, 0, 0xFFFFFFFF);
+        drawCenteredString(fontRendererObj, format.format(motor.get().getVariable(TileMotor.MOVEMENT_TIME)) + "s", 0, 0, 0xFFFFFF);
         GlStateManager.popMatrix();
 
         GlStateManager.pushMatrix();

@@ -26,7 +26,7 @@ public class MotorLogicLinearActuator implements IMotorLogic {
 
     private DynamicReference<TileMotor> motor;
     private EnumFacing face = EnumFacing.DOWN;
-    private EnumMotorAction action = EnumMotorAction.STOP;
+    private EnumMotorAction action = EnumMotorAction.MOVE_BACKWARD;
 
     public MotorLogicLinearActuator() {
 
@@ -96,7 +96,9 @@ public class MotorLogicLinearActuator implements IMotorLogic {
         for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
             BlockData data = block.getKey().toBlockData();
             data.remove(block.getKey().getWorld(), block.getKey().getPos(), 3);
-            data = BlockData.fromNBT(data.serializeNBT());// TODO: Make it so this isn't required?
+        }
+        for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
+            BlockData data = block.getKey().toBlockData();
             data.place(block.getKey().getWorld(), block.getValue(), 3);
         }
     }

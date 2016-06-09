@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.amadornes.framez.api.motor.IMotorUpgradeFactory;
 import com.amadornes.framez.motor.MotorRegistry;
-import com.amadornes.framez.util.ICapabiltyLambda;
+import com.amadornes.framez.util.ICapabilityLambda;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -42,7 +42,7 @@ public class ItemMotorUpgrade extends ItemFramez {
     }
 
     @Override
-    public ICapabiltyLambda initCapabilities(ItemStack stack, NBTTagCompound nbt) {
+    public ICapabilityLambda initCapabilities(ItemStack stack, NBTTagCompound nbt) {
 
         return (c, f) -> {
             if (f != null || c != IMotorUpgradeFactory.CAPABILITY_ITEM_UPGRADE) return null;

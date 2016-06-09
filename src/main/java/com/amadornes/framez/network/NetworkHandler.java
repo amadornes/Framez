@@ -24,6 +24,7 @@ public class NetworkHandler {
     public static void init() {
 
         instance.registerPacket(PacketShowGUI.class, Side.SERVER);
+        instance.registerPacket(PacketUpdateTrigger.class, Side.SERVER);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

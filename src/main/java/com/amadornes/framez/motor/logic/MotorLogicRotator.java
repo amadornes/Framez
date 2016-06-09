@@ -1,5 +1,6 @@
 package com.amadornes.framez.motor.logic;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,7 +13,6 @@ import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.api.motor.IMotorAction;
 import com.amadornes.framez.motor.MotorTrigger;
-import com.amadornes.framez.motor.MotorTriggerConstant;
 import com.amadornes.framez.motor.MotorTriggerRedstone;
 import com.amadornes.framez.movement.IMovement;
 import com.amadornes.framez.movement.MovementRotation;
@@ -39,12 +39,12 @@ public class MotorLogicRotator implements IMotorLogic {
     @Override
     public IMotorAction initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap) {
 
-        triggers.put(EnumMotorAction.MOVE_FORWARD, new MotorTrigger(new MotorTriggerRedstone(motor), false));
-        triggers.put(EnumMotorAction.MOVE_BACKWARD, new MotorTrigger(new MotorTriggerConstant(), true));
+        triggers.put(EnumMotorAction.ROTATE_CLOCKWISE, new MotorTrigger(new MotorTriggerRedstone(motor), false));
+        triggers.put(EnumMotorAction.ROTATE_CCLOCKWISE, new MotorTrigger());
         triggers.put(EnumMotorAction.STOP, new MotorTrigger(new MotorTriggerRedstone(motor), true));
 
-        actionIdMap.add(EnumMotorAction.MOVE_FORWARD);
-        actionIdMap.add(EnumMotorAction.MOVE_BACKWARD);
+        actionIdMap.add(EnumMotorAction.ROTATE_CLOCKWISE);
+        actionIdMap.add(EnumMotorAction.ROTATE_CCLOCKWISE);
         actionIdMap.add(EnumMotorAction.STOP);
 
         return EnumMotorAction.STOP;
@@ -102,13 +102,17 @@ public class MotorLogicRotator implements IMotorLogic {
     public void move(MovingStructure structure, IMotorAction action) {
 
         this.action = (EnumMotorAction) action;
+        Map<BlockData, BlockPos> transformed = new HashMap<BlockData, BlockPos>();
         for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
             BlockData data = block.getKey().toBlockData();
             data.remove(block.getKey().getWorld(), block.getKey().getPos(), 3);
             data = BlockData.fromNBT(data.serializeNBT());// TODO: Make it so this isn't required?
-            data = data.withRotation(
-                    new BlockRotation(face.getAxis(), direction == AxisDirection.POSITIVE ? RotationAngle.CCW_90 : RotationAngle.CW_90));
-            data.place(block.getKey().getWorld(), block.getValue(), 3);
+            data = data.withRotation(new BlockRotation(face.getAxis(),
+                    action == EnumMotorAction.ROTATE_CCLOCKWISE ? RotationAngle.CCW_90 : RotationAngle.CW_90));
+            transformed.put(data, block.getValue());
+        }
+        for (Entry<BlockData, BlockPos> block : transformed.entrySet()) {
+            block.getKey().place(motor.get().getWorld(), block.getValue(), 3);
         }
     }
 
@@ -120,7 +124,7 @@ public class MotorLogicRotator implements IMotorLogic {
     @Override
     public IMovement getMovement(Set<MovingBlock> blocks, IMotorAction action) {
 
-        return new MovementRotation();
+        return new MovementRotation(motor, face.getAxis(), (EnumMotorAction) action);
     }
 
     @Override

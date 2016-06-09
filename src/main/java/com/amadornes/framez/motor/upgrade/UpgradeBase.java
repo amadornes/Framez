@@ -1,6 +1,5 @@
 package com.amadornes.framez.motor.upgrade;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
@@ -49,9 +48,9 @@ public class UpgradeBase implements IMotorUpgrade {
     }
 
     @Override
-    public Collection<IMotorTrigger> getProvidedTriggers() {
+    public Map<ResourceLocation, IMotorTrigger> getProvidedTriggers() {
 
-        return Collections.emptyList();
+        return Collections.emptyMap();
     }
 
     @Override

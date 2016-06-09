@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.api.frame.IFrame;
 import com.amadornes.framez.api.frame.IFrameMaterial;
 import com.amadornes.framez.api.frame.IFrameRegistry;
@@ -13,6 +14,7 @@ import com.amadornes.framez.api.frame.ISticky;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -20,8 +22,8 @@ public enum FrameRegistry implements IFrameRegistry {
 
     INSTANCE;
 
-    public Map<String, IFrameMaterial> materials = new LinkedHashMap<String, IFrameMaterial>();
-    public Map<String, IFrameMaterial> internalMaterials = new LinkedHashMap<String, IFrameMaterial>();
+    private Map<ResourceLocation, IFrameMaterial> materials = new LinkedHashMap<ResourceLocation, IFrameMaterial>();
+    private Map<ResourceLocation, IFrameMaterial> internalMaterials = new LinkedHashMap<ResourceLocation, IFrameMaterial>();
 
     private Map<Integer, IStickinessProvider> stickinessProviders = new TreeMap<Integer, IStickinessProvider>(
             (a, b) -> Integer.compare(b, a));
@@ -105,6 +107,17 @@ public enum FrameRegistry implements IFrameRegistry {
     public IFrame getFrame(TileEntity te) {
 
         return te == null || !te.hasCapability(IFrame.CAPABILITY_FRAME, null) ? null : te.getCapability(IFrame.CAPABILITY_FRAME, null);
+    }
+
+    public IFrameMaterial getMaterial(ResourceLocation name) {
+
+        if (name.getResourceDomain().equals("minecraft")) name = new ResourceLocation(ModInfo.MODID, name.getResourcePath());
+        return materials.get(name);
+    }
+
+    public Map<ResourceLocation, IFrameMaterial> getMaterials() {
+
+        return materials;
     }
 
 }

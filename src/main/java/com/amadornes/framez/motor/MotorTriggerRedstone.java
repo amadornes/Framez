@@ -3,7 +3,9 @@ package com.amadornes.framez.motor;
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.IMotor;
 import com.amadornes.framez.api.motor.IMotorTrigger;
+import com.amadornes.framez.api.motor.MotorTriggerType;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
@@ -23,6 +25,18 @@ public class MotorTriggerRedstone implements IMotorTrigger {
     }
 
     @Override
+    public ItemStack getIconStack(boolean inverted) {
+
+        return inverted ? new ItemStack(Blocks.REDSTONE_TORCH) : new ItemStack(Items.REDSTONE);
+    }
+
+    @Override
+    public MotorTriggerType getTriggerType() {
+
+        return MotorTriggerType.TYPE_REDSTONE;
+    }
+
+    @Override
     public boolean isActive() {
 
         return motor.get().getMotorWorld().isBlockPowered(motor.get().getMotorPos());
@@ -35,9 +49,9 @@ public class MotorTriggerRedstone implements IMotorTrigger {
     }
 
     @Override
-    public ItemStack getIconStack() {
+    public boolean requiresInvertedOverlay() {
 
-        return new ItemStack(Items.REDSTONE);
+        return false;
     }
 
     @Override

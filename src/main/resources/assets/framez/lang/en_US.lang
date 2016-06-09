@@ -28,6 +28,19 @@ item.framez:motor_upgrade.creative.name=Creative Upgrade
 
 item.framez:wrench.name=Wrench
 
+item.framez:frame.name=%s Frame
+
+// ---------------------------------- //
+//              MATERIALS             //
+// ---------------------------------- //
+
+framemat.framez:wood.name=Wood
+framemat.framez:wood.adj=Wooden
+framemat.framez:iron.name=Iron
+framemat.framez:iron.adj=Iron
+framemat.framez:gold.name=Gold
+framemat.framez:gold.adj=Golden
+
 // ---------------------------------- //
 //              VARIABLE              //
 // ---------------------------------- //
@@ -40,4 +53,65 @@ var.framez:power_storage_size=Max. Power Stored
 // ---------------------------------- //
 
 gui.framez:motor.overview=Overview
+gui.framez:motor.upgrades=Upgrades
+gui.framez:motor.triggers=Triggers
 gui.framez:motor.speed=Speed Regulation
+gui.framez:motor.issues=Movement Issues
+
+gui.framez:button.save=Save
+gui.framez:button.cancel=Cancel
+
+gui.framez:action=Action
+
+gui.framez:csettings.title=Client Settings
+gui.framez:csettings.1=Connect Contig. Frames
+gui.framez:csettings.2=Click-Through Frames
+gui.framez:csettings.3=---
+gui.framez:csettings.4=---
+
+// ---------------------------------- //
+//              TOOLTIPS              //
+// ---------------------------------- //
+
+tooltip.framez:shift=%sHold %sShift%s for Details
+
+tooltip.framez:frame.border=Border
+tooltip.framez:frame.cross=Cross
+tooltip.framez:frame.binding=Binding
+
+tooltip.framez:frame.maxblocks=Max. Carried Blocks
+tooltip.framez:frame.maxparts=Max. Carried Parts
+tooltip.framez:frame.mintime=Min. Movement Time
+tooltip.framez:frame.mintime.warp=%sWarp
+
+// ---------------------------------- //
+//         ACTIONS & TRIGGERS         //
+// ---------------------------------- //
+action.framez:forward=Forward
+action.framez:backward=Backward
+action.framez:clockwise=Clockwise Rotation
+action.framez:cclockwise=Counter-Clockwise Rotation
+action.framez:stop=Stop
+
+trigger.framez:inverted=Inverted
+
+trigger.framez:always=Always
+trigger.framez:redstone=Redstone Signal On
+trigger.framez:redstone.inverted=Redstone Signal Off
+
+trigger.framez:bundled.white=Bundled Wire (White)
+trigger.framez:bundled.orange=Bundled Wire (Orange)
+trigger.framez:bundled.magenta=Bundled Wire (Magenta)
+trigger.framez:bundled.light_blue=Bundled Wire (Light Blue)
+trigger.framez:bundled.yellow=Bundled Wire (Yellow)
+trigger.framez:bundled.lime=Bundled Wire (Lime)
+trigger.framez:bundled.pink=Bundled Wire (Pink)
+trigger.framez:bundled.gray=Bundled Wire (Gray)
+trigger.framez:bundled.silver=Bundled Wire (Light Gray)
+trigger.framez:bundled.cyan=Bundled Wire (Cyan)
+trigger.framez:bundled.purple=Bundled Wire (Purple)
+trigger.framez:bundled.blue=Bundled Wire (Blue)
+trigger.framez:bundled.brown=Bundled Wire (Brown)
+trigger.framez:bundled.green=Bundled Wire (Green)
+trigger.framez:bundled.red=Bundled Wire (Red)
+trigger.framez:bundled.black=Bundled Wire (Black)

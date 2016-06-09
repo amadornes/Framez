@@ -2,20 +2,18 @@ package com.amadornes.framez.tile;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.amadornes.framez.Framez;
+import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.api.motor.EnumMotorStatus;
@@ -27,6 +25,7 @@ import com.amadornes.framez.api.motor.IMotorUpgrade;
 import com.amadornes.framez.api.motor.IMotorUpgradeFactory;
 import com.amadornes.framez.api.motor.IMotorVariable;
 import com.amadornes.framez.block.BlockMotor;
+import com.amadornes.framez.motor.EnumTriggerOperation;
 import com.amadornes.framez.motor.MotorHelper;
 import com.amadornes.framez.motor.MotorRegistry;
 import com.amadornes.framez.motor.MotorRegistry.MotorExtension;
@@ -37,6 +36,8 @@ import com.amadornes.framez.motor.SimpleMotorVariable;
 import com.amadornes.framez.motor.logic.IMotorLogic;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
 import com.amadornes.framez.movement.MovingStructure;
+import com.amadornes.framez.util.LinkedHashBiMap;
+import com.google.common.collect.BiMap;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemBlock;
@@ -69,12 +70,12 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public final DynamicReference<TileMotor> reference;
     private IMotorLogic logic;
 
-    private final List<IMotorAction> actionIdMap = new LinkedList<IMotorAction>();
-    public final Map<IMotorAction, MotorTrigger> triggers = new HashMap<IMotorAction, MotorTrigger>();
-    public final Set<IMotorTrigger> availableTriggers = new LinkedHashSet<IMotorTrigger>();
+    public final List<IMotorAction> actionIdMap = new LinkedList<IMotorAction>();
+    public final Map<IMotorAction, MotorTrigger> triggers = new LinkedHashMap<IMotorAction, MotorTrigger>();
+    public final BiMap<ResourceLocation, IMotorTrigger> availableTriggers = LinkedHashBiMap.create();
     public final Pair<IMotorUpgrade, ItemStack>[] upgrades = new Pair[getUpgradeSlots()];
-    public final Map<IMotorVariable<?>, Supplier<Object>> nativeVariables = new HashMap<IMotorVariable<?>, Supplier<Object>>();
-    private final Map<ResourceLocation, IMotorExtension> extensions = new HashMap<ResourceLocation, IMotorExtension>();
+    public final Map<IMotorVariable<?>, Supplier<Object>> nativeVariables = new LinkedHashMap<IMotorVariable<?>, Supplier<Object>>();
+    private final Map<ResourceLocation, IMotorExtension> extensions = new LinkedHashMap<ResourceLocation, IMotorExtension>();
 
     private IMotorAction currentAction;
     private DynamicReference<Boolean> moving = null;
@@ -95,8 +96,8 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         if (motor == null) {
             this.reference = new DynamicReference<TileMotor>(this);
 
-            this.availableTriggers.add(new MotorTriggerConstant());
-            this.availableTriggers.add(new MotorTriggerRedstone(this.reference));
+            this.availableTriggers.put(new ResourceLocation(ModInfo.MODID, "always"), new MotorTriggerConstant());
+            this.availableTriggers.put(new ResourceLocation(ModInfo.MODID, "redstone"), new MotorTriggerRedstone(this.reference));
 
             this.nativeVariables.put(TileMotor.POWER_STORED, () -> 0.0D);
             this.nativeVariables.put(TileMotor.POWER_STORAGE_SIZE, () -> 0.0D);
@@ -106,13 +107,13 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
             IMotorExtension ext;
             for (Entry<ResourceLocation, MotorExtension> e : MotorRegistry.INSTANCE.extensions.entrySet()) {
                 this.extensions.put(e.getKey(), ext = e.getValue().instantiate(this.reference));
-                availableTriggers.addAll(ext.getProvidedTriggers());
+                availableTriggers.putAll(ext.getProvidedTriggers());
             }
         } else {
             this.reference = motor.reference;
 
             this.triggers.putAll(motor.triggers);
-            this.availableTriggers.addAll(motor.availableTriggers);
+            this.availableTriggers.putAll(motor.availableTriggers);
             for (int i = 0; i < getUpgradeSlots(); i++)
                 this.upgrades[i] = motor.upgrades[i];
             this.nativeVariables.putAll(motor.nativeVariables);
@@ -132,6 +133,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
         logic.setMotor(reference);
 
+        triggers.clear();
         currentAction = logic.initTriggers(triggers, actionIdMap);
     }
 
@@ -153,7 +155,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
             IMotorAction newAction = currentAction;
             int activeTriggers = 0;
             for (Entry<IMotorAction, MotorTrigger> e : triggers.entrySet()) {
-                if (e.getValue().getTrigger().isActive() == !e.getValue().isInverted()) {
+                if (e.getValue().isActive()) {
                     newAction = e.getKey();
                     activeTriggers++;
                 }
@@ -379,6 +381,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         return state.withProperty(BlockMotor.PROPERTY_LOGIC_TYPE, getLogic() == null ? 0 : getLogic().getID());
     }
 
+    @SuppressWarnings("deprecation")
     public IExtendedBlockState getExtendedState(IExtendedBlockState state) {
 
         for (Pair<IMotorUpgrade, ItemStack> pair : upgrades) {
@@ -400,32 +403,101 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
+    public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 
-        super.writeToNBT(tag);
+        tag = super.writeToNBT(tag);
+        writeToPacketNBT(tag);
+        return tag;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
 
         super.readFromNBT(tag);
+        logic = null;
+        readFromPacketNBT(tag);
     }
 
-    public void writeToPacketNBT(NBTTagCompound tag) {
+    public NBTTagCompound writeToPacketNBT(NBTTagCompound tag) {
+
+        tag.setInteger("logicID", getLogic().getID());
 
         tag.setInteger("currentAction", actionIdMap.indexOf(currentAction));
         tag.setBoolean("moving", moving != null && moving.get());
         tag.setInteger("currentMovementTicks", currentMovementTicks);
+
         tag.setTag("logic", getLogic().serializeNBT());
+
+        NBTTagCompound triggers = new NBTTagCompound();
+        for (Entry<IMotorAction, MotorTrigger> e : this.triggers.entrySet())
+            triggers.setTag("action" + actionIdMap.indexOf(e.getKey()), writeTriggerToNBT(e.getValue()));
+        tag.setTag("triggers", triggers);
+
+        NBTTagCompound upgrades = new NBTTagCompound();
+        for (int i = 0; i < this.upgrades.length; i++) {
+            Pair<IMotorUpgrade, ItemStack> p = this.upgrades[i];
+            if (p != null) {
+                NBTTagCompound upgrade = new NBTTagCompound();
+                upgrade.setString("upgradeType", p.getKey().getType().toString());
+                upgrade.setTag("data", p.getKey().serializeNBT());
+                upgrade.setTag("stack", p.getValue().writeToNBT(new NBTTagCompound()));
+                upgrades.setTag("upgrade" + i, upgrade);
+            }
+        }
+        return tag;
     }
 
     public void readFromPacketNBT(NBTTagCompound tag) {
 
-        if (logic == null) getBlockMetadata();
+        if (logic == null) initLogic(IMotorLogic.create(tag.getInteger("logicID")));
+
         currentAction = actionIdMap.get(tag.getInteger("currentAction"));
         moving = new DynamicReference<Boolean>(tag.getBoolean("moving"));
         currentMovementTicks = tag.getInteger("currentMovementTicks");
+
         getLogic().deserializeNBT(tag.getCompoundTag("logic"));
+
+        NBTTagCompound triggers = tag.getCompoundTag("triggers");
+        for (Entry<IMotorAction, MotorTrigger> e : this.triggers.entrySet())
+            readTriggerFromNBT(e.getValue(), triggers.getCompoundTag("action" + actionIdMap.indexOf(e.getKey())));
+
+        NBTTagCompound upgrades = tag.getCompoundTag("upgrades");
+        for (int i = 0; i < this.upgrades.length; i++) {
+            if (!upgrades.hasKey("upgrade" + i)) continue;
+            Pair<IMotorUpgrade, ItemStack> p = this.upgrades[i];
+            NBTTagCompound upgrade = upgrades.getCompoundTag("upgrade" + i);
+            if (p != null && p.getKey().getType().toString().equals(upgrade.getString("upgradeType"))) {
+                p.getKey().deserializeNBT(upgrade.getCompoundTag("data"));
+                this.upgrades[i] = Pair.of(p.getKey(), ItemStack.loadItemStackFromNBT(upgrade.getCompoundTag("stack")));
+            } else {
+                IMotorUpgrade upg = MotorRegistry.INSTANCE.upgrades.get(new ResourceLocation(upgrade.getString("upgradeType")))
+                        .createUpgrade(reference, i);
+                upg.deserializeNBT(upgrade.getCompoundTag("data"));
+                this.upgrades[i] = Pair.of(upg, ItemStack.loadItemStackFromNBT(upgrade.getCompoundTag("stack")));
+            }
+        }
+    }
+
+    public NBTTagCompound writeTriggerToNBT(MotorTrigger trigger) {
+
+        NBTTagCompound data = new NBTTagCompound();
+        data.setInteger("operation", trigger.getOperation().ordinal());
+        NBTTagCompound trig = new NBTTagCompound();
+        for (Entry<IMotorTrigger, Boolean> e2 : trigger.getTriggers().entrySet())
+            trig.setBoolean(availableTriggers.inverse().get(e2.getKey()).toString(), e2.getValue());
+        data.setTag("triggers", trig);
+        return data;
+    }
+
+    public void readTriggerFromNBT(MotorTrigger trigger, NBTTagCompound tag) {
+
+        trigger.setOperation(EnumTriggerOperation.values()[tag.getInteger("operation")]);
+        trigger.getTriggers().clear();
+        NBTTagCompound trig = tag.getCompoundTag("triggers");
+        IMotorTrigger t;
+        for (String k : trig.getKeySet())
+            trigger.addTrigger(t = availableTriggers.get(new ResourceLocation(k)),
+                    trig.getBoolean(availableTriggers.inverse().get(t).toString()));
     }
 
     public void sendUpdatePacket() {
@@ -435,17 +507,21 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     }
 
     @Override
-    public SPacketUpdateTileEntity getDescriptionPacket() {
+    public SPacketUpdateTileEntity getUpdatePacket() {
 
-        NBTTagCompound tag = new NBTTagCompound();
-        writeToPacketNBT(tag);
-        return new SPacketUpdateTileEntity(getPos(), 0, tag);
+        return new SPacketUpdateTileEntity(getPos(), 0, writeToPacketNBT(new NBTTagCompound()));
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
 
         readFromPacketNBT(packet.getNbtCompound());
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag() {
+
+        return writeToPacketNBT(super.getUpdateTag());
     }
 
     @Override

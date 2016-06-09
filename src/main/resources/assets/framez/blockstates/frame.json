@@ -12,10 +12,7 @@
 		"transform": "forge:default-block"
 	},
 	"variants": {
-		"multipart": [{
-		}],
-		"inventory": [{
-			"transform": "forge:default-block"
-		}]
+		"multipart": [{}],
+		"inventory": [{}]
 	}
 }

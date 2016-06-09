@@ -53,6 +53,7 @@ public class UpgradeCamouflage extends UpgradeBase implements IItemHandlerModifi
         return slots[slot];
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 

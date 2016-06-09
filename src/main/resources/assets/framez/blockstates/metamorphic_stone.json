@@ -21,8 +21,8 @@
 		"inventory0": [ { "textures": { "all": "framez:blocks/metamorphic_stone/stone" } } ],
 		"inventory1": [ { "textures": { "all": "framez:blocks/metamorphic_stone/cracked" } } ],
 		"inventory2": [ { "textures": { "all": "framez:blocks/metamorphic_stone/bricks" } } ],
-		"inventory3": [ { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } } ],
-		"inventory4": [ { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } } ],
-		"inventory5": [ { "textures": { "all": "framez:blocks/metamorphic_stone/cracked_base" } } ]
+		"inventory3": [ { "textures": { "in":  "minecraft:blocks/water_still" }, "model": "framez:metamorphic_stone" } ],
+		"inventory4": [ { "textures": { "in":  "minecraft:blocks/lava_still"  }, "model": "framez:metamorphic_stone" } ],
+		"inventory5": [ { "textures": { "in":  "minecraft:blocks/snow"        }, "model": "framez:metamorphic_stone" } ]
 	}
 }

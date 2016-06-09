@@ -25,6 +25,7 @@ public class CommonProxy {
 
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isFullBlock(IBlockState state) {
 
         return state.getBlock().isFullBlock(state) && state.getBlock().isFullCube(state) && !state.getBlock().hasTileEntity(state);

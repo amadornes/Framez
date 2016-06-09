@@ -1,6 +1,5 @@
 package com.amadornes.framez.api.motor;
 
-import java.util.Collection;
 import java.util.Map;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -20,7 +19,7 @@ public interface IMotorUpgrade extends INBTSerializable<NBTTagCompound> {
 
     public Map<? extends IMotorVariable<?>, Object> getProvidedVariables();
 
-    public Collection<? extends IMotorTrigger> getProvidedTriggers();
+    public Map<ResourceLocation, ? extends IMotorTrigger> getProvidedTriggers();
 
     public boolean hasConfigGUI();
 

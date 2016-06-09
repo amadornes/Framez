@@ -41,7 +41,7 @@ public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> 
         IBlockState state;
         wr.setTranslation(x - pos.getX(), y - pos.getY() - extension, z - pos.getZ());
         state = motor.getMotorWorld().getBlockState(pos);
-        state = state.getBlock().getActualState(state, motor.getMotorWorld(), pos).withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
+        state = state.getActualState(motor.getMotorWorld(), pos).withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
         IBakedModel model = brd.getBlockModelShapes().getModelForState(state);
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(), model, state, pos, wr, false);
         wr.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());

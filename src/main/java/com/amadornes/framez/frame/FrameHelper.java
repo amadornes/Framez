@@ -10,7 +10,7 @@ public class FrameHelper {
 
     public static IFrameMaterial getMaterial(ItemStack stack) {
 
-        for (IFrameMaterial mat : FrameRegistry.INSTANCE.materials.values())
+        for (IFrameMaterial mat : FrameRegistry.INSTANCE.getMaterials().values())
             if (mat.isMaterialItem(stack)) return mat;
         return null;
     }

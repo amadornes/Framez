@@ -1,0 +1,17 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"textures": {
+		},
+		"model": "forge:item-layer",
+		"transform": "forge:default-item"
+	},
+	"variants": {
+		"normal": [{}],
+		"inventory0":   [ { "textures": { "layer0": "framez:items/icons/stop" } } ],
+		"inventory1":   [ { "textures": { "layer0": "framez:items/icons/forward" } } ],
+		"inventory2":   [ { "textures": { "layer0": "framez:items/icons/backward" } } ],
+		"inventory3":   [ { "textures": { "layer0": "framez:items/icons/clockwise" } } ],
+		"inventory4":   [ { "textures": { "layer0": "framez:items/icons/cclockwise" } } ]
+	}
+}

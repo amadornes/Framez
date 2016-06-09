@@ -6,7 +6,9 @@ public enum EnumFrameTexture {
     BORDER_PANEL(EnumFramePart.BORDER),
     CROSS(EnumFramePart.CROSS),
     CROSS_SMALL(EnumFramePart.CROSS),
-    BINDING(EnumFramePart.BINDING);
+    CROSS_OUTER(EnumFramePart.CROSS),
+    BINDING(EnumFramePart.BINDING),
+    BINDING_OUTER(EnumFramePart.BINDING);
 
     public static final EnumFrameTexture[] VALUES = values();
 

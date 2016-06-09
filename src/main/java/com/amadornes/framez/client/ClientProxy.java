@@ -11,11 +11,14 @@ import com.amadornes.framez.CommonProxy;
 import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.api.frame.EnumFrameTexture;
 import com.amadornes.framez.api.frame.IFrameMaterial;
+import com.amadornes.framez.client.gui.GuiWrench;
 import com.amadornes.framez.client.model.ModelFrame;
+import com.amadornes.framez.client.model.ModelFramePanel;
 import com.amadornes.framez.client.model.ModelWrapperCamouflage;
 import com.amadornes.framez.client.render.FTESRMotor;
 import com.amadornes.framez.frame.FrameRegistry;
 import com.amadornes.framez.init.FramezBlocks;
+import com.amadornes.framez.init.FramezItems;
 import com.amadornes.framez.tile.TileMotor;
 import com.google.common.collect.Maps;
 
@@ -25,10 +28,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -38,12 +43,14 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class ClientProxy extends CommonProxy {
 
-    public static IBakedModel MODEL_FRAME_BORDER, MODEL_FRAME_CROSS, MODEL_FRAME_ORIGINAL;
+    public static IBakedModel MODEL_FRAME_BORDER, MODEL_FRAME_CROSS_IN, MODEL_FRAME_CROSS_OUT, MODEL_FRAME_ORIGINAL;
     public static IBakedModel MODEL_ITEM_BORDER, MODEL_ITEM_CROSS, MODEL_ITEM_BINDING;
     public static int BLOCK_TEXTURE_WIDTH, BLOCK_TEXTURE_HEIGHT;
+    public static TextureAtlasSprite TEXTURE_TRANSPARENT;
 
     @Override
     public void preInit() {
@@ -94,8 +101,8 @@ public class ClientProxy extends CommonProxy {
             MODEL_ITEM_BINDING = event.getModelRegistry().getObject(new ModelResourceLocation(resLoc, "inventory0"));
             MODEL_ITEM_CROSS = event.getModelRegistry().getObject(new ModelResourceLocation(resLoc, "inventory1"));
             MODEL_ITEM_BORDER = event.getModelRegistry().getObject(new ModelResourceLocation(resLoc, "inventory2"));
-            // event.getModelRegistry().putObject(new ModelResourceLocation(resLoc, "inventory0"), new ModelFramePanel());
-            // event.getModelRegistry().putObject(new ModelResourceLocation(resLoc, "inventory1"), new ModelFramePanel());
+            event.getModelRegistry().putObject(new ModelResourceLocation(resLoc, "inventory0"), new ModelFramePanel());
+            event.getModelRegistry().putObject(new ModelResourceLocation(resLoc, "inventory1"), new ModelFramePanel());
         }
 
         // Dynamic frame block models
@@ -103,7 +110,10 @@ public class ClientProxy extends CommonProxy {
             MODEL_FRAME_BORDER = ModelLoaderRegistry.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_border")).bake(
                     TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
                     r -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:stone"));
-            MODEL_FRAME_CROSS = ModelLoaderRegistry.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_cross")).bake(
+            MODEL_FRAME_CROSS_OUT = ModelLoaderRegistry.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_cross_out")).bake(
+                    TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
+                    r -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:stone"));
+            MODEL_FRAME_CROSS_IN = ModelLoaderRegistry.getModel(new ResourceLocation(ModInfo.MODID, "block/frame_cross_in")).bake(
                     TRSRTransformation.identity(), DefaultVertexFormats.BLOCK,
                     r -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:stone"));
         } catch (Exception e) {
@@ -114,9 +124,10 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public void onTextureStitchPre(TextureStitchEvent.Pre event) {
 
-        for (IFrameMaterial mat : FrameRegistry.INSTANCE.materials.values())
+        for (IFrameMaterial mat : FrameRegistry.INSTANCE.getMaterials().values())
             for (EnumFrameTexture tex : EnumFrameTexture.VALUES)
                 if (mat.canBeUsedAs(tex.getPart())) event.getMap().registerSprite(mat.getTexture(tex));
+        TEXTURE_TRANSPARENT = event.getMap().registerSprite(new ResourceLocation(ModInfo.MODID, "transparent"));
     }
 
     @SubscribeEvent
@@ -125,6 +136,26 @@ public class ClientProxy extends CommonProxy {
         Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         BLOCK_TEXTURE_WIDTH = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
         BLOCK_TEXTURE_HEIGHT = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
+    }
+
+    private boolean wrenchGui = false;
+
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        if (player == null) return;
+
+        ItemStack stack = player.getHeldItemMainhand();
+        if (stack == null || stack.getItem() != FramezItems.wrench) return;
+
+        if (!wrenchGui && isAltDown() && Minecraft.getMinecraft().currentScreen == null) {
+            Minecraft.getMinecraft().displayGuiScreen(new GuiWrench());
+            wrenchGui = true;
+        } else if (wrenchGui && !isAltDown() && Minecraft.getMinecraft().currentScreen instanceof GuiWrench) {
+            Minecraft.getMinecraft().displayGuiScreen(null);
+            wrenchGui = false;
+        }
     }
 
     @Override

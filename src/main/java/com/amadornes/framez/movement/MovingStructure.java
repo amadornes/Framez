@@ -17,7 +17,6 @@ import com.amadornes.framez.util.AdvancedMutableBlockPos;
 import com.amadornes.framez.util.Graph;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -50,12 +49,12 @@ public class MovingStructure implements IMovingStructure {
 
         NBTTagCompound tag = new NBTTagCompound();
 
-        NBTTagList blocks = new NBTTagList();
-        for (MovingBlock b : getBlocks().keySet()) {
+        // NBTTagList blocks = new NBTTagList();
+        // for (MovingBlock b : getBlocks().keySet()) {
+        //
+        // }
 
-        }
-
-        return new NBTTagCompound();// TODO: Serialize to NBT
+        return tag;// TODO: Serialize to NBT
     }
 
     public static MovingStructure fromNBT(NBTTagCompound tag) {

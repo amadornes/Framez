@@ -30,6 +30,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
 public class GuiCamouflage extends SubGuiContainer {
 
+    @SuppressWarnings("unused") // TODO Use
     private UpgradeCamouflage upgrade;
 
     private double angleX, angleY;

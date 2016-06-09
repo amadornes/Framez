@@ -33,7 +33,7 @@ public class RenderRotator extends RenderMotor<MotorLogicRotator> {
             if (ticks == -1) {
                 progress = 1;
             }
-            angle = (logic.getAction() == EnumMotorAction.MOVE_BACKWARD ? progress : -progress) * 90;
+            angle = (logic.getAction() == EnumMotorAction.ROTATE_CCLOCKWISE ? progress : -progress) * 90;
         } else {
             angle = 0;
         }
@@ -43,7 +43,7 @@ public class RenderRotator extends RenderMotor<MotorLogicRotator> {
         IBlockState state;
         wr.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
         state = motor.getMotorWorld().getBlockState(pos);
-        state = state.getBlock().getActualState(state, motor.getMotorWorld(), pos).withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
+        state = state.getActualState(motor.getMotorWorld(), pos).withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
         IVertexTransformer transformer = new IVertexTransformer() {
 
             @Override

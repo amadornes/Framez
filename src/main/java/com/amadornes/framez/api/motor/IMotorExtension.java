@@ -1,10 +1,10 @@
 package com.amadornes.framez.api.motor;
 
-import java.util.Collection;
 import java.util.Map;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -12,7 +12,7 @@ public interface IMotorExtension extends INBTSerializable<NBTTagCompound> {
 
     public Map<? extends IMotorVariable<?>, Object> getProvidedVariables();
 
-    public Collection<? extends IMotorTrigger> getProvidedTriggers();
+    public Map<ResourceLocation, ? extends IMotorTrigger> getProvidedTriggers();
 
     public boolean hasCapability(Capability<?> capability, EnumFacing side);
 

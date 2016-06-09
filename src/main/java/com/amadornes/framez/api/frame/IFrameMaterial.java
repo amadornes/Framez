@@ -5,7 +5,7 @@ import net.minecraft.util.ResourceLocation;
 
 public interface IFrameMaterial {
 
-    public String getType();
+    public ResourceLocation getType();
 
     public boolean canBeUsedAs(EnumFramePart part);
 

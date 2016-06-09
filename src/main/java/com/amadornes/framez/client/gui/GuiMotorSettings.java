@@ -7,13 +7,15 @@ import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiMotorSettings extends GuiScreen {
 
-    private final int xSize = 200, ySize = 135;
+    private final int xSize = 226, ySize = 156;
 
     private final GuiMotorSettingsTab[] tabs;
     private int tab = 0;
@@ -27,7 +29,8 @@ public class GuiMotorSettings extends GuiScreen {
                 new GuiMotorSettingsTabOverview(motor, xSize, ySize), //
                 new GuiMotorSettingsTabUpgrades(motor, xSize, ySize), //
                 new GuiMotorSettingsTabTriggers(motor, xSize, ySize), //
-                new GuiMotorSettingsTabSpeed(motor, xSize, ySize)//
+                new GuiMotorSettingsTabSpeed(motor, xSize, ySize), //
+                new GuiMotorSettingsTabIssues(motor, xSize, ySize)//
         };
 
         this.motor = motor;
@@ -42,13 +45,18 @@ public class GuiMotorSettings extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 
+        if (Minecraft.getMinecraft().currentScreen == this) this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+
         int left = (width - xSize) / 2;
         int top = (height - ySize) / 2;
 
-        mc.renderEngine.bindTexture(new ResourceLocation(ModInfo.MODID, "textures/gui/motor_settings.png"));
+        mc.renderEngine.bindTexture(new ResourceLocation(ModInfo.MODID, "textures/gui/motor_base.png"));
         drawTexturedModalRect(left, top, 0, 0, xSize, ySize);
-        for (int i = 0; i < 5; i++)
-            drawTexturedModalRect(left + xSize - 3, top + 6 + (24 + 1) * i, xSize + (tab == i ? 24 : 0), 24 * i, 24, 24);
+        for (int i = 0; i < tabs.length; i++) {
+            boolean selected = tab == i;
+            drawTexturedModalRect(left + xSize - (selected ? 3 : 0), top + 7 + 29 * i, xSize + (selected ? 0 : 3), 7 + 29 * i,
+                    26 + (selected ? 3 : 0), 26);
+        }
 
         tabs[tab].drawScreen(mouseX, mouseY, partialTicks);
     }
@@ -72,51 +80,37 @@ public class GuiMotorSettings extends GuiScreen {
         int left = (width - xSize) / 2;
         int top = (height - ySize) / 2;
 
-        if (mouseX >= left && mouseX < left + xSize && mouseY >= top && mouseY < top + ySize) {
-            tabs[tab].mouseClicked(mouseX, mouseY, mouseButton);
-            return;
-        }
-
-        for (int i = 0; i < 4; i++) {
-            int x = left + xSize - 1, y = top + 6 + (24 + 1) * i;
-            if (mouseX >= x && mouseX < x + 22 && mouseY >= y && mouseY < y + 24) {
+        for (int i = 0; i < tabs.length; i++) {
+            if (tab == i) continue;
+            int x = left + xSize, y = top + 7 + 29 * i;
+            int w = 26, h = 26;
+            if (mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h) {
                 tab = i;
-                // TODO: Click sound
-                // mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return;
             }
         }
+
+        tabs[tab].mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 
-        int left = (width - xSize) / 2;
-        int top = (height - ySize) / 2;
-
-        if (mouseX >= left && mouseX < left + xSize && mouseY >= top && mouseY < top + ySize) {
-            tabs[tab].mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-            return;
-        }
+        tabs[tab].mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
     }
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int state) {
 
-        int left = (width - xSize) / 2;
-        int top = (height - ySize) / 2;
-
-        if (mouseX >= left && mouseX < left + xSize && mouseY >= top && mouseY < top + ySize) {
-            tabs[tab].mouseReleased(mouseX, mouseY, state);
-            return;
-        }
+        tabs[tab].mouseReleased(mouseX, mouseY, state);
     }
 
     @Override
     public void setWorldAndResolution(Minecraft mc, int width, int height) {
 
         super.setWorldAndResolution(mc, width, height);
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < tabs.length; i++)
             tabs[i].setWorldAndResolution(mc, width, height);
     }
 

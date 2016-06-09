@@ -69,8 +69,8 @@ public class FramezRecipes {
 
             ItemStack stack = new ItemStack(FramezItems.frame_panel, 1, 0);
             NBTTagCompound tag = new NBTTagCompound();
-            tag.setString("cross", cross.getType());
-            tag.setString("binding", binding.getType());
+            tag.setString("cross", cross.getType().toString());
+            tag.setString("binding", binding.getType().toString());
             stack.setTagCompound(tag);
             return stack;
         }
@@ -129,7 +129,7 @@ public class FramezRecipes {
 
             ItemStack stack = new ItemStack(FramezItems.frame_panel, 1, 1);
             NBTTagCompound tag = (NBTTagCompound) cross.getTagCompound().copy();
-            tag.setString("border", border.getType());
+            tag.setString("border", border.getType().toString());
             stack.setTagCompound(tag);
             return stack;
         }

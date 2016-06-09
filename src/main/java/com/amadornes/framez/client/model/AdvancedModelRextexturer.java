@@ -7,8 +7,6 @@ import javax.vecmath.Matrix4f;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.amadornes.framez.client.ClientProxy;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.FaceBakery;
@@ -25,13 +23,18 @@ public class AdvancedModelRextexturer {
 
     public static IBakedModel retexture(IBlockState state, long rand, IBakedModel model, TextureAtlasSprite texture) {
 
+        return retexture(state, rand, model, new TextureAtlasSprite[] { texture, texture, texture, texture, texture, texture, texture });
+    }
+
+    public static IBakedModel retexture(IBlockState state, long rand, IBakedModel model, TextureAtlasSprite[] textures) {
+
         IBakedModel result = new IPerspectiveAwareModel() {
 
             @Override
             public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
 
-                return (List) Arrays
-                        .asList(model.getQuads(state, side, rand).stream().map(q -> new AdvancedBreakingFour(q, texture)).toArray());
+                return (List) Arrays.asList(model.getQuads(state, side, rand).stream()
+                        .map(q -> new AdvancedBreakingFour(q, textures[q.getFace() == null ? 6 : q.getFace().ordinal()])).toArray());
             }
 
             @Override
@@ -55,7 +58,7 @@ public class AdvancedModelRextexturer {
             @Override
             public TextureAtlasSprite getParticleTexture() {
 
-                return texture;
+                return textures[0];
             }
 
             @Override
@@ -90,20 +93,23 @@ public class AdvancedModelRextexturer {
                     FaceBakery.getFacingFromVertexData(quad.getVertexData()), textureIn, quad.shouldApplyDiffuseLighting(),
                     quad.getFormat());
             this.texture = textureIn;
-            this.remapQuad();
+            this.remapQuad(quad);
         }
 
-        private void remapQuad() {
+        private void remapQuad(BakedQuad quad) {
 
             for (int i = 0; i < 4; ++i)
-                this.remapVert(i);
+                this.remapVert(quad, i);
         }
 
-        private void remapVert(int vertex) {
+        private void remapVert(BakedQuad quad, int vertex) {
 
             int i = 7 * vertex;
-            float u = (Float.intBitsToFloat(this.vertexData[i + 4]) * ClientProxy.BLOCK_TEXTURE_WIDTH) % 16F;
-            float v = (Float.intBitsToFloat(this.vertexData[i + 5]) * ClientProxy.BLOCK_TEXTURE_HEIGHT) % 16F;
+
+            float u = (Float.intBitsToFloat(this.vertexData[i + 4]) - quad.getSprite().getInterpolatedU(0)) * 16F
+                    / (quad.getSprite().getInterpolatedU(16) - quad.getSprite().getInterpolatedU(0));
+            float v = (Float.intBitsToFloat(this.vertexData[i + 5]) - quad.getSprite().getInterpolatedV(0)) * 16F
+                    / (quad.getSprite().getInterpolatedV(16) - quad.getSprite().getInterpolatedV(0));
             this.vertexData[i + 4] = Float.floatToRawIntBits(this.texture.getInterpolatedU(u));
             this.vertexData[i + 5] = Float.floatToRawIntBits(this.texture.getInterpolatedV(v));
         }

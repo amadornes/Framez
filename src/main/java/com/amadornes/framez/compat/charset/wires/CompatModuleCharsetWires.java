@@ -1,10 +1,8 @@
 package com.amadornes.framez.compat.charset.wires;
 
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.amadornes.framez.api.DynamicReference;
@@ -13,6 +11,7 @@ import com.amadornes.framez.api.motor.IMotor;
 import com.amadornes.framez.api.motor.IMotorExtension;
 import com.amadornes.framez.api.motor.IMotorTrigger;
 import com.amadornes.framez.api.motor.IMotorVariable;
+import com.amadornes.framez.api.motor.MotorTriggerType;
 import com.amadornes.framez.compat.IModule;
 
 import net.minecraft.item.EnumDyeColor;
@@ -57,14 +56,15 @@ public class CompatModuleCharsetWires implements IModule {
     public class BundledReceiverExtension implements IMotorExtension, IBundledReceiver {
 
         private final DynamicReference<? extends IMotor> motor;
-        private final List<BundledTrigger> triggers = new LinkedList<BundledTrigger>();
+        private final Map<ResourceLocation, BundledTrigger> triggers = new LinkedHashMap<ResourceLocation, BundledTrigger>();
         private BitSet values = new BitSet(16);
 
         public BundledReceiverExtension(DynamicReference<? extends IMotor> motor) {
 
             this.motor = motor;
             for (int i = 0; i < 16; i++)
-                triggers.add(new BundledTrigger(this, i));
+                triggers.put(new ResourceLocation("CharsetWires", "bundled." + EnumDyeColor.byMetadata(i).getName()),
+                        new BundledTrigger(this, i));
         }
 
         @Override
@@ -74,7 +74,7 @@ public class CompatModuleCharsetWires implements IModule {
         }
 
         @Override
-        public Collection<BundledTrigger> getProvidedTriggers() {
+        public Map<ResourceLocation, BundledTrigger> getProvidedTriggers() {
 
             return triggers;
         }
@@ -152,6 +152,18 @@ public class CompatModuleCharsetWires implements IModule {
         }
 
         @Override
+        public ItemStack getIconStack(boolean inverted) {
+
+            return new ItemStack(Item.getByNameOrId("CharsetWires:wire"), 1, (color + 1) * 2);
+        }
+
+        @Override
+        public MotorTriggerType getTriggerType() {
+
+            return MotorTriggerType.TYPE_REDSTONE_BUNLDED[color];
+        }
+
+        @Override
         public boolean isActive() {
 
             return extension.values.get(color);
@@ -164,9 +176,9 @@ public class CompatModuleCharsetWires implements IModule {
         }
 
         @Override
-        public ItemStack getIconStack() {
+        public boolean requiresInvertedOverlay() {
 
-            return new ItemStack(Item.getByNameOrId("CharsetWires:wire"), 1, (color + 1) * 2);
+            return true;
         }
 
     }

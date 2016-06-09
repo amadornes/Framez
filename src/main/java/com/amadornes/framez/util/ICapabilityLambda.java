@@ -4,7 +4,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public interface ICapabiltyLambda extends ICapabilityProvider {
+public interface ICapabilityLambda extends ICapabilityProvider {
 
     public Object getCap(Capability<?> capability, EnumFacing facing);
 

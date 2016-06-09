@@ -29,12 +29,14 @@ public abstract class LocatedPacket<T extends LocatedPacket<T>> extends Packet<T
     public void toBytes(ByteBuf buf) {
 
         buf.writeLong(pos.toLong());
+        super.toBytes(buf);
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
 
         pos = BlockPos.fromLong(buf.readLong());
+        super.fromBytes(buf);
     }
 
     public TargetPoint getTargetPoint(World world, double range) {

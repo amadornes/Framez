@@ -47,6 +47,7 @@ public class FramezBlocks {
         registerBlock(block, itemblock, name, i -> i + "", vars);
     }
 
+    @SuppressWarnings("deprecation") // TODO: Upgrade to the new registr
     private static void registerBlock(Block block, Class<? extends ItemBlock> itemblock, String name, IntFunction<String> i2s,
             int... variants) {
 

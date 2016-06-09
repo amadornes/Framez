@@ -20,7 +20,7 @@ public class GuiMotorSettingsTabOverview extends GuiMotorSettingsTab {
         int left = (width - xSize) / 2;
         int top = (height - ySize) / 2;
 
-        drawString(fontRendererObj, I18n.format("gui.framez:motor.overview") + ":", left + 8, top + 8, 0xFFFFFFFF);
+        drawString(fontRendererObj, I18n.format("gui.framez:motor.overview") + ":", left + 8, top + 8, 0xFFFFFF);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(left + 12, top + 20, 0);
@@ -28,7 +28,7 @@ public class GuiMotorSettingsTabOverview extends GuiMotorSettingsTab {
         motor.get().gatherVariables().entrySet().stream().filter(e -> e.getKey().shouldDisplayInOverview()).limit(11).reduce(0, (a, b) -> {
             drawString(fontRendererObj,
                     I18n.format(b.getKey().getUnlocalizedName()) + ": " + FramezUtils.valueToString(b.getKey(), b.getValue()), 0, 10 * a,
-                    0xFFFFFFFF);
+                    0xBBBBBB);
             return a + 1;
         }, (a, b) -> b);
         GlStateManager.popMatrix();
