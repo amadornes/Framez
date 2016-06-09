@@ -11,6 +11,11 @@ tile.framez:metamorphic_stone.water.name=Aqueous Metamorphic Stone
 tile.framez:metamorphic_stone.fire.name=Fiery Metamorphic Stone
 tile.framez:metamorphic_stone.ice.name=Gelid Metamorphic Stone
 
+tile.framez:motor.linear_actuator.name=Frame Linear Actuator
+tile.framez:motor.rotator.name=Frame Rotator
+tile.framez:motor.slider.name=Frame Slider
+tile.framez:motor.blink_drive.name=Frame Blink Drive
+
 // ---------------------------------- //
 //               ITEMS                //
 // ---------------------------------- //
@@ -25,9 +30,13 @@ item.framez:motor_upgrade.stepinterp.name=Step Interpolation Upgrade
 item.framez:motor_upgrade.soundmuffler.name=Sound Muffler Upgrade
 item.framez:motor_upgrade.extrange.name=Extended Range Upgrade
 item.framez:motor_upgrade.creative.name=Creative Upgrade
+item.framez:motor_upgrade.dank.name=Dank Upgrade
 
 item.framez:wrench.name=Wrench
 
+item.framez:nugget.iron=Iron Nugget
+
+item.framez:frame_panel.name=Frame Panel
 item.framez:frame.name=%s Frame
 
 // ---------------------------------- //

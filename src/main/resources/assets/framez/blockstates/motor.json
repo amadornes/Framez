@@ -3,37 +3,34 @@
 	"defaults": {
 		"textures": {
 	        "border": "framez:blocks/motor/border",
-	        "border_la": "framez:blocks/motor/border_la",
 	        "rod": "framez:blocks/motor/rod",
 	        "center": "framez:blocks/motor/center",
-	        "particle": "framez:blocks/motor/center"
+	        "particle": "framez:blocks/motor/center",
+	        "border_b": "framez:blocks/motor/border_b",
+	        "center_b": "framez:blocks/motor/center_b",
+	        "border_s": "framez:blocks/motor/border_s",
+	        "center_s": "framez:blocks/motor/center_s"
 		},
 		"model": "framez:motor",
 		"transform": "forge:default-block"
 	},
 	"variants": {
 		"normal": [{}],
-		"part=0,type=0": [{ "model": "framez:motor_small_body" }],
-		"part=1,type=0": [{ "model": "framez:motor_small_head" }],
-		"part=2,type=0": [{ "model": "framez:motor_small_rod" }],
-		"part=0,type=1": [{ "model": "framez:motor_small_body" }],
-		"part=1,type=1": [{ "model": "framez:motor_small_head" }],
-		"part=2,type=1": [{ "model": "framez:motor_small_rod" }],
-		"inventory0": [{
-			"model": "framez:motor_small_body",
-			"submodel": {
-				"head": {
-					"model": "framez:motor_small_head"
-				}
-			}
-		}],
-		"inventory1": [{
-			"model": "framez:motor_small_body",
-			"submodel": {
-				"head": {
-					"model": "framez:motor_small_head"
-				}
-			}
-		}]
+		"part=0,type=0": [{ "model": "framez:motor_body" }],
+		"part=1,type=0": [{ "model": "framez:motor_head" }],
+		"part=2,type=0": [{ "model": "framez:motor_rod" }],
+		"part=0,type=1": [{ "model": "framez:motor_body" }],
+		"part=1,type=1": [{ "model": "framez:motor_head" }],
+		"part=2,type=1": [{ "model": "framez:motor_rod" }],// Nope
+		"part=0,type=2": [{ "model": "framez:motor_bodyhead" }],
+		"part=1,type=2": [{ "model": "framez:motor" }],// Nope
+		"part=2,type=2": [{ "model": "framez:motor" }],// No rod, so why add another model?
+		"part=0,type=3": [{ "model": "framez:motor_small" }],
+		"part=1,type=3": [{ "model": "framez:motor" }],// Nope
+		"part=2,type=3": [{ "model": "framez:motor" }],// Nope
+		"inventory0": [{ "model": "framez:motor_bodyhead" }],
+		"inventory1": [{ "model": "framez:motor_bodyhead" }],
+		"inventory2": [{ "model": "framez:motor_bodyhead" }],
+		"inventory3": [{ "model": "framez:motor_small"    }]
 	}
 }

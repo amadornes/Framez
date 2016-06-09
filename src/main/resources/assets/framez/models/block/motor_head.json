@@ -8,10 +8,10 @@
 			"faces": {
 				"down":  { "texture": "#border" },
 				"up":    { "texture": "#border" },
-				"north": { "texture": "#border_la" },
-				"south": { "texture": "#border_la" },
-				"west":  { "texture": "#border_la" },
-				"east":  { "texture": "#border_la" }
+				"north": { "texture": "#border_b" },
+				"south": { "texture": "#border_b" },
+				"west":  { "texture": "#border_b" },
+				"east":  { "texture": "#border_b" }
 			}
     	},
     	{

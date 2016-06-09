@@ -20,9 +20,10 @@ import net.minecraftforge.common.util.INBTSerializable;
 public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     @SuppressWarnings("unchecked")
-    public static final Class<IMotorLogic>[] TYPES = new Class[] { MotorLogicLinearActuator.class, MotorLogicRotator.class };
-    public static final String[] TYPE_NAMES = new String[] { "linear_actuator", "rotator" };
-    public static final String[] TYPE_FTESRS = new String[] { "RenderLinearActuator", "RenderRotator" };
+    public static final Class<IMotorLogic>[] TYPES = new Class[] { MotorLogicLinearActuator.class, MotorLogicRotator.class,
+            MotorLogicSlider.class };
+    public static final String[] TYPE_NAMES = new String[] { "linear_actuator", "rotator", "slider" };
+    public static final String[] TYPE_FTESRS = new String[] { "RenderLinearActuator", "RenderRotator", "RenderSlider" };
 
     public static IMotorLogic create(int meta) {
 
