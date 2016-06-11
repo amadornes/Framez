@@ -2,10 +2,8 @@ package com.amadornes.framez.motor.logic;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-import com.amadornes.blockdata.BlockData;
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.api.motor.IMotorAction;
@@ -92,21 +90,14 @@ public class MotorLogicSlider implements IMotorLogic {
     @Override
     public boolean canMove(MovingStructure structure, IMotorAction action) {
 
-        return action != this.action;
+        return true;
     }
 
     @Override
     public void move(MovingStructure structure, IMotorAction action) {
 
         this.action = (EnumMotorAction) action;
-        for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
-            BlockData data = block.getKey().toBlockData();
-            data.remove(block.getKey().getWorld(), block.getKey().getPos(), 3);
-        }
-        for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
-            BlockData data = block.getKey().toBlockData();
-            data.place(block.getKey().getWorld(), block.getValue(), 3);
-        }
+        IMotorLogic.super.move(structure, action);
     }
 
     @Override

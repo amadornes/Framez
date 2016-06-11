@@ -1,9 +1,12 @@
 package com.amadornes.framez.motor.logic;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import com.amadornes.blockdata.BlockData;
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.IMotorAction;
 import com.amadornes.framez.motor.MotorTrigger;
@@ -59,7 +62,24 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     public boolean canMove(MovingStructure structure, IMotorAction action);
 
-    public void move(MovingStructure structure, IMotorAction action);
+    public default void move(MovingStructure structure, IMotorAction action) {
+
+        Map<BlockData, BlockPos> transformed = new HashMap<BlockData, BlockPos>();
+        for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
+            BlockData data = block.getKey().toBlockData();
+            data.remove(block.getKey().getWorld(), block.getKey().getPos(), 3);
+            data = transform(structure, action, data);
+            transformed.put(data, block.getValue());
+        }
+        for (Entry<BlockData, BlockPos> block : transformed.entrySet()) {
+            block.getKey().place(getMotor().getWorld(), block.getValue(), 3);
+        }
+    }
+
+    public default BlockData transform(MovingStructure structure, IMotorAction action, BlockData data) {
+
+        return data;
+    }
 
     public void onMovementComplete();
 

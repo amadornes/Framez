@@ -1,9 +1,7 @@
 package com.amadornes.framez.motor.logic;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.amadornes.blockdata.BlockData;
@@ -102,18 +100,14 @@ public class MotorLogicRotator implements IMotorLogic {
     public void move(MovingStructure structure, IMotorAction action) {
 
         this.action = (EnumMotorAction) action;
-        Map<BlockData, BlockPos> transformed = new HashMap<BlockData, BlockPos>();
-        for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
-            BlockData data = block.getKey().toBlockData();
-            data.remove(block.getKey().getWorld(), block.getKey().getPos(), 3);
-            data = BlockData.fromNBT(data.serializeNBT());// TODO: Make it so this isn't required?
-            data = data.withRotation(new BlockRotation(face.getAxis(),
-                    action == EnumMotorAction.ROTATE_CCLOCKWISE ? RotationAngle.CCW_90 : RotationAngle.CW_90));
-            transformed.put(data, block.getValue());
-        }
-        for (Entry<BlockData, BlockPos> block : transformed.entrySet()) {
-            block.getKey().place(motor.get().getWorld(), block.getValue(), 3);
-        }
+        IMotorLogic.super.move(structure, action);
+    }
+
+    @Override
+    public BlockData transform(MovingStructure structure, IMotorAction action, BlockData data) {
+
+        return data.withRotation(new BlockRotation(face.getAxis(),
+                action == EnumMotorAction.ROTATE_CCLOCKWISE ? RotationAngle.CCW_90 : RotationAngle.CW_90));
     }
 
     @Override
