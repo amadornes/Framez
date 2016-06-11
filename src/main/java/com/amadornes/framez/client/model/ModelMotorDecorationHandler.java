@@ -7,6 +7,8 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.amadornes.framez.client.ModelTransformer;
 import com.amadornes.framez.util.EnumIconTypes;
 
@@ -15,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -22,9 +25,10 @@ import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.client.model.IPerspectiveAwareModel;
 
 @SuppressWarnings("deprecation")
-public class ModelMotorDecorationHandler implements IBakedModel {
+public class ModelMotorDecorationHandler implements IBakedModel, IPerspectiveAwareModel {
 
     private IBakedModel model;
     private int id;
@@ -36,7 +40,7 @@ public class ModelMotorDecorationHandler implements IBakedModel {
         this.id = id;
     }
 
-    private void genDecorations(int id) {
+    private void genDecorations(int id, boolean isInWorld) {
 
         float dist = (0.6875F / 2F + 7) / 16F;
 
@@ -49,19 +53,19 @@ public class ModelMotorDecorationHandler implements IBakedModel {
             mat.setScale(0.6875F);
 
             mat.setTranslation(new Vector3f(0, 2 / 16F, dist));
-            decorations[EnumFacing.SOUTH.ordinal()] = transform(model, mat);
+            decorations[EnumFacing.SOUTH.ordinal()] = transform(model, mat, isInWorld);
 
             mat.setTranslation(new Vector3f(0, 2 / 16F, -dist));
-            decorations[EnumFacing.NORTH.ordinal()] = transform(model, mat);
+            decorations[EnumFacing.NORTH.ordinal()] = transform(model, mat, isInWorld);
 
             mat.rotY((float) Math.toRadians(90));
             mat.setScale(0.6875F);
 
             mat.setTranslation(new Vector3f(dist, 2 / 16F, 0));
-            decorations[EnumFacing.EAST.ordinal()] = transform(model, mat);
+            decorations[EnumFacing.EAST.ordinal()] = transform(model, mat, isInWorld);
 
             mat.setTranslation(new Vector3f(-dist, 2 / 16F, 0));
-            decorations[EnumFacing.WEST.ordinal()] = transform(model, mat);
+            decorations[EnumFacing.WEST.ordinal()] = transform(model, mat, isInWorld);
         } else
         // Rotator
         if (id == 1) {
@@ -72,7 +76,7 @@ public class ModelMotorDecorationHandler implements IBakedModel {
             mat.rotX((float) Math.toRadians(-90));
             mat.setTranslation(new Vector3f(0, dist, 0));
             mat.setScale(0.6875F);
-            decorations[EnumFacing.UP.ordinal()] = transform(model, mat);
+            decorations[EnumFacing.UP.ordinal()] = transform(model, mat, isInWorld);
         } else
         // Slider
         if (id == 2) {
@@ -89,7 +93,7 @@ public class ModelMotorDecorationHandler implements IBakedModel {
                 mat.mul(mat2);
                 mat.setTranslation(new Vector3f(0, dist, 0));
                 mat.setScale(0.6875F);
-                decorations[EnumFacing.UP.ordinal()] = transform(model, mat);
+                decorations[EnumFacing.UP.ordinal()] = transform(model, mat, isInWorld);
             }
             // Sides
             {
@@ -101,15 +105,15 @@ public class ModelMotorDecorationHandler implements IBakedModel {
                 mat.setScale(0.6875F);
 
                 mat.setTranslation(new Vector3f(-dist, 2 / 16F, 0));
-                decorations[EnumFacing.WEST.ordinal()] = transform(model, mat);
+                decorations[EnumFacing.WEST.ordinal()] = transform(model, mat, isInWorld);
 
                 mat.setTranslation(new Vector3f(dist, 2 / 16F, 0));
-                decorations[EnumFacing.EAST.ordinal()] = transform(model, mat);
+                decorations[EnumFacing.EAST.ordinal()] = transform(model, mat, isInWorld);
             }
         }
     }
 
-    private IBakedModel transform(IBakedModel model, Matrix4f mat) {
+    private IBakedModel transform(IBakedModel model, Matrix4f mat, boolean isInWorld) {
 
         return ModelTransformer.transform(model, (quad, type, usage, data) -> {
             if (usage == EnumUsage.POSITION) {
@@ -131,7 +135,7 @@ public class ModelMotorDecorationHandler implements IBakedModel {
                 data[1] = 15 * 32.0f / 0xffff;
             }
             return data;
-        }, null, 0L, f -> new VertexFormat(f).addElement(DefaultVertexFormats.TEX_2S));
+        }, null, 0L, f -> isInWorld ? new VertexFormat(f).addElement(DefaultVertexFormats.TEX_2S) : f);
 
     }
 
@@ -140,7 +144,7 @@ public class ModelMotorDecorationHandler implements IBakedModel {
 
         if (decorations == null) {
             decorations = new IBakedModel[6];
-            genDecorations(id);
+            genDecorations(id, state != null);
         }
 
         IBakedModel decor = side == null ? null : decorations[side.ordinal()];
@@ -186,6 +190,16 @@ public class ModelMotorDecorationHandler implements IBakedModel {
     public ItemOverrideList getOverrides() {
 
         return model.getOverrides();
+    }
+
+    @Override
+    public Pair<? extends IBakedModel, Matrix4f> handlePerspective(TransformType cameraTransformType) {
+
+        if (model instanceof IPerspectiveAwareModel) {
+            Pair<? extends IBakedModel, Matrix4f> p = ((IPerspectiveAwareModel) model).handlePerspective(cameraTransformType);
+            if (p != null) return Pair.of(this, p.getRight());
+        }
+        return Pair.of(this, null);
     }
 
 }

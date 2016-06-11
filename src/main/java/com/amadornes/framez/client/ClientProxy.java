@@ -87,12 +87,24 @@ public class ClientProxy extends CommonProxy {
         // Wrap motor models
         for (IBlockState state : FramezBlocks.motor.getBlockState().getValidStates()) {
             if (state.getValue(BlockMotor.PROPERTY_PART_TYPE) != 0) continue;
-            ModelResourceLocation res = getModelResourceLocation(state);
-            IBakedModel model = event.getModelRegistry().getObject(res);
-            model = new ModelMotorDecorationHandler(model, state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)); // Motor Icons
-            model = new ModelMotorRotationHandler(model); // Rotation
-            model = new ModelMotorCamouflageHandler(model); // Camouflaging
-            event.getModelRegistry().putObject(res, model);
+
+            // Block
+            {
+                ModelResourceLocation res = getModelResourceLocation(state);
+                IBakedModel model = event.getModelRegistry().getObject(res);
+                model = new ModelMotorDecorationHandler(model, state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)); // Motor Icons
+                model = new ModelMotorRotationHandler(model); // Rotation
+                model = new ModelMotorCamouflageHandler(model); // Camouflaging
+                event.getModelRegistry().putObject(res, model);
+            }
+            // Item
+            {
+                ModelResourceLocation res = getModelResourceLocation(state.getBlock(),
+                        "inventory" + state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE));
+                IBakedModel model = event.getModelRegistry().getObject(res);
+                model = new ModelMotorDecorationHandler(model, state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)); // Motor Icons
+                event.getModelRegistry().putObject(res, model);
+            }
         }
 
         // Dynamic frame part model
@@ -208,6 +220,11 @@ public class ClientProxy extends CommonProxy {
 
         return new ModelResourceLocation(Block.REGISTRY.getNameForObject(state.getBlock()).toString(),
                 getPropertyString(Maps.<IProperty, Comparable> newLinkedHashMap(state.getProperties())));
+    }
+
+    private ModelResourceLocation getModelResourceLocation(Block block, String properties) {
+
+        return new ModelResourceLocation(Block.REGISTRY.getNameForObject(block).toString(), properties);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
