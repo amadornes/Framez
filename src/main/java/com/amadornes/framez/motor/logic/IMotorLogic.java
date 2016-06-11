@@ -24,6 +24,7 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
             MotorLogicSlider.class };
     public static final String[] TYPE_NAMES = new String[] { "linear_actuator", "rotator", "slider" };
     public static final String[] TYPE_FTESRS = new String[] { "RenderLinearActuator", "RenderRotator", "RenderSlider" };
+    public static final boolean[] TYPE_HAS_HEAD = new boolean[] { true, true, false };
 
     public static IMotorLogic create(int meta) {
 

@@ -26,7 +26,7 @@ public class MotorLogicSlider implements IMotorLogic {
 
     private DynamicReference<TileMotor> motor;
     private EnumFacing face = EnumFacing.DOWN;
-    private EnumFacing front = EnumFacing.SOUTH;
+    private EnumFacing front = EnumFacing.NORTH;
     private EnumMotorAction action = EnumMotorAction.STOP;
 
     public MotorLogicSlider() {

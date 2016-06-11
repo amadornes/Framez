@@ -7,11 +7,16 @@
 		"transform": "forge:default-item"
 	},
 	"variants": {
-		"normal": [{}],
-		"inventory0":   [ { "textures": { "layer0": "framez:items/icons/stop" } } ],
-		"inventory1":   [ { "textures": { "layer0": "framez:items/icons/forward" } } ],
-		"inventory2":   [ { "textures": { "layer0": "framez:items/icons/backward" } } ],
-		"inventory3":   [ { "textures": { "layer0": "framez:items/icons/clockwise" } } ],
-		"inventory4":   [ { "textures": { "layer0": "framez:items/icons/cclockwise" } } ]
+		"normal":     [ { } ],
+		"inventory0": [ { "textures": { "layer0": "framez:items/icons/stop" } } ],
+		"inventory1": [ { "textures": { "layer0": "framez:items/icons/forward" } } ],
+		"inventory2": [ { "textures": { "layer0": "framez:items/icons/backward" } } ],
+		"inventory3": [ { "textures": { "layer0": "framez:items/icons/clockwise" } } ],
+		"inventory4": [ { "textures": { "layer0": "framez:items/icons/cclockwise" } } ],
+		"inventory5": [ { "textures": { "layer0": "framez:items/icons/forward_nb" } } ],
+		"inventory6": [ { "textures": { "layer0": "framez:items/icons/backward_nb" } } ],
+		"inventory7": [ { "textures": { "layer0": "framez:items/icons/clockwise_nb" } } ],
+		"inventory8": [ { "textures": { "layer0": "framez:items/icons/cclockwise_nb" } } ],
+		"inventory9": [ { "textures": { "layer0": "framez:items/icons/down_nb" } } ]
 	}
 }

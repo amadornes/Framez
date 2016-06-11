@@ -104,12 +104,14 @@ public class AdvancedModelRextexturer {
 
         private void remapVert(BakedQuad quad, int vertex) {
 
-            int i = 7 * vertex;
+            TextureAtlasSprite texture = quad.getSprite();
+            if (texture == null) return;
 
-            float u = (Float.intBitsToFloat(this.vertexData[i + 4]) - quad.getSprite().getInterpolatedU(0)) * 16F
-                    / (quad.getSprite().getInterpolatedU(16) - quad.getSprite().getInterpolatedU(0));
-            float v = (Float.intBitsToFloat(this.vertexData[i + 5]) - quad.getSprite().getInterpolatedV(0)) * 16F
-                    / (quad.getSprite().getInterpolatedV(16) - quad.getSprite().getInterpolatedV(0));
+            int i = 7 * vertex;
+            float u = (Float.intBitsToFloat(this.vertexData[i + 4]) - texture.getInterpolatedU(0)) * 16F
+                    / (texture.getInterpolatedU(16) - texture.getInterpolatedU(0));
+            float v = (Float.intBitsToFloat(this.vertexData[i + 5]) - texture.getInterpolatedV(0)) * 16F
+                    / (texture.getInterpolatedV(16) - texture.getInterpolatedV(0));
             this.vertexData[i + 4] = Float.floatToRawIntBits(this.texture.getInterpolatedU(u));
             this.vertexData[i + 5] = Float.floatToRawIntBits(this.texture.getInterpolatedV(v));
         }

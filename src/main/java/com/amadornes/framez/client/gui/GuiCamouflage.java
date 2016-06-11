@@ -12,14 +12,21 @@ import org.lwjgl.util.vector.Vector3f;
 import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.IMotor;
+import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.container.ContainerCamouflage;
+import com.amadornes.framez.init.FramezBlocks;
+import com.amadornes.framez.motor.logic.IMotorLogic;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
+import com.amadornes.framez.util.IsolatedWorld;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -30,7 +37,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
 public class GuiCamouflage extends SubGuiContainer {
 
-    @SuppressWarnings("unused") // TODO Use
     private UpgradeCamouflage upgrade;
 
     private double angleX, angleY;
@@ -74,6 +80,7 @@ public class GuiCamouflage extends SubGuiContainer {
 
     private static final FloatBuffer buf = BufferUtils.createFloatBuffer(16);
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 
@@ -120,35 +127,33 @@ public class GuiCamouflage extends SubGuiContainer {
                 GlStateManager.multMatrix(buf);
                 GlStateManager.translate(-0.5, -0.5, -0.5);
 
-                // TODO: Re-enable camouflage GUI
-                // mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                // mc.renderEngine.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-                // IMotor motor = upgrade.motor.get();
-                // VertexBuffer wr = Tessellator.getInstance().getBuffer();
-                // wr.begin(7, DefaultVertexFormats.BLOCK);
-                // wr.setTranslation(-motor.getMotorPos().getX(), -motor.getMotorPos().getY(), -motor.getMotorPos().getZ());
-                // IBlockState state = FramezBlocks.motor.getActualState(motor.getMotorWorld().getBlockState(motor.getMotorPos()),
-                // motor.getMotorWorld(), motor.getMotorPos());
-                // IBakedModel model;
-                //
-                // state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 0);
-                // model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
-                // model = model instanceof ISmartBlockModel ? ((ISmartBlockModel) model)
-                // .handleBlockState(FramezBlocks.motor.getExtendedState(state, motor.getMotorWorld(), motor.getMotorPos())) : model;
-                //
-                // mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
-                // IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, state, motor.getMotorPos(), wr);
-                //
-                // state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
-                // model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
-                // model = model instanceof ISmartBlockModel ? ((ISmartBlockModel) model).handleBlockState(state) : model;
-                //
-                // mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
-                // IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, state, motor.getMotorPos(), wr);
-                //
-                // wr.setTranslation(0, 0, 0);
-                // Tessellator.getInstance().draw();
-                // mc.renderEngine.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap();
+                mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                mc.renderEngine.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+                IMotor motor = upgrade.motor.get();
+                VertexBuffer wr = Tessellator.getInstance().getBuffer();
+                wr.begin(7, DefaultVertexFormats.BLOCK);
+                wr.setTranslation(-motor.getMotorPos().getX(), -motor.getMotorPos().getY(), -motor.getMotorPos().getZ());
+                IBlockState state = FramezBlocks.motor.getActualState(motor.getMotorWorld().getBlockState(motor.getMotorPos()),
+                        motor.getMotorWorld(), motor.getMotorPos());
+                IBlockState exstate = state.getBlock().getExtendedState(state, motor.getMotorWorld(), motor.getMotorPos());
+                IBakedModel model;
+
+                state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 0);
+                model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+                mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
+                        IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, exstate, motor.getMotorPos(), wr, false);
+
+                if (IMotorLogic.TYPE_HAS_HEAD[state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)]) {
+                    state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
+                    model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+                    mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
+                            IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, exstate, motor.getMotorPos(), wr,
+                            false);
+                }
+
+                wr.setTranslation(0, 0, 0);
+                Tessellator.getInstance().draw();
+                mc.renderEngine.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
             }
             GlStateManager.popMatrix();
 

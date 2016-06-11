@@ -11,10 +11,13 @@ import com.amadornes.framez.CommonProxy;
 import com.amadornes.framez.ModInfo;
 import com.amadornes.framez.api.frame.EnumFrameTexture;
 import com.amadornes.framez.api.frame.IFrameMaterial;
+import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.client.gui.GuiWrench;
 import com.amadornes.framez.client.model.ModelFrame;
 import com.amadornes.framez.client.model.ModelFramePanel;
-import com.amadornes.framez.client.model.ModelWrapperCamouflage;
+import com.amadornes.framez.client.model.ModelMotorCamouflageHandler;
+import com.amadornes.framez.client.model.ModelMotorDecorationHandler;
+import com.amadornes.framez.client.model.ModelMotorRotationHandler;
 import com.amadornes.framez.client.render.FTESRMotor;
 import com.amadornes.framez.frame.FrameRegistry;
 import com.amadornes.framez.init.FramezBlocks;
@@ -81,9 +84,15 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public void onModelBake(ModelBakeEvent event) {
 
+        // Wrap motor models
         for (IBlockState state : FramezBlocks.motor.getBlockState().getValidStates()) {
+            if (state.getValue(BlockMotor.PROPERTY_PART_TYPE) != 0) continue;
             ModelResourceLocation res = getModelResourceLocation(state);
-            event.getModelRegistry().putObject(res, new ModelWrapperCamouflage(event.getModelRegistry().getObject(res)));
+            IBakedModel model = event.getModelRegistry().getObject(res);
+            model = new ModelMotorDecorationHandler(model, state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)); // Motor Icons
+            model = new ModelMotorRotationHandler(model); // Rotation
+            model = new ModelMotorCamouflageHandler(model); // Camouflaging
+            event.getModelRegistry().putObject(res, model);
         }
 
         // Dynamic frame part model

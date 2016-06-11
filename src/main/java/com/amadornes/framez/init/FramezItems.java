@@ -5,7 +5,6 @@ import java.util.function.IntFunction;
 
 import com.amadornes.framez.Framez;
 import com.amadornes.framez.ModInfo;
-import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.item.ItemFrame;
 import com.amadornes.framez.item.ItemFramePanel;
 import com.amadornes.framez.item.ItemIcons;
@@ -13,6 +12,7 @@ import com.amadornes.framez.item.ItemMotorUpgrade;
 import com.amadornes.framez.item.ItemNugget;
 import com.amadornes.framez.item.ItemWrench;
 import com.amadornes.framez.motor.MotorRegistry;
+import com.amadornes.framez.util.EnumIconTypes;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -45,7 +45,7 @@ public class FramezItems {
                 MotorRegistry.INSTANCE.internalUpgrades.size());
         registerItem(nugget, "nugget", i -> "_" + ItemNugget.NUGGET_TYPES.get(i), ItemNugget.NUGGET_TYPES.size());
         registerItem(frame_panel, "frame_panel", 3);
-        registerItem(icons, "icons", EnumMotorAction.values().length);
+        registerItem(icons, "icons", EnumIconTypes.VALUES.length);
     }
 
     private static void registerItem(Item item, String name, int variantCount) {
