@@ -1,0 +1,126 @@
+#itemGroup.framez=Framez
+
+// ---------------------------------- //
+//               BLOCKS               //
+// ---------------------------------- //
+
+tile.framez:metamorphic_stone.name=变质石
+tile.framez:metamorphic_stone.cracked.name=碎裂变质石
+tile.framez:metamorphic_stone.bricks.name=变质石砖
+tile.framez:metamorphic_stone.water.name=水之变质石
+tile.framez:metamorphic_stone.fire.name=火之变质石
+tile.framez:metamorphic_stone.ice.name=冰之变质石
+
+tile.framez:motor.linear_actuator.name=框架线性推动装置
+tile.framez:motor.rotator.name=框架旋转装置
+tile.framez:motor.slider.name=框架滑行装置
+tile.framez:motor.blink_drive.name=框架闪现装置
+
+// ---------------------------------- //
+//               ITEMS                //
+// ---------------------------------- //
+
+item.framez:motor_upgrade.camouflage.name=伪装升级
+item.framez:motor_upgrade.telekinetic.name=念力升级
+item.framez:motor_upgrade.advtrigger.name=高级触发器升级
+item.framez:motor_upgrade.crawling.name=爬行升级
+item.framez:motor_upgrade.speedreg.name=速度调控升级
+item.framez:motor_upgrade.computerized.name=计算机控制升级
+item.framez:motor_upgrade.stepinterp.name=阶梯插值升级
+item.framez:motor_upgrade.soundmuffler.name=消音升级
+item.framez:motor_upgrade.extrange.name=范围拓展升级
+item.framez:motor_upgrade.creative.name=创造模式升级
+item.framez:motor_upgrade.dank.name=黑暗科技升级
+
+item.framez:wrench.name=扳手
+
+item.framez:nugget.iron=铁粒
+
+item.framez:frame_panel.name=框架板材
+item.framez:frame.name=%s框架
+
+// ---------------------------------- //
+//              MATERIALS             //
+// ---------------------------------- //
+
+framemat.framez:wood.name=木
+framemat.framez:wood.adj=木质
+framemat.framez:iron.name=铁
+framemat.framez:iron.adj=铁
+framemat.framez:gold.name=金
+framemat.framez:gold.adj=金
+
+// ---------------------------------- //
+//              VARIABLE              //
+// ---------------------------------- //
+
+var.framez:power_stored=当前储能
+var.framez:power_storage_size=最大储能
+
+// ---------------------------------- //
+//                GUI                 //
+// ---------------------------------- //
+
+gui.framez:motor.overview=概况
+gui.framez:motor.upgrades=升级
+gui.framez:motor.triggers=触发器
+gui.framez:motor.speed=速度控制
+gui.framez:motor.issues=移动问题
+
+gui.framez:button.save=保存
+gui.framez:button.cancel=取消
+
+gui.framez:action=动作
+
+gui.framez:csettings.title=客户端设定
+gui.framez:csettings.1=连接相邻的框架的材质
+gui.framez:csettings.2=鼠标点击时忽略框架
+gui.framez:csettings.3=---
+gui.framez:csettings.4=---
+
+// ---------------------------------- //
+//              TOOLTIPS              //
+// ---------------------------------- //
+
+tooltip.framez:shift=%s按住%sShift%s显示详细信息
+
+tooltip.framez:frame.border=边框
+tooltip.framez:frame.cross=十字
+tooltip.framez:frame.binding=连结
+
+tooltip.framez:frame.maxblocks=最大可承载方块数
+tooltip.framez:frame.maxparts=最大可承载部件数
+tooltip.framez:frame.mintime=最短移动时间
+tooltip.framez:frame.mintime.warp=%s曲速移动
+
+// ---------------------------------- //
+//         ACTIONS & TRIGGERS         //
+// ---------------------------------- //
+action.framez:forward=前
+action.framez:backward=后
+action.framez:clockwise=顺时针旋转
+action.framez:cclockwise=逆时针旋转
+action.framez:stop=停止
+
+trigger.framez:inverted=反相
+
+trigger.framez:always=总是触发
+trigger.framez:redstone=有红石信号
+trigger.framez:redstone.inverted=无红石信号
+
+trigger.framez:bundled.white=白色捆绑线缆
+trigger.framez:bundled.orange=橙色捆绑线缆
+trigger.framez:bundled.magenta=品红色捆绑线缆
+trigger.framez:bundled.light_blue=淡蓝色捆绑线缆
+trigger.framez:bundled.yellow=黄色捆绑线缆
+trigger.framez:bundled.lime=黄绿色捆绑线缆
+trigger.framez:bundled.pink=粉色捆绑线缆
+trigger.framez:bundled.gray=灰色捆绑线缆
+trigger.framez:bundled.silver=淡灰色捆绑线缆
+trigger.framez:bundled.cyan=青色捆绑线缆
+trigger.framez:bundled.purple=紫色捆绑线缆
+trigger.framez:bundled.blue=蓝色捆绑线缆
+trigger.framez:bundled.brown=棕色捆绑线缆
+trigger.framez:bundled.green=绿色捆绑线缆
+trigger.framez:bundled.red=红色捆绑线缆
+trigger.framez:bundled.black=黑色捆绑线缆
