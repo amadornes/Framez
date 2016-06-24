@@ -6,8 +6,12 @@ public interface IMotorAction {
 
     public String getUnlocalizedName();
 
+    public ItemStack getIconStack();
+
     public boolean isMoving();
 
-    public ItemStack getIconStack();
+    public boolean clashesWith(IMotorAction action);
+
+    public int[] getCategories();
 
 }

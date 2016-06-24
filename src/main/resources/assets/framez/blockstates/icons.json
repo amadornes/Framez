@@ -13,10 +13,12 @@
 		"inventory2": [ { "textures": { "layer0": "framez:items/icons/backward" } } ],
 		"inventory3": [ { "textures": { "layer0": "framez:items/icons/clockwise" } } ],
 		"inventory4": [ { "textures": { "layer0": "framez:items/icons/cclockwise" } } ],
-		"inventory5": [ { "textures": { "layer0": "framez:items/icons/forward_nb" } } ],
-		"inventory6": [ { "textures": { "layer0": "framez:items/icons/backward_nb" } } ],
-		"inventory7": [ { "textures": { "layer0": "framez:items/icons/clockwise_nb" } } ],
-		"inventory8": [ { "textures": { "layer0": "framez:items/icons/cclockwise_nb" } } ],
-		"inventory9": [ { "textures": { "layer0": "framez:items/icons/down_nb" } } ]
+		"inventory5": [ { "textures": { "layer0": "framez:items/icons/stickiness_on" } } ],
+		"inventory6": [ { "textures": { "layer0": "framez:items/icons/stickiness_off" } } ],
+		"inventory7": [ { "textures": { "layer0": "framez:items/icons/forward_nb" } } ],
+		"inventory8": [ { "textures": { "layer0": "framez:items/icons/backward_nb" } } ],
+		"inventory9": [ { "textures": { "layer0": "framez:items/icons/clockwise_nb" } } ],
+		"inventory10": [ { "textures": { "layer0": "framez:items/icons/cclockwise_nb" } } ],
+		"inventory11": [ { "textures": { "layer0": "framez:items/icons/down_nb" } } ]
 	}
 }

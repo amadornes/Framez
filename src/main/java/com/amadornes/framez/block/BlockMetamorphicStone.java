@@ -39,7 +39,7 @@ public class BlockMetamorphicStone extends Block {
     public BlockMetamorphicStone() {
 
         super(Material.IRON);
-        setHardness(1.5F);
+        setHardness(3F);
         setResistance(30);
         setUnlocalizedName(ModInfo.MODID + ":metamorphic_stone");
         setHarvestLevel("pickaxe", 3);
@@ -77,26 +77,27 @@ public class BlockMetamorphicStone extends Block {
     @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock) {
 
+        Type type = state.getValue(TYPE);
         for (EnumFacing side : EnumFacing.VALUES)
-            convertIfNeeded(world, pos, side, state);
+            convertIfNeeded(world, pos, side, type);
     }
 
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
 
-        if (state.getValue(TYPE).ticking) world.scheduleBlockUpdate(pos, this, 1, 0);
+        Type type = state.getValue(TYPE);
+        if (type.hasLogic) world.scheduleBlockUpdate(pos, this, 1, 0);
 
         for (EnumFacing side : EnumFacing.VALUES)
-            convertIfNeeded(world, pos, side, state);
+            convertIfNeeded(world, pos, side, type);
     }
 
-    public void convertIfNeeded(World world, BlockPos pos, EnumFacing side, IBlockState state) {
+    public static void convertIfNeeded(World world, BlockPos pos, EnumFacing side, Type type) {
 
         if (world.isRemote) return;
 
         pos = pos.offset(side);
 
-        Type type = state.getValue(TYPE);
         IBlockState fluidState = world.getBlockState(pos);
         if (type == Type.WATER) {
             if (fluidState.getMaterial() == Material.LAVA) {
@@ -222,11 +223,11 @@ public class BlockMetamorphicStone extends Block {
 
         public static final Type[] VALUES = values();
 
-        public final boolean ticking;
+        public final boolean hasLogic;
 
-        private Type(boolean ticking) {
+        private Type(boolean hasLogic) {
 
-            this.ticking = ticking;
+            this.hasLogic = hasLogic;
         }
 
         @Override

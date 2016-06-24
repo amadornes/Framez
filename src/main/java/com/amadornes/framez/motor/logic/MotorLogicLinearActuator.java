@@ -25,21 +25,24 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     private DynamicReference<TileMotor> motor;
     private EnumFacing face = EnumFacing.DOWN;
     private EnumMotorAction action = EnumMotorAction.MOVE_BACKWARD;
+    private boolean stickyFront = false;
 
     public MotorLogicLinearActuator() {
 
     }
 
     @Override
-    public IMotorAction initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap) {
+    public void initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap) {
 
         triggers.put(EnumMotorAction.MOVE_FORWARD, new MotorTrigger(new MotorTriggerRedstone(motor), false));
         triggers.put(EnumMotorAction.MOVE_BACKWARD, new MotorTrigger(new MotorTriggerRedstone(motor), true));
+        triggers.put(EnumMotorAction.STICKINESS_ENABLED, new MotorTrigger());
+        triggers.put(EnumMotorAction.STICKINESS_DISABLED, new MotorTrigger());
 
         actionIdMap.add(EnumMotorAction.MOVE_FORWARD);
         actionIdMap.add(EnumMotorAction.MOVE_BACKWARD);
-
-        return EnumMotorAction.MOVE_BACKWARD;
+        actionIdMap.add(EnumMotorAction.STICKINESS_ENABLED);
+        actionIdMap.add(EnumMotorAction.STICKINESS_DISABLED);
     }
 
     @Override
@@ -82,27 +85,38 @@ public class MotorLogicLinearActuator implements IMotorLogic {
     }
 
     @Override
+    public void performAction(IMotorAction action) {
+
+        if (action.isMoving()) {
+            getMotor().move(action);
+        } else if (action == EnumMotorAction.STICKINESS_ENABLED) {
+            stickyFront = true;
+        } else if (action == EnumMotorAction.STICKINESS_DISABLED) {
+            stickyFront = false;
+        }
+    }
+
+    @Override
     public boolean canMove(MovingStructure structure, IMotorAction action) {
 
         return action != this.action;
     }
 
     @Override
-    public void move(MovingStructure structure, IMotorAction action) {
+    public void move(MovingStructure structure, IMotorAction action, int duration) {
 
         this.action = (EnumMotorAction) action;
-        IMotorLogic.super.move(structure, action);
-    }
-
-    @Override
-    public void onMovementComplete() {
-
+        IMotorLogic.super.move(structure, action, duration);
     }
 
     @Override
     public IMovement getMovement(Set<MovingBlock> blocks, IMotorAction action) {
 
-        return new MovementTranslation(action == EnumMotorAction.MOVE_BACKWARD ? face.getOpposite() : face);
+        if (action == EnumMotorAction.MOVE_FORWARD || stickyFront) {
+            return new MovementTranslation(action == EnumMotorAction.MOVE_BACKWARD ? face.getOpposite() : face);
+        } else {
+            return null;
+        }
     }
 
     @Override

@@ -38,6 +38,8 @@ import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
 import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.util.LinkedHashBiMap;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemBlock;
@@ -77,7 +79,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public final Map<IMotorVariable<?>, Supplier<Object>> nativeVariables = new LinkedHashMap<IMotorVariable<?>, Supplier<Object>>();
     private final Map<ResourceLocation, IMotorExtension> extensions = new LinkedHashMap<ResourceLocation, IMotorExtension>();
 
-    private IMotorAction currentAction;
+    private IMotorAction[] previousActions;
     private DynamicReference<Boolean> moving = null;
     private int currentMovementTicks = -1;
 
@@ -119,7 +121,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
             this.nativeVariables.putAll(motor.nativeVariables);
             this.extensions.putAll(motor.extensions);
 
-            this.currentAction = motor.currentAction;
+            this.previousActions = motor.previousActions;
             this.moving = motor.moving;
             this.currentMovementTicks = motor.currentMovementTicks;
         }
@@ -134,7 +136,13 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         logic.setMotor(reference);
 
         triggers.clear();
-        currentAction = logic.initTriggers(triggers, actionIdMap);
+        logic.initTriggers(triggers, actionIdMap);
+
+        int max = 0;
+        for (IMotorAction action : triggers.keySet())
+            for (int i : action.getCategories())
+                max = Math.max(max, i);
+        previousActions = new IMotorAction[max + 1];
     }
 
     @Override
@@ -152,16 +160,46 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
             }
         }
         if (!getMotorWorld().isRemote) {
-            IMotorAction newAction = currentAction;
-            int activeTriggers = 0;
+            Multimap<Integer, IMotorAction> newActionsMap = MultimapBuilder.hashKeys().linkedListValues().build();
+            IMotorAction[] newActions = new IMotorAction[previousActions.length];
             for (Entry<IMotorAction, MotorTrigger> e : triggers.entrySet()) {
                 if (e.getValue().isActive()) {
-                    newAction = e.getKey();
-                    activeTriggers++;
+                    for (int i : e.getKey().getCategories()) {
+                        newActions[i] = e.getKey();
+                        newActionsMap.put(i, e.getKey());
+                    }
                 }
             }
-            if (activeTriggers == 1) currentAction = newAction;
-            if (currentAction.isMoving()) move(currentAction);
+            boolean clash = false;
+            for (IMotorAction a : newActions) {
+                if (a == null) continue;
+                for (IMotorAction b : newActions) {
+                    if (b == null) continue;
+                    if (a != b && (a.clashesWith(b) || b.clashesWith(a))) {
+                        clash = true;
+                        break;
+                    }
+                }
+                if (clash) break;
+            }
+            if (!clash) {
+                for (int i = 0; i < newActions.length; i++) {
+                    if (newActionsMap.containsKey(i)) {
+                        if (newActions[i] != previousActions[i]) {
+                            for (IMotorAction action : newActionsMap.get(i)) {
+                                logic.performAction(action);
+                            }
+                            continue;
+                        }
+                        // } else {
+                        // newActions[i] = previousActions[i];
+                    }
+                    if (newActions[i] != null) {
+                        logic.performAction(newActions[i]);
+                    }
+                }
+                previousActions = newActions;
+            }
         }
     }
 
@@ -212,15 +250,15 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
                 s -> logic.getMovement(s, action), () -> getMotorWorld());
         // TODO: Check consumed energy using the wrong variables
         return couldMove = (movedStructure != null && logic.canMove(movedStructure, action) && logic.getConsumedEnergy(movedStructure,
-                getVariable(TileMotor.MOVEMENT_TIME).doubleValue()) <= getVariable(TileMotor.POWER_STORED));
+                getVariable(TileMotor.MOVEMENT_TIME).intValue()) <= getVariable(TileMotor.POWER_STORED));
     }
 
     @Override
     public DynamicReference<Boolean> move(IMotorAction action) {
 
-        if (action == EnumMotorAction.STOP) return null;
+        if (!action.isMoving()) return null;
         if (canMove(action)) {
-            getLogic().move(movedStructure, action);
+            getLogic().move(movedStructure, action, getVariable(TileMotor.MOVEMENT_TIME).intValue());
             currentMovementTicks = 0;
             moving = new DynamicReference<Boolean>(true);
             sendUpdatePacket();
@@ -422,7 +460,6 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
         tag.setInteger("logicID", getLogic().getID());
 
-        tag.setInteger("currentAction", actionIdMap.indexOf(currentAction));
         tag.setBoolean("moving", moving != null && moving.get());
         tag.setInteger("currentMovementTicks", currentMovementTicks);
 
@@ -451,7 +488,6 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
 
         if (logic == null) initLogic(IMotorLogic.create(tag.getInteger("logicID")));
 
-        currentAction = actionIdMap.get(tag.getInteger("currentAction"));
         moving = new DynamicReference<Boolean>(tag.getBoolean("moving"));
         currentMovementTicks = tag.getInteger("currentMovementTicks");
 
@@ -483,8 +519,10 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         NBTTagCompound data = new NBTTagCompound();
         data.setInteger("operation", trigger.getOperation().ordinal());
         NBTTagCompound trig = new NBTTagCompound();
-        for (Entry<IMotorTrigger, Boolean> e2 : trigger.getTriggers().entrySet())
-            trig.setBoolean(availableTriggers.inverse().get(e2.getKey()).toString(), e2.getValue());
+        for (Entry<IMotorTrigger, Boolean> e2 : trigger.getTriggers().entrySet()) {
+            String id = availableTriggers.inverse().get(e2.getKey()).toString();
+            trig.setBoolean(id, e2.getValue());
+        }
         data.setTag("triggers", trig);
         return data;
     }
@@ -494,10 +532,10 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         trigger.setOperation(EnumTriggerOperation.values()[tag.getInteger("operation")]);
         trigger.getTriggers().clear();
         NBTTagCompound trig = tag.getCompoundTag("triggers");
-        IMotorTrigger t;
-        for (String k : trig.getKeySet())
-            trigger.addTrigger(t = availableTriggers.get(new ResourceLocation(k)),
-                    trig.getBoolean(availableTriggers.inverse().get(t).toString()));
+        for (String k : trig.getKeySet()) {
+            if (k.endsWith("_data")) continue;
+            trigger.addTrigger(availableTriggers.get(new ResourceLocation(k)), trig.getBoolean(k));
+        }
     }
 
     public void sendUpdatePacket() {

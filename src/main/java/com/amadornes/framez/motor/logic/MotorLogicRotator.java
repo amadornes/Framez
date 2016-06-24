@@ -35,7 +35,7 @@ public class MotorLogicRotator implements IMotorLogic {
     }
 
     @Override
-    public IMotorAction initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap) {
+    public void initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap) {
 
         triggers.put(EnumMotorAction.ROTATE_CLOCKWISE, new MotorTrigger(new MotorTriggerRedstone(motor), false));
         triggers.put(EnumMotorAction.ROTATE_CCLOCKWISE, new MotorTrigger());
@@ -44,8 +44,6 @@ public class MotorLogicRotator implements IMotorLogic {
         actionIdMap.add(EnumMotorAction.ROTATE_CLOCKWISE);
         actionIdMap.add(EnumMotorAction.ROTATE_CCLOCKWISE);
         actionIdMap.add(EnumMotorAction.STOP);
-
-        return EnumMotorAction.STOP;
     }
 
     @Override
@@ -87,6 +85,7 @@ public class MotorLogicRotator implements IMotorLogic {
     @Override
     public double getConsumedEnergy(MovingStructure structure, double energyApplied) {
 
+        System.out.println(energyApplied);
         return 0; // TODO: Determine consumed energy
     }
 
@@ -97,10 +96,10 @@ public class MotorLogicRotator implements IMotorLogic {
     }
 
     @Override
-    public void move(MovingStructure structure, IMotorAction action) {
+    public void move(MovingStructure structure, IMotorAction action, int duration) {
 
         this.action = (EnumMotorAction) action;
-        IMotorLogic.super.move(structure, action);
+        IMotorLogic.super.move(structure, action, duration);
     }
 
     @Override

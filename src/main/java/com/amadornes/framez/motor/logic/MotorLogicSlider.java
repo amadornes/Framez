@@ -32,7 +32,7 @@ public class MotorLogicSlider implements IMotorLogic {
     }
 
     @Override
-    public IMotorAction initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap) {
+    public void initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap) {
 
         triggers.put(EnumMotorAction.MOVE_FORWARD, new MotorTrigger(new MotorTriggerRedstone(motor), false));
         triggers.put(EnumMotorAction.MOVE_BACKWARD, new MotorTrigger());
@@ -41,8 +41,6 @@ public class MotorLogicSlider implements IMotorLogic {
         actionIdMap.add(EnumMotorAction.MOVE_FORWARD);
         actionIdMap.add(EnumMotorAction.MOVE_BACKWARD);
         actionIdMap.add(EnumMotorAction.STOP);
-
-        return EnumMotorAction.STOP;
     }
 
     @Override
@@ -94,10 +92,10 @@ public class MotorLogicSlider implements IMotorLogic {
     }
 
     @Override
-    public void move(MovingStructure structure, IMotorAction action) {
+    public void move(MovingStructure structure, IMotorAction action, int duration) {
 
         this.action = (EnumMotorAction) action;
-        IMotorLogic.super.move(structure, action);
+        IMotorLogic.super.move(structure, action, duration);
     }
 
     @Override

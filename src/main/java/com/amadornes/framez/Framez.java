@@ -46,9 +46,9 @@ public class Framez {
 
         MinecraftForge.EVENT_BUS.register(proxy);
 
-        FrameRegistry.INSTANCE.registerMaterial(new FrameMaterialBasic("wood", 20, 40, 3, 3, "stickWood"));
-        FrameRegistry.INSTANCE.registerMaterial(new FrameMaterialBasic("iron", 20, 40, 3, 3, "nuggetIron"));
-        FrameRegistry.INSTANCE.registerMaterial(new FrameMaterialBasic("gold", 20, 40, 3, 3, "nuggetGold"));
+        FrameRegistry.INSTANCE.registerMaterial(new FrameMaterialBasic("wood", 40, 40, 2, 6, "stickWood"));
+        FrameRegistry.INSTANCE.registerMaterial(new FrameMaterialBasic("iron", 30, 20, 6, 3, "nuggetIron"));
+        FrameRegistry.INSTANCE.registerMaterial(new FrameMaterialBasic("gold", 80, 10, 4, 2, "nuggetGold"));
 
         registerUpgrade("camouflage", (m, s) -> new UpgradeCamouflage(m, s));
         registerUpgrade("telekinetic", (m, s) -> new UpgradeBase(m, s));

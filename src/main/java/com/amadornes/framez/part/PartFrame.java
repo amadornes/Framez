@@ -166,6 +166,12 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     }
 
     @Override
+    public float getHardness(PartMOP hit) {
+
+        return 1;
+    }
+
+    @Override
     public boolean canRenderInLayer(BlockRenderLayer layer) {
 
         return layer == BlockRenderLayer.CUTOUT;

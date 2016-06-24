@@ -46,7 +46,7 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
         return -1;
     }
 
-    public IMotorAction initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap);
+    public void initTriggers(Map<IMotorAction, MotorTrigger> triggers, List<IMotorAction> actionIdMap);
 
     public EnumFacing getFace();
 
@@ -54,15 +54,23 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     public void setMotor(DynamicReference<TileMotor> motor);
 
-    public BlockPos getStructureSearchLocation(IMotorAction action);
+    public default BlockPos getStructureSearchLocation(IMotorAction action) {
+
+        return getMotor().getMotorPos();
+    }
 
     public boolean rotate(EnumFacing axis);
 
     public double getConsumedEnergy(MovingStructure structure, double energyApplied);
 
+    public default void performAction(IMotorAction action) {
+
+        if (action.isMoving()) getMotor().move(action);
+    }
+
     public boolean canMove(MovingStructure structure, IMotorAction action);
 
-    public default void move(MovingStructure structure, IMotorAction action) {
+    public default void move(MovingStructure structure, IMotorAction action, int duration) {
 
         Map<BlockData, BlockPos> transformed = new HashMap<BlockData, BlockPos>();
         for (Entry<MovingBlock, BlockPos> block : structure.getBlocks().entrySet()) {
@@ -72,7 +80,7 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
             transformed.put(data, block.getValue());
         }
         for (Entry<BlockData, BlockPos> block : transformed.entrySet()) {
-            block.getKey().place(getMotor().getWorld(), block.getValue(), 3);
+            block.getKey().place(getMotor().getMotorWorld(), block.getValue(), 3);
         }
     }
 
@@ -81,7 +89,9 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
         return data;
     }
 
-    public void onMovementComplete();
+    public default void onMovementComplete() {
+
+    }
 
     public IMovement getMovement(Set<MovingBlock> blocks, IMotorAction action);
 

@@ -96,11 +96,13 @@ tooltip.framez:frame.mintime.warp=%sWarp
 // ---------------------------------- //
 //         ACTIONS & TRIGGERS         //
 // ---------------------------------- //
+action.framez:stop=Stop
 action.framez:forward=Forward
 action.framez:backward=Backward
 action.framez:clockwise=Clockwise Rotation
 action.framez:cclockwise=Counter-Clockwise Rotation
-action.framez:stop=Stop
+action.framez:stickiness_on=Stickiness On
+action.framez:stickiness_off=Stickiness Off
 
 trigger.framez:inverted=Inverted
 

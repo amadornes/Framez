@@ -98,7 +98,7 @@ public class MovingStructure implements IMovingStructure {
         IMovement movement = movementSupplier.apply(blocks);
         Map<MovingBlock, BlockPos> blockMap = new HashMap<MovingBlock, BlockPos>();
         for (MovingBlock b : blocks)
-            if (b != start) blockMap.put(b, movement.transform(b.getPos()));
+            if (b != start) blockMap.put(b, movement != null ? movement.transform(b.getPos()) : b.getPos());
 
         // This is not needed. Motors may want to move even if there are no blocks (linear actuator)
         // if (blockMap.isEmpty()) return null;
