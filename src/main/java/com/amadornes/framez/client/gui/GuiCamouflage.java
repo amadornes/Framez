@@ -15,7 +15,7 @@ import com.amadornes.framez.api.motor.IMotor;
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.container.ContainerCamouflage;
 import com.amadornes.framez.init.FramezBlocks;
-import com.amadornes.framez.motor.logic.IMotorLogic;
+import com.amadornes.framez.motor.logic.MotorLogicType;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
 import com.amadornes.framez.util.IsolatedWorld;
 
@@ -143,7 +143,7 @@ public class GuiCamouflage extends SubGuiContainer {
                 mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(
                         IsolatedWorld.getWorld(motor.getMotorWorld(), motor.getMotorPos()), model, exstate, motor.getMotorPos(), wr, false);
 
-                if (IMotorLogic.TYPE_HAS_HEAD[state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)]) {
+                if (MotorLogicType.VALUES[state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)].hasHead) {
                     state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
                     model = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
                     mc.getBlockRendererDispatcher().getBlockModelRenderer().renderModel(

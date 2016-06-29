@@ -3,6 +3,7 @@ package com.amadornes.framez.block;
 import com.amadornes.framez.api.item.IFramezWrench;
 import com.amadornes.framez.client.gui.GuiMotorSettings;
 import com.amadornes.framez.motor.logic.IMotorLogic;
+import com.amadornes.framez.motor.logic.MotorLogicType;
 import com.amadornes.framez.tile.TileMotor;
 import com.amadornes.framez.util.PropertyCamouflage;
 
@@ -31,7 +32,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 @SuppressWarnings("unchecked")
 public class BlockMotor extends Block implements ITileEntityProvider {
 
-    public static final IProperty<Integer> PROPERTY_LOGIC_TYPE = PropertyInteger.create("type", 0, IMotorLogic.TYPES.length);
+    public static final IProperty<Integer> PROPERTY_LOGIC_TYPE = PropertyInteger.create("type", 0, MotorLogicType.VALUES.length);
     public static final IProperty<Integer> PROPERTY_PART_TYPE = PropertyInteger.create("part", 0, 2);
     public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_DOWN = new PropertyCamouflage("camo_down");
     public static final IUnlistedProperty<IBlockState> PROPERTY_CAMO_UP = new PropertyCamouflage("camo_up");

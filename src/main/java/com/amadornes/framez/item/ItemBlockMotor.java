@@ -3,7 +3,7 @@ package com.amadornes.framez.item;
 import java.util.List;
 
 import com.amadornes.framez.ModInfo;
-import com.amadornes.framez.motor.logic.IMotorLogic;
+import com.amadornes.framez.motor.logic.MotorLogicType;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -21,8 +21,8 @@ public class ItemBlockMotor extends ItemBlockFramez {
     public String getUnlocalizedName(ItemStack stack) {
 
         int meta = stack.getItemDamage();
-        if (meta >= IMotorLogic.TYPES.length) return "<ERROR>";
-        return "tile." + ModInfo.MODID + ":motor." + IMotorLogic.TYPE_NAMES[meta];
+        if (meta >= MotorLogicType.VALUES.length) return "<ERROR>";
+        return "tile." + ModInfo.MODID + ":motor." + MotorLogicType.VALUES[meta].name().toLowerCase();
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ItemBlockMotor extends ItemBlockFramez {
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> items) {
 
-        for (int i = 0; i < IMotorLogic.TYPES.length; i++)
+        for (int i = 0; i < MotorLogicType.VALUES.length; i++)
             items.add(new ItemStack(item, 1, i));
     }
 

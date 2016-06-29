@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.amadornes.framez.block.BlockMotor;
-import com.amadornes.framez.motor.logic.IMotorLogic;
+import com.amadornes.framez.motor.logic.MotorLogicType;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -41,7 +41,7 @@ public class ModelMotorCamouflageHandler implements IBakedModel {
             IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes()
                     .getModelForState(faces[side.ordinal()]);
             if (model != null) {
-                boolean overrideFace = !IMotorLogic.TYPE_HAS_HEAD[state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)];
+                boolean overrideFace = !MotorLogicType.VALUES[state.getValue(BlockMotor.PROPERTY_LOGIC_TYPE)].hasHead;
                 // TODO: Check motor setting
                 if (overrideFace) {
                     return model.getQuads(faces[side.ordinal()], side, rand);

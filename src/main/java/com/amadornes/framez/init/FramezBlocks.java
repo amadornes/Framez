@@ -8,7 +8,7 @@ import com.amadornes.framez.block.BlockMetamorphicStone;
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.item.ItemBlockMetamorphicStone;
 import com.amadornes.framez.item.ItemBlockMotor;
-import com.amadornes.framez.motor.logic.IMotorLogic;
+import com.amadornes.framez.motor.logic.MotorLogicType;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.block.Block;
@@ -29,7 +29,7 @@ public class FramezBlocks {
 
     public static void register() {
 
-        registerBlock(motor, ItemBlockMotor.class, "motor", IMotorLogic.TYPES.length);
+        registerBlock(motor, ItemBlockMotor.class, "motor", MotorLogicType.VALUES.length);
         GameRegistry.registerTileEntity(TileMotor.class, ModInfo.MODID + ":motor");
         registerBlock(metamorphic_stone, ItemBlockMetamorphicStone.class, "metamorphic_stone", 6);
     }

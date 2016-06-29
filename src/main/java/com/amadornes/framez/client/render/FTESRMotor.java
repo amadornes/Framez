@@ -2,6 +2,7 @@ package com.amadornes.framez.client.render;
 
 import com.amadornes.framez.Framez;
 import com.amadornes.framez.motor.logic.IMotorLogic;
+import com.amadornes.framez.motor.logic.MotorLogicType;
 import com.amadornes.framez.tile.TileMotor;
 
 import net.minecraft.client.renderer.VertexBuffer;
@@ -11,9 +12,9 @@ public class FTESRMotor extends FastTESR<TileMotor> {
 
     public static final RenderMotor<?>[] FTESRS;
     static {
-        FTESRS = new RenderMotor[IMotorLogic.TYPE_FTESRS.length];
+        FTESRS = new RenderMotor[MotorLogicType.VALUES.length];
         for (int i = 0; i < FTESRS.length; i++) {
-            String s = IMotorLogic.TYPE_FTESRS[i];
+            String s = MotorLogicType.VALUES[i].ftesr;
             if (s != null) {
                 try {
                     FTESRS[i] = (RenderMotor<?>) Class.forName(Framez.class.getPackage().getName() + ".client.render." + s).newInstance();

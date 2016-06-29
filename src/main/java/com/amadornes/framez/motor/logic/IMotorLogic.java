@@ -22,17 +22,10 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
-    @SuppressWarnings("unchecked")
-    public static final Class<IMotorLogic>[] TYPES = new Class[] { MotorLogicLinearActuator.class, MotorLogicRotator.class,
-            MotorLogicSlider.class, MotorLogicBlinkDrive.class };
-    public static final String[] TYPE_NAMES = new String[] { "linear_actuator", "rotator", "slider", "blink_drive" };
-    public static final String[] TYPE_FTESRS = new String[] { "RenderLinearActuator", "RenderRotator", "RenderSlider", null };
-    public static final boolean[] TYPE_HAS_HEAD = new boolean[] { true, true, false, false };
-
     public static IMotorLogic create(int meta) {
 
         try {
-            return TYPES[meta].newInstance();
+            return MotorLogicType.VALUES[meta].logicClass.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -41,8 +34,8 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     public default int getID() {
 
-        for (int i = 0; i < TYPES.length; i++)
-            if (TYPES[i] == getClass()) return i;
+        for (int i = 0; i < MotorLogicType.VALUES.length; i++)
+            if (MotorLogicType.VALUES[i].logicClass == getClass()) return i;
         return -1;
     }
 
