@@ -17,7 +17,8 @@ public enum EnumIconTypes {
     BACKWARD_NB,
     CLOCKWISE_NB,
     CCLOCKWISE_NB,
-    DOWN_NB;
+    DOWN_NB,
+    DOWN_DOUBLE_NB;
 
     public static final EnumIconTypes[] VALUES = values();
 

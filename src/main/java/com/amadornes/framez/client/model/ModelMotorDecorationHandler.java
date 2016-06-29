@@ -110,6 +110,29 @@ public class ModelMotorDecorationHandler implements IBakedModel, IPerspectiveAwa
                 mat.setTranslation(new Vector3f(dist, 2 / 16F, 0));
                 decorations[EnumFacing.EAST.ordinal()] = transform(model, mat, isInWorld);
             }
+        } else
+        // Blink Drive
+        if (id == 3) {
+            IBakedModel model = Minecraft.getMinecraft().getRenderItem()
+                    .getItemModelWithOverrides(EnumIconTypes.DOWN_DOUBLE_NB.getIconStack(), null, null);
+            final Matrix4f mat = new Matrix4f();
+            mat.setIdentity();
+            mat.setScale(0.6875F);
+
+            mat.setTranslation(new Vector3f(0, 1 / 16F, dist));
+            decorations[EnumFacing.SOUTH.ordinal()] = transform(model, mat, isInWorld);
+
+            mat.setTranslation(new Vector3f(0, 1 / 16F, -dist));
+            decorations[EnumFacing.NORTH.ordinal()] = transform(model, mat, isInWorld);
+
+            mat.rotY((float) Math.toRadians(90));
+            mat.setScale(0.6875F);
+
+            mat.setTranslation(new Vector3f(dist, 1 / 16F, 0));
+            decorations[EnumFacing.EAST.ordinal()] = transform(model, mat, isInWorld);
+
+            mat.setTranslation(new Vector3f(-dist, 1 / 16F, 0));
+            decorations[EnumFacing.WEST.ordinal()] = transform(model, mat, isInWorld);
         }
     }
 

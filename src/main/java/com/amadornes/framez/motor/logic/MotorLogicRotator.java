@@ -83,13 +83,6 @@ public class MotorLogicRotator implements IMotorLogic {
     }
 
     @Override
-    public double getConsumedEnergy(MovingStructure structure, double energyApplied) {
-
-        System.out.println(energyApplied);
-        return 0; // TODO: Determine consumed energy
-    }
-
-    @Override
     public boolean canMove(MovingStructure structure, IMotorAction action) {
 
         return true;

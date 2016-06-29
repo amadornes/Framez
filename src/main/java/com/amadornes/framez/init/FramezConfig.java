@@ -25,4 +25,10 @@ public class FramezConfig {
 
     }
 
+    public static class Motor {
+
+        public static int blinkDriveRange = 32;
+
+    }
+
 }

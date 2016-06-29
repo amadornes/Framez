@@ -20,6 +20,7 @@ import com.amadornes.framez.api.motor.EnumMotorStatus;
 import com.amadornes.framez.api.motor.IMotor;
 import com.amadornes.framez.api.motor.IMotorAction;
 import com.amadornes.framez.api.motor.IMotorExtension;
+import com.amadornes.framez.api.motor.IMotorInteractions;
 import com.amadornes.framez.api.motor.IMotorTrigger;
 import com.amadornes.framez.api.motor.IMotorUpgrade;
 import com.amadornes.framez.api.motor.IMotorUpgradeFactory;
@@ -41,6 +42,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -59,7 +61,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 @SuppressWarnings("unchecked")
-public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItemHandlerModifiable, ITickable {
+public class TileMotor extends TileEntity implements IMotor, IMotorInteractions, IItemHandler, IItemHandlerModifiable, ITickable {
 
     public static final int UPGRADE_SLOTS = 9;
 
@@ -145,10 +147,16 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
         previousActions = new IMotorAction[max + 1];
     }
 
+    private boolean firstTick = true;
+
     @Override
     public void update() {
 
         if (logic == null) getBlockMetadata();
+        if (firstTick) {
+            firstTick = false;
+            getLogic().onFirstTick();
+        }
         if (moving != null) {
             if (moving.get()) currentMovementTicks++;
             if (currentMovementTicks >= getVariable(MOVEMENT_TIME)) {
@@ -159,6 +167,7 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
                 sendUpdatePacket();
             }
         }
+        onTick();
         if (!getMotorWorld().isRemote) {
             Multimap<Integer, IMotorAction> newActionsMap = MultimapBuilder.hashKeys().linkedListValues().build();
             IMotorAction[] newActions = new IMotorAction[previousActions.length];
@@ -581,6 +590,47 @@ public class TileMotor extends TileEntity implements IMotor, IItemHandler, IItem
     public boolean hasFastRenderer() {
 
         return true;
+    }
+
+    @Override
+    public void validate() {
+
+        super.validate();
+        onValidate();
+        getLogic().validate();
+    }
+
+    @Override
+    public void invalidate() {
+
+        super.invalidate();
+        onInvalidate();
+        getLogic().invalidate();
+        firstTick = true;
+    }
+
+    @Override
+    public void onTick() {
+
+        // NO-OP
+    }
+
+    @Override
+    public void onNeighborBlockChange(Block block) {
+
+        // NO-OP
+    }
+
+    @Override
+    public void onValidate() {
+
+        // NO-OP
+    }
+
+    @Override
+    public void onInvalidate() {
+
+        // NO-OP
     }
 
 }

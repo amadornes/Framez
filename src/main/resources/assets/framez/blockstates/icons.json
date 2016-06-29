@@ -19,6 +19,7 @@
 		"inventory8": [ { "textures": { "layer0": "framez:items/icons/backward_nb" } } ],
 		"inventory9": [ { "textures": { "layer0": "framez:items/icons/clockwise_nb" } } ],
 		"inventory10": [ { "textures": { "layer0": "framez:items/icons/cclockwise_nb" } } ],
-		"inventory11": [ { "textures": { "layer0": "framez:items/icons/down_nb" } } ]
+		"inventory11": [ { "textures": { "layer0": "framez:items/icons/down_nb" } } ],
+		"inventory12": [ { "textures": { "layer0": "framez:items/icons/down_double_nb" } } ]
 	}
 }

@@ -80,12 +80,6 @@ public class MotorLogicSlider implements IMotorLogic {
     }
 
     @Override
-    public double getConsumedEnergy(MovingStructure structure, double energyApplied) {
-
-        return 0; // TODO: Determine consumed energy
-    }
-
-    @Override
     public boolean canMove(MovingStructure structure, IMotorAction action) {
 
         return true;

@@ -18,7 +18,6 @@
 		"inventory_stepinterp":   [ { "textures": { "layer1": "framez:items/motor_upgrade/step_interpolation" } } ],
 		"inventory_soundmuffler": [ { "textures": { "layer1": "framez:items/motor_upgrade/sound_muffler" } } ],
 		"inventory_extrange":     [ { "textures": { "layer1": "framez:items/motor_upgrade/extended_range" } } ],
-		"inventory_creative":     [ { "textures": { "layer1": "framez:items/motor_upgrade/creative" } } ],
-		"inventory_dank":         [ { "textures": { "layer1": "framez:items/motor_upgrade/power_memes" } } ]
+		"inventory_creative":     [ { "textures": { "layer1": "framez:items/motor_upgrade/creative" } } ]
 	}
 }

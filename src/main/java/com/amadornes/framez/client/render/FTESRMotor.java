@@ -51,7 +51,8 @@ public class FTESRMotor extends FastTESR<TileMotor> {
 
         T logic = (T) te.getLogic();
         RenderMotor<T> renderer = (RenderMotor<T>) FTESRS[logic.getID()];
-        return renderer.alwaysRender(logic);
+        if (renderer != null) return renderer.alwaysRender(logic);
+        return false;
     }
 
 }

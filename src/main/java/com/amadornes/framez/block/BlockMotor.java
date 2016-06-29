@@ -102,6 +102,12 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     }
 
     @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
+
+        ((TileMotor) world.getTileEntity(pos)).onNeighborBlockChange(block);
+    }
+
+    @Override
     protected BlockStateContainer createBlockState() {
 
         return new ExtendedBlockState(this, new IProperty[] { PROPERTY_LOGIC_TYPE, PROPERTY_PART_TYPE }, new IUnlistedProperty[] {

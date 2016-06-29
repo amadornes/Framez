@@ -28,7 +28,6 @@ import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.Block;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -46,7 +45,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties.PropertyAdapter;
@@ -180,7 +178,7 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     @Override
     public BlockStateContainer createBlockState() {
 
-        return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], Arrays.copyOf(PROPERTIES, PROPERTIES.length));
+        return new BlockStateContainer.Builder(MCMultiPartMod.multipart).add(PROPERTIES).build();
     }
 
     @Override

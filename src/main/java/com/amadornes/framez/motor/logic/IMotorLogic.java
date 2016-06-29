@@ -24,10 +24,10 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     @SuppressWarnings("unchecked")
     public static final Class<IMotorLogic>[] TYPES = new Class[] { MotorLogicLinearActuator.class, MotorLogicRotator.class,
-            MotorLogicSlider.class };
-    public static final String[] TYPE_NAMES = new String[] { "linear_actuator", "rotator", "slider" };
-    public static final String[] TYPE_FTESRS = new String[] { "RenderLinearActuator", "RenderRotator", "RenderSlider" };
-    public static final boolean[] TYPE_HAS_HEAD = new boolean[] { true, true, false };
+            MotorLogicSlider.class, MotorLogicBlinkDrive.class };
+    public static final String[] TYPE_NAMES = new String[] { "linear_actuator", "rotator", "slider", "blink_drive" };
+    public static final String[] TYPE_FTESRS = new String[] { "RenderLinearActuator", "RenderRotator", "RenderSlider", null };
+    public static final boolean[] TYPE_HAS_HEAD = new boolean[] { true, true, false, false };
 
     public static IMotorLogic create(int meta) {
 
@@ -61,7 +61,10 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
 
     public boolean rotate(EnumFacing axis);
 
-    public double getConsumedEnergy(MovingStructure structure, double energyApplied);
+    public default double getConsumedEnergy(MovingStructure structure, double energyApplied) {
+
+        return 0; // TODO: Let's not forget to change this, okay?
+    }
 
     public default void performAction(IMotorAction action) {
 
@@ -94,5 +97,17 @@ public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
     }
 
     public IMovement getMovement(Set<MovingBlock> blocks, IMotorAction action);
+
+    public default void onFirstTick() {
+
+    }
+
+    public default void validate() {
+
+    }
+
+    public default void invalidate() {
+
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.amadornes.framez.movement;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import com.amadornes.framez.util.Graph;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -55,6 +57,28 @@ public class MovingStructure implements IMovingStructure {
         // }
 
         return tag;// TODO: Serialize to NBT
+    }
+
+    public static int getSizeAlongAxis(Collection<MovingBlock> blocks, Axis axis, BlockPos reference, int minVal, int maxVal) {
+
+        int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE, val;
+        for (MovingBlock b : blocks) {
+            BlockPos pos = b.getPos();
+            if (axis == Axis.X) {
+                if (pos.getY() != reference.getY() && pos.getZ() != reference.getZ()) continue;
+                val = pos.getX();
+            } else if (axis == Axis.Y) {
+                if (pos.getX() != reference.getX() && pos.getZ() != reference.getZ()) continue;
+                val = pos.getY();
+            } else {
+                if (pos.getX() != reference.getX() && pos.getY() != reference.getY()) continue;
+                val = pos.getZ();
+            }
+            if (val < minVal || val > maxVal) continue;
+            min = Math.min(min, val);
+            max = Math.max(max, val);
+        }
+        return max - min;
     }
 
     public static MovingStructure fromNBT(NBTTagCompound tag) {

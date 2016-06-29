@@ -13,7 +13,6 @@ import com.amadornes.framez.motor.MotorRegistry;
 import com.amadornes.framez.motor.upgrade.UpgradeBase;
 import com.amadornes.framez.motor.upgrade.UpgradeCamouflage;
 import com.amadornes.framez.motor.upgrade.UpgradeCreative;
-import com.amadornes.framez.motor.upgrade.UpgradeDank;
 import com.amadornes.framez.motor.upgrade.UpgradeFactoryBase;
 import com.amadornes.framez.motor.upgrade.UpgradeFactoryBase.IMotorUpgradeCreatorInt;
 import com.amadornes.framez.network.GuiHandler;
@@ -33,7 +32,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION)
+@Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = "required-after:mcmultipart")
 public class Framez {
 
     @Instance
@@ -60,7 +59,6 @@ public class Framez {
         registerUpgrade("soundMuffler", (m, s) -> new UpgradeBase(m, s));
         registerUpgrade("extRange", (m, s) -> new UpgradeBase(m, s));
         registerUpgrade("creative", (m, s) -> new UpgradeCreative(m, s));
-        registerUpgrade("dank", (m, s) -> new UpgradeDank(m, s));
 
         FramezItems.initialize();
         FramezItems.register();
