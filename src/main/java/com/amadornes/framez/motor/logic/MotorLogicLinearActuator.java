@@ -20,12 +20,17 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 
-public class MotorLogicLinearActuator implements IMotorLogic {
+public class MotorLogicLinearActuator implements IMotorLogic<EnumFacing> {
 
     private DynamicReference<TileMotor> motor;
     private EnumFacing face = EnumFacing.DOWN;
     private EnumMotorAction action = EnumMotorAction.MOVE_BACKWARD;
     private boolean stickyFront = false;
+
+    public MotorLogicLinearActuator(EnumFacing facing) {
+
+        face = facing;
+    }
 
     public MotorLogicLinearActuator() {
 

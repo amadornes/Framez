@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.amadornes.framez.api.DynamicReference;
 import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.api.motor.IMotorAction;
@@ -20,12 +22,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 
-public class MotorLogicSlider implements IMotorLogic {
+public class MotorLogicSlider implements IMotorLogic<Pair<EnumFacing, EnumFacing>> {
 
     private DynamicReference<TileMotor> motor;
     private EnumFacing face = EnumFacing.DOWN;
     private EnumFacing front = EnumFacing.NORTH;
     private EnumMotorAction action = EnumMotorAction.STOP;
+
+    public MotorLogicSlider(Pair<EnumFacing, EnumFacing> directions) {
+
+        face = directions.getLeft();
+        front = directions.getRight();
+    }
 
     public MotorLogicSlider() {
 

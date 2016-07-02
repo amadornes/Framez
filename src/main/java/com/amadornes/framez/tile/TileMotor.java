@@ -72,7 +72,7 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
     public static final IMotorVariable<EnumSet<EnumFacing>> STICKY_FACES = new SimpleMotorVariable<EnumSet<EnumFacing>>();
 
     public final DynamicReference<TileMotor> reference;
-    private IMotorLogic logic;
+    private IMotorLogic<?> logic;
 
     public final List<IMotorAction> actionIdMap = new LinkedList<IMotorAction>();
     public final Map<IMotorAction, MotorTrigger> triggers = new LinkedHashMap<IMotorAction, MotorTrigger>();
@@ -90,12 +90,12 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
         this(null);
     }
 
-    public TileMotor(IMotorLogic logic) {
+    public TileMotor(IMotorLogic<?> logic) {
 
         this(null, logic);
     }
 
-    public TileMotor(TileMotor motor, IMotorLogic logic) {
+    public TileMotor(TileMotor motor, IMotorLogic<?> logic) {
 
         if (motor == null) {
             this.reference = new DynamicReference<TileMotor>(this);
@@ -130,7 +130,7 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
         if (logic != null) initLogic(logic);
     }
 
-    private void initLogic(IMotorLogic logic) {
+    private void initLogic(IMotorLogic<?> logic) {
 
         this.logic = logic;
         if (logic == null) return;
@@ -249,7 +249,7 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
 
         if (action == EnumMotorAction.STOP) return false;
         if (checkStatus(EnumMotorStatus.MOVING)) return false;
-        IMotorLogic logic = getLogic();
+        IMotorLogic<?> logic = getLogic();
         if (logic == null) return false;
         if (lastMoveCheck == getWorld().getTotalWorldTime()) return couldMove;
 
@@ -411,7 +411,7 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
         else insertItem(slot, stack, false);
     }
 
-    public IMotorLogic getLogic() {
+    public IMotorLogic<?> getLogic() {
 
         if (logic == null) getBlockMetadata();
         return logic;
@@ -597,7 +597,7 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
 
         super.validate();
         onValidate();
-        getLogic().validate();
+        if (getLogic() != null) getLogic().validate();
     }
 
     @Override
@@ -605,7 +605,7 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
 
         super.invalidate();
         onInvalidate();
-        getLogic().invalidate();
+        if (getLogic() != null) getLogic().invalidate();
         firstTick = true;
     }
 

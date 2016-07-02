@@ -22,6 +22,9 @@ import com.amadornes.framez.client.render.FTESRMotor;
 import com.amadornes.framez.frame.FrameRegistry;
 import com.amadornes.framez.init.FramezBlocks;
 import com.amadornes.framez.init.FramezItems;
+import com.amadornes.framez.item.ItemBlockMotor;
+import com.amadornes.framez.motor.logic.MotorLogicType;
+import com.amadornes.framez.motor.placement.IMotorPlacement;
 import com.amadornes.framez.tile.TileMotor;
 import com.google.common.collect.Maps;
 
@@ -38,13 +41,17 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -177,6 +184,36 @@ public class ClientProxy extends CommonProxy {
             Minecraft.getMinecraft().displayGuiScreen(null);
             wrenchGui = false;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public <T> void drawBlockHighlight(DrawBlockHighlightEvent event) {
+
+        if (event.getTarget().typeOfHit != Type.BLOCK) return;
+
+        EntityPlayer player = event.getPlayer();
+
+        ItemStack motorStack = player.getHeldItemMainhand();
+        if (motorStack == null || !(motorStack.getItem() instanceof ItemBlockMotor)) {
+            motorStack = player.getHeldItemMainhand();
+            if (motorStack == null || !(motorStack.getItem() instanceof ItemBlockMotor)) return;
+        }
+        MotorLogicType logicType = MotorLogicType.VALUES[motorStack.getItemDamage()];
+        IMotorPlacement<T> placement = (IMotorPlacement<T>) logicType.placement;
+
+        BlockPos pos = event.getTarget().getBlockPos();
+        float partialTicks = event.getPartialTicks();
+        double x = pos.getX() - (player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks);
+        double y = pos.getY() - (player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks);
+        double z = pos.getZ() - (player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks);
+        GL11.glPushMatrix();
+        {
+            GL11.glTranslated(x + event.getTarget().sideHit.getFrontOffsetX(), y + event.getTarget().sideHit.getFrontOffsetY(),
+                    z + event.getTarget().sideHit.getFrontOffsetZ());
+            placement.renderPlacementArrow(placement.getPlacementData(player, event.getTarget()));
+        }
+        GL11.glPopMatrix();
     }
 
     @Override

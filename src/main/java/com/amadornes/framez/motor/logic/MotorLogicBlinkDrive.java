@@ -24,11 +24,16 @@ import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class MotorLogicBlinkDrive implements IMotorLogic {
+public class MotorLogicBlinkDrive implements IMotorLogic<EnumFacing> {
 
     private DynamicReference<TileMotor> motor, linked;
     private EnumFacing face = EnumFacing.DOWN;
     private EnumMotorAction action = EnumMotorAction.MOVE_BACKWARD;
+
+    public MotorLogicBlinkDrive(EnumFacing facing) {
+
+        face = facing;
+    }
 
     public MotorLogicBlinkDrive() {
 
@@ -137,7 +142,7 @@ public class MotorLogicBlinkDrive implements IMotorLogic {
             pos = pos.offset(face);
             TileEntity tile = world.getTileEntity(pos);
             if (tile != null && tile instanceof TileMotor) {
-                IMotorLogic logic = ((TileMotor) tile).getLogic();
+                IMotorLogic<?> logic = ((TileMotor) tile).getLogic();
                 if (logic instanceof MotorLogicBlinkDrive && logic.getFace() == otherFacing) {
                     linked = ((MotorLogicBlinkDrive) logic).motor;
                     ((MotorLogicBlinkDrive) logic).linked = motor;

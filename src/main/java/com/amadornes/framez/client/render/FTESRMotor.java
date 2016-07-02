@@ -29,13 +29,13 @@ public class FTESRMotor extends FastTESR<TileMotor> {
     public void renderTileEntityFast(TileMotor te, double x, double y, double z, float partialTicks, int destroyStage,
             VertexBuffer buffer) {
 
-        IMotorLogic logic = te.getLogic();
+        IMotorLogic<?> logic = te.getLogic();
         RenderMotor<?> renderer = FTESRS[logic.getID()];
         if (renderer != null) render(renderer, logic, x, y, z, partialTicks, destroyStage, buffer);
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends IMotorLogic> void render(RenderMotor<T> renderer, IMotorLogic logic, double x, double y, double z,
+    private <T extends IMotorLogic<?>> void render(RenderMotor<T> renderer, IMotorLogic<?> logic, double x, double y, double z,
             float partialTicks, int destroyStage, VertexBuffer buffer) {
 
         renderer.renderMotor((T) logic, x, y, z, partialTicks, destroyStage, buffer);
@@ -48,7 +48,7 @@ public class FTESRMotor extends FastTESR<TileMotor> {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IMotorLogic> boolean isGlobal(TileMotor te) {
+    public <T extends IMotorLogic<?>> boolean isGlobal(TileMotor te) {
 
         T logic = (T) te.getLogic();
         RenderMotor<T> renderer = (RenderMotor<T>) FTESRS[logic.getID()];

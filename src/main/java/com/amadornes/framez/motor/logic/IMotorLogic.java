@@ -15,17 +15,30 @@ import com.amadornes.framez.movement.MovingBlock;
 import com.amadornes.framez.movement.MovingStructure;
 import com.amadornes.framez.tile.TileMotor;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IMotorLogic extends INBTSerializable<NBTTagCompound> {
+public interface IMotorLogic<P> extends INBTSerializable<NBTTagCompound> {
 
-    public static IMotorLogic create(int meta) {
+    public static IMotorLogic<?> create(int meta) {
 
         try {
             return MotorLogicType.VALUES[meta].logicClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static IMotorLogic<?> create(int meta, EntityPlayer player, RayTraceResult hit) {
+
+        try {
+            MotorLogicType type = MotorLogicType.VALUES[meta];
+            return (IMotorLogic<?>) type.logicClass.getConstructors()[0].newInstance(type.placement.getPlacementData(player, hit));
         } catch (Exception e) {
             e.printStackTrace();
         }

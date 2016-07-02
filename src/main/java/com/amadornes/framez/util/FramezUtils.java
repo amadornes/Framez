@@ -9,6 +9,7 @@ import com.amadornes.framez.api.motor.IMotorVariable;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class FramezUtils {
@@ -103,6 +104,22 @@ public class FramezUtils {
     public static <T> String valueToString(IMotorVariable<T> var, Object value) {
 
         return var.valueToString((T) value);
+    }
+
+    private static final int[][] ROTATION_MATRIX = { //
+            //
+            { 0, 1, 4, 5, 3, 2, 6 }, //
+            { 0, 1, 5, 4, 2, 3, 6 }, //
+            { 5, 4, 2, 3, 0, 1, 6 }, //
+            { 4, 5, 2, 3, 1, 0, 6 }, //
+            { 2, 3, 1, 0, 4, 5, 6 }, //
+            { 3, 2, 0, 1, 4, 5, 6 }, //
+            { 0, 1, 2, 3, 4, 5, 6 },//
+    };
+
+    public static final EnumFacing rotate(EnumFacing dir, EnumFacing axis) {
+
+        return EnumFacing.getFront(ROTATION_MATRIX[axis.ordinal()][dir.ordinal()]);
     }
 
 }
