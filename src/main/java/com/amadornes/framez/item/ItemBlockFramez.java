@@ -45,7 +45,9 @@ public class ItemBlockFramez extends ItemBlock implements IFramezItem {
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY,
             float hitZ, IBlockState newState) {
 
-        if (!world.setBlockState(pos, newState, 3)) return false;
+        if (!world.setBlockState(pos, newState, 3)) {
+            return false;
+        }
 
         IBlockState state = world.getBlockState(pos);
         if (state.getBlock() == this.block) {
@@ -67,8 +69,10 @@ public class ItemBlockFramez extends ItemBlock implements IFramezItem {
                 TileEntity tileentity = worldIn.getTileEntity(pos);
 
                 if (tileentity != null) {
-                    if (!worldIn.isRemote && tileentity.onlyOpsCanSetNbt() && (player == null
-                            || !minecraftserver.getPlayerList().canSendCommands(player.getGameProfile()))) { return false; }
+                    if (!worldIn.isRemote && tileentity.onlyOpsCanSetNbt()
+                            && (player == null || !minecraftserver.getPlayerList().canSendCommands(player.getGameProfile()))) {
+                        return false;
+                    }
 
                     NBTTagCompound nbttagcompound = (NBTTagCompound) stackIn.getTagCompound().getTag("BlockEntityTag");
                     nbttagcompound.setInteger("x", pos.getX());

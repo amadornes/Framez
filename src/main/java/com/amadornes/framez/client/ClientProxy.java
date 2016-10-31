@@ -93,7 +93,9 @@ public class ClientProxy extends CommonProxy {
 
         // Wrap motor models
         for (IBlockState state : FramezBlocks.motor.getBlockState().getValidStates()) {
-            if (state.getValue(BlockMotor.PROPERTY_PART_TYPE) != 0) continue;
+            if (state.getValue(BlockMotor.PROPERTY_PART_TYPE) != 0) {
+                continue;
+            }
 
             // Block
             {
@@ -152,9 +154,13 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public void onTextureStitchPre(TextureStitchEvent.Pre event) {
 
-        for (IFrameMaterial mat : FrameRegistry.INSTANCE.getMaterials().values())
-            for (EnumFrameTexture tex : EnumFrameTexture.VALUES)
-                if (mat.canBeUsedAs(tex.getPart())) event.getMap().registerSprite(mat.getTexture(tex));
+        for (IFrameMaterial mat : FrameRegistry.INSTANCE.getMaterials().values()) {
+            for (EnumFrameTexture tex : EnumFrameTexture.VALUES) {
+                if (mat.canBeUsedAs(tex.getPart())) {
+                    event.getMap().registerSprite(mat.getTexture(tex));
+                }
+            }
+        }
         TEXTURE_TRANSPARENT = event.getMap().registerSprite(new ResourceLocation(ModInfo.MODID, "transparent"));
     }
 
@@ -172,10 +178,14 @@ public class ClientProxy extends CommonProxy {
     public void onClientTick(TickEvent.ClientTickEvent event) {
 
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
 
         ItemStack stack = player.getHeldItemMainhand();
-        if (stack == null || stack.getItem() != FramezItems.wrench) return;
+        if (stack == null || stack.getItem() != FramezItems.wrench) {
+            return;
+        }
 
         if (!wrenchGui && isAltDown() && Minecraft.getMinecraft().currentScreen == null) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiWrench());
@@ -190,14 +200,18 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public <T> void drawBlockHighlight(DrawBlockHighlightEvent event) {
 
-        if (event.getTarget().typeOfHit != Type.BLOCK) return;
+        if (event.getTarget().typeOfHit != Type.BLOCK) {
+            return;
+        }
 
         EntityPlayer player = event.getPlayer();
 
         ItemStack motorStack = player.getHeldItemMainhand();
         if (motorStack == null || !(motorStack.getItem() instanceof ItemBlockMotor)) {
             motorStack = player.getHeldItemMainhand();
-            if (motorStack == null || !(motorStack.getItem() instanceof ItemBlockMotor)) return;
+            if (motorStack == null || !(motorStack.getItem() instanceof ItemBlockMotor)) {
+                return;
+            }
         }
         MotorLogicType logicType = MotorLogicType.VALUES[motorStack.getItemDamage()];
         IMotorPlacement<T> placement = (IMotorPlacement<T>) logicType.placement;

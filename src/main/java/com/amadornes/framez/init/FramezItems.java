@@ -56,8 +56,9 @@ public class FramezItems {
     private static void registerItem(Item item, String name, IntFunction<String> i2s, int variantCount) {
 
         GameRegistry.register(item, new ResourceLocation(ModInfo.MODID, name));
-        for (int i = 0; i < variantCount; i++)
+        for (int i = 0; i < variantCount; i++) {
             Framez.proxy.registerItemRenderer(item, name, i2s, i);
+        }
         item.setCreativeTab(FramezCreativeTab.tab);
     }
 
@@ -72,8 +73,9 @@ public class FramezItems {
         if (variants.length <= 1) {
             Framez.proxy.registerItemRenderer(item, name, i2s, -1);
         } else {
-            for (int v : variants)
+            for (int v : variants) {
                 Framez.proxy.registerItemRenderer(item, name, i2s, v);
+            }
         }
         item.setCreativeTab(FramezCreativeTab.tab);
     }

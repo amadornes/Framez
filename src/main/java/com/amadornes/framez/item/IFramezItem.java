@@ -39,7 +39,9 @@ public interface IFramezItem {
 
         String unlocalized = getUnlocalizedTip(stack, player, advanced);
         String localized = I18n.format(unlocalized);
-        if (!hasTooltip(stack, player, unlocalized, localized, advanced)) return;
+        if (!hasTooltip(stack, player, unlocalized, localized, advanced)) {
+            return;
+        }
 
         if (!Framez.proxy.isShiftDown()) {
             tooltip.add(I18n.format("tooltip." + ModInfo.MODID + ":shift", TextFormatting.GRAY,

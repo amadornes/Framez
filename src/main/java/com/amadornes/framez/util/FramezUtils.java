@@ -8,7 +8,6 @@ import com.amadornes.framez.api.motor.IMotorVariable;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
@@ -16,7 +15,9 @@ public class FramezUtils {
 
     public static void spawnItemInWorld(World world, ItemStack itemStack, double x, double y, double z) {
 
-        if (world.isRemote) return;
+        if (world.isRemote) {
+            return;
+        }
         try {
             float dX = world.rand.nextFloat() * 0.8F + 0.1F;
             float dY = world.rand.nextFloat() * 0.8F + 0.1F;
@@ -26,7 +27,7 @@ public class FramezUtils {
                     new ItemStack(itemStack.getItem(), itemStack.stackSize, itemStack.getItemDamage()));
 
             if (itemStack.hasTagCompound()) {
-                entityItem.getEntityItem().setTagCompound((NBTTagCompound) itemStack.getTagCompound().copy());
+                entityItem.getEntityItem().setTagCompound(itemStack.getTagCompound().copy());
             }
 
             float factor = 0.05F;
@@ -66,7 +67,9 @@ public class FramezUtils {
             }
             if (lineLen + word.length() > maxCharsPerLine || word.contains("\\n")) {
                 if (word.contains("\\n")) {
-                    if (lineLen > 0) output.append(" ");
+                    if (lineLen > 0) {
+                        output.append(" ");
+                    }
                     for (int i = 0; i < word.length(); i++) {
                         char c = word.charAt(i);
                         if (c == '\\' && i + 1 < word.length() && Character.toLowerCase(word.charAt(i + 1)) == 'n') {

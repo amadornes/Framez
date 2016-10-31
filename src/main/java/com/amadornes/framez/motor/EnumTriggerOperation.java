@@ -11,8 +11,11 @@ public enum EnumTriggerOperation {
         @Override
         public boolean isActive(MotorTrigger trigger) {
 
-            for (Entry<IMotorTrigger, Boolean> e : trigger.getTriggers().entrySet())
-                if (e.getKey().isActive() != e.getValue()) return true;
+            for (Entry<IMotorTrigger, Boolean> e : trigger.getTriggers().entrySet()) {
+                if (e.getKey().isActive() != e.getValue()) {
+                    return true;
+                }
+            }
             return false;
         }
     },
@@ -21,9 +24,14 @@ public enum EnumTriggerOperation {
         @Override
         public boolean isActive(MotorTrigger trigger) {
 
-            if (trigger.getTriggers().isEmpty()) return false;
-            for (Entry<IMotorTrigger, Boolean> e : trigger.getTriggers().entrySet())
-                if (e.getKey().isActive() == e.getValue()) return false;
+            if (trigger.getTriggers().isEmpty()) {
+                return false;
+            }
+            for (Entry<IMotorTrigger, Boolean> e : trigger.getTriggers().entrySet()) {
+                if (e.getKey().isActive() == e.getValue()) {
+                    return false;
+                }
+            }
             return true;
         }
     },
@@ -33,8 +41,11 @@ public enum EnumTriggerOperation {
         public boolean isActive(MotorTrigger trigger) {
 
             boolean state = false;
-            for (Entry<IMotorTrigger, Boolean> e : trigger.getTriggers().entrySet())
-                if (e.getKey().isActive() != e.getValue()) state = !state;
+            for (Entry<IMotorTrigger, Boolean> e : trigger.getTriggers().entrySet()) {
+                if (e.getKey().isActive() != e.getValue()) {
+                    state = !state;
+                }
+            }
             return state;
         }
     };

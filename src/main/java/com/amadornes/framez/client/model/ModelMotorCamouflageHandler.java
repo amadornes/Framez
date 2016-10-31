@@ -30,8 +30,9 @@ public class ModelMotorCamouflageHandler implements IBakedModel {
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
 
         if (!(state instanceof IExtendedBlockState)
-                || !((IExtendedBlockState) state).getUnlistedNames().contains(BlockMotor.PROPERTY_CAMO_DOWN))
+                || !((IExtendedBlockState) state).getUnlistedNames().contains(BlockMotor.PROPERTY_CAMO_DOWN)) {
             return Collections.emptyList();
+        }
         IExtendedBlockState s = (IExtendedBlockState) state;
         IBlockState[] faces = new IBlockState[] { s.getValue(BlockMotor.PROPERTY_CAMO_DOWN), s.getValue(BlockMotor.PROPERTY_CAMO_UP),
                 s.getValue(BlockMotor.PROPERTY_CAMO_NORTH), s.getValue(BlockMotor.PROPERTY_CAMO_SOUTH),

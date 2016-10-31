@@ -171,7 +171,9 @@ public class ModelMotorDecorationHandler implements IBakedModel, IPerspectiveAwa
         }
 
         IBakedModel decor = side == null ? null : decorations[side.ordinal()];
-        if (decor == null) return model.getQuads(state, side, rand);
+        if (decor == null) {
+            return model.getQuads(state, side, rand);
+        }
 
         List<BakedQuad> list = new ArrayList<BakedQuad>();
         list.addAll(model.getQuads(state, side, rand));
@@ -220,7 +222,9 @@ public class ModelMotorDecorationHandler implements IBakedModel, IPerspectiveAwa
 
         if (model instanceof IPerspectiveAwareModel) {
             Pair<? extends IBakedModel, Matrix4f> p = ((IPerspectiveAwareModel) model).handlePerspective(cameraTransformType);
-            if (p != null) return Pair.of(this, p.getRight());
+            if (p != null) {
+                return Pair.of(this, p.getRight());
+            }
         }
         return Pair.of(this, null);
     }

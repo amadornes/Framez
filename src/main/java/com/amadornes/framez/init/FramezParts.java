@@ -14,16 +14,18 @@ public class FramezParts {
 
         MultipartRegistry.registerPart(PartFrame.class, "frame");
 
-        for (BlockMetamorphicStone.Type type : BlockMetamorphicStone.Type.VALUES)
+        for (BlockMetamorphicStone.Type type : BlockMetamorphicStone.Type.VALUES) {
             registerMetamorphicStoneMicroMaterial(type);
+        }
     }
 
     private static void registerMetamorphicStoneMicroMaterial(BlockMetamorphicStone.Type type) {
 
         BlockMicroMaterial bmm = new BlockMicroMaterial(
                 FramezBlocks.metamorphic_stone.getDefaultState().withProperty(BlockMetamorphicStone.TYPE, type));
-        if (type.hasLogic)
+        if (type.hasLogic) {
             bmm = bmm.withDelegate(t -> new MicroDelegateMetamorphicStone(t.getFirst(), type));
+        }
         MicroblockRegistry.registerMaterial(bmm);
     }
 

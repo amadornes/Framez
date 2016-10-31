@@ -82,8 +82,9 @@ public class MotorLogicRotator implements IMotorLogic<EnumFacing> {
             direction = direction == AxisDirection.NEGATIVE ? AxisDirection.POSITIVE : AxisDirection.NEGATIVE;
             return true;
         }
-        for (int i = 0; i < (axis.getAxisDirection() == AxisDirection.POSITIVE ? 1 : 3); i++)
+        for (int i = 0; i < (axis.getAxisDirection() == AxisDirection.POSITIVE ? 1 : 3); i++) {
             face = face.rotateAround(axis.getAxis());
+        }
         return true;
     }
 

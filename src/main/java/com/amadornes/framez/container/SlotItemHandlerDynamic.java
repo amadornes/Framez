@@ -28,7 +28,9 @@ public class SlotItemHandlerDynamic extends Slot {
     @Override
     public boolean isItemValid(ItemStack stack) {
 
-        if (stack == null) return false;
+        if (stack == null) {
+            return false;
+        }
         ItemStack remainder = this.itemHandler.get().insertItem(index, stack, true);
         return remainder == null || remainder.stackSize < stack.stackSize;
     }

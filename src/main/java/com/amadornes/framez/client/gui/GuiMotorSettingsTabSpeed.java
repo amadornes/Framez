@@ -57,8 +57,10 @@ public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
         GlStateManager.popMatrix();
 
         GlStateManager.pushMatrix();
-        if (dragging) GlStateManager
-                .translate((Math.min(Math.max(left + 13, mouseX - xOff), left + xSize - 21) - button.xPosition) * partialTicks, 0, 0);
+        if (dragging) {
+            GlStateManager
+                    .translate((Math.min(Math.max(left + 13, mouseX - xOff), left + xSize - 21) - button.xPosition) * partialTicks, 0, 0);
+        }
         super.drawScreen(mouseX, mouseY, partialTicks);
         GlStateManager.popMatrix();
     }
@@ -92,7 +94,9 @@ public class GuiMotorSettingsTabSpeed extends GuiMotorSettingsTab {
     public void mouseReleased(int mouseX, int mouseY, int state) {
 
         super.mouseReleased(mouseX, mouseY, state);
-        if (state == 0) dragging = false;
+        if (state == 0) {
+            dragging = false;
+        }
     }
 
 }

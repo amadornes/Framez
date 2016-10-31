@@ -32,7 +32,9 @@ public abstract class SubGuiScreen extends GuiScreen {
     @Override
     public void drawDefaultBackground() {
 
-        if (mc.currentScreen == this) super.drawDefaultBackground();
+        if (mc.currentScreen == this) {
+            super.drawDefaultBackground();
+        }
     }
 
     @Override
@@ -43,8 +45,12 @@ public abstract class SubGuiScreen extends GuiScreen {
             mc.thePlayer.closeScreen();
             if (!Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && !Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                 mc.displayGuiScreen(parent);
-                if (parent != null) Mouse.setCursorPosition(mx, my);
-                if (mc.currentScreen == null) mc.setIngameFocus();
+                if (parent != null) {
+                    Mouse.setCursorPosition(mx, my);
+                }
+                if (mc.currentScreen == null) {
+                    mc.setIngameFocus();
+                }
             }
             return;
         }

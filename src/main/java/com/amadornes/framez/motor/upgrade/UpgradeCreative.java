@@ -15,7 +15,9 @@ public class UpgradeCreative extends UpgradeBase {
     @Override
     public int getAlterationPriority(IMotorVariable<?> variable) {
 
-        if (variable == TileMotor.POWER_STORAGE_SIZE || variable == TileMotor.POWER_STORED) return Integer.MIN_VALUE;
+        if (variable == TileMotor.POWER_STORAGE_SIZE || variable == TileMotor.POWER_STORED) {
+            return Integer.MIN_VALUE;
+        }
         return super.getAlterationPriority(variable);
     }
 
@@ -23,7 +25,9 @@ public class UpgradeCreative extends UpgradeBase {
     @Override
     public <T> T alterValue(T value, IMotorVariable<T> variable) {
 
-        if (variable == TileMotor.POWER_STORAGE_SIZE || variable == TileMotor.POWER_STORED) return (T) (Double) 1000000.0D;
+        if (variable == TileMotor.POWER_STORAGE_SIZE || variable == TileMotor.POWER_STORED) {
+            return (T) (Double) 1000000.0D;
+        }
         return super.alterValue(value, variable);
     }
 

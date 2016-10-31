@@ -21,7 +21,9 @@ public class MotorHelper {
 
     public static boolean addUpgrade(TileMotor motor, IMotorUpgradeFactory upgradeFactory, int slot, ItemStack stack, boolean simulate) {
 
-        if (!upgradeFactory.canApply(motor.getSafeReference(), stack, Framez.proxy.getPlayer())) return false;
+        if (!upgradeFactory.canApply(motor.getSafeReference(), stack, Framez.proxy.getPlayer())) {
+            return false;
+        }
         motor.setUpgrade(slot, upgradeFactory.createUpgrade(motor.getSafeReference(), slot), stack.copy().splitStack(1));
         if (upgradeFactory.getTrait() != null && !simulate) {
             TileMotor newMotor = mixin(motor.getBaseClass(), motor.upgrades, motor);
@@ -49,12 +51,17 @@ public class MotorHelper {
 
         try {
             Set<Class<? extends JTrait<? extends IMotor>>> allTraits = new LinkedHashSet<Class<? extends JTrait<? extends IMotor>>>();
-            for (MotorExtension extension : MotorRegistry.INSTANCE.extensions.values())
-                if (extension.getTrait() != null) allTraits.add(extension.getTrait());
+            for (MotorExtension extension : MotorRegistry.INSTANCE.extensions.values()) {
+                if (extension.getTrait() != null) {
+                    allTraits.add(extension.getTrait());
+                }
+            }
             for (Pair<IMotorUpgrade, ItemStack> upgrade : upgrades) {
                 if (upgrade != null) {
                     IMotorUpgradeFactory upgradeFactory = MotorRegistry.INSTANCE.upgrades.get(upgrade.getLeft().getType());
-                    if (upgradeFactory.getTrait() != null) allTraits.add(upgradeFactory.getTrait());
+                    if (upgradeFactory.getTrait() != null) {
+                        allTraits.add(upgradeFactory.getTrait());
+                    }
                 }
             }
             return MixinFactory.mixin(clazz, allTraits.toArray(new Class[allTraits.size()]))

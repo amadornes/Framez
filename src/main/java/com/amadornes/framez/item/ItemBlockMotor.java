@@ -21,7 +21,9 @@ public class ItemBlockMotor extends ItemBlockFramez {
     public String getUnlocalizedName(ItemStack stack) {
 
         int meta = stack.getItemDamage();
-        if (meta >= MotorLogicType.VALUES.length) return "<ERROR>";
+        if (meta >= MotorLogicType.VALUES.length) {
+            return "<ERROR>";
+        }
         return "tile." + ModInfo.MODID + ":motor." + MotorLogicType.VALUES[meta].name().toLowerCase();
     }
 
@@ -34,8 +36,9 @@ public class ItemBlockMotor extends ItemBlockFramez {
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> items) {
 
-        for (int i = 0; i < MotorLogicType.VALUES.length; i++)
+        for (int i = 0; i < MotorLogicType.VALUES.length; i++) {
             items.add(new ItemStack(item, 1, i));
+        }
     }
 
     @Override

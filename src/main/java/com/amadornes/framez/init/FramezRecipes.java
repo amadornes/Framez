@@ -46,24 +46,34 @@ public class FramezRecipes {
         @Override
         public ItemStack getCraftingResult(InventoryCrafting inv) {
 
-            if (inv.getWidth() != 3 && inv.getHeight() != 3) return null;
+            if (inv.getWidth() != 3 && inv.getHeight() != 3) {
+                return null;
+            }
 
             IFrameMaterial cross = null, binding = null;
             for (int i = 0; i < 9; i++) {
                 ItemStack s = inv.getStackInSlot(i);
                 if (i == 4) {
                     binding = FrameHelper.getMaterial(s);
-                    if (binding == null) return null;
+                    if (binding == null) {
+                        return null;
+                    }
                 } else if (i % 2 == 0) {
                     if (cross == null) {
                         cross = FrameHelper.getMaterial(s);
-                        if (cross == null) return null;
+                        if (cross == null) {
+                            return null;
+                        }
                     } else {
                         IFrameMaterial mat = FrameHelper.getMaterial(s);
-                        if (mat != cross) return null;
+                        if (mat != cross) {
+                            return null;
+                        }
                     }
                 } else {
-                    if (s != null) return null;
+                    if (s != null) {
+                        return null;
+                    }
                 }
             }
 
@@ -106,29 +116,39 @@ public class FramezRecipes {
         @Override
         public ItemStack getCraftingResult(InventoryCrafting inv) {
 
-            if (inv.getWidth() != 3 && inv.getHeight() != 3) return null;
+            if (inv.getWidth() != 3 && inv.getHeight() != 3) {
+                return null;
+            }
 
             ItemStack cross = null;
             IFrameMaterial border = null;
             for (int i = 0; i < 9; i++) {
                 ItemStack s = inv.getStackInSlot(i);
                 if (i == 4) {
-                    if ((cross = s) == null) return null;
+                    if ((cross = s) == null) {
+                        return null;
+                    }
                 } else if (i % 2 == 1) {
                     if (border == null) {
                         border = FrameHelper.getMaterial(s);
-                        if (border == null) return null;
+                        if (border == null) {
+                            return null;
+                        }
                     } else {
                         IFrameMaterial mat = FrameHelper.getMaterial(s);
-                        if (mat != border) return null;
+                        if (mat != border) {
+                            return null;
+                        }
                     }
                 } else {
-                    if (s != null) return null;
+                    if (s != null) {
+                        return null;
+                    }
                 }
             }
 
             ItemStack stack = new ItemStack(FramezItems.frame_panel, 1, 1);
-            NBTTagCompound tag = (NBTTagCompound) cross.getTagCompound().copy();
+            NBTTagCompound tag = cross.getTagCompound().copy();
             tag.setString("border", border.getType().toString());
             stack.setTagCompound(tag);
             return stack;
@@ -165,7 +185,9 @@ public class FramezRecipes {
         @Override
         public ItemStack getCraftingResult(InventoryCrafting inv) {
 
-            if (inv.getSizeInventory() < 6) return null;
+            if (inv.getSizeInventory() < 6) {
+                return null;
+            }
 
             ItemStack panel = null;
             int count = 0;
@@ -178,16 +200,20 @@ public class FramezRecipes {
                             count++;
                         }
                     } else {
-                        if (!ItemStack.areItemsEqual(s, panel) || !ItemStack.areItemStackTagsEqual(s, panel)) return null;
+                        if (!ItemStack.areItemsEqual(s, panel) || !ItemStack.areItemStackTagsEqual(s, panel)) {
+                            return null;
+                        }
                         count++;
                     }
                 }
             }
 
-            if (count != 6) return null;
+            if (count != 6) {
+                return null;
+            }
 
             ItemStack stack = new ItemStack(FramezItems.frame, 6);
-            stack.setTagCompound((NBTTagCompound) panel.getTagCompound().copy());
+            stack.setTagCompound(panel.getTagCompound().copy());
             return stack;
         }
 

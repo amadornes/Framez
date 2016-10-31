@@ -47,20 +47,28 @@ public class ModelFramePanel implements IBakedModel, IPerspectiveAwareModel {
         this.cache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
         this.materials = new IFrameMaterial[3];
         Iterator<IFrameMaterial> it = FrameRegistry.INSTANCE.getMaterials().values().iterator();
-        for (int i = 0; i < materials.length; i++)
+        for (int i = 0; i < materials.length; i++) {
             materials[i] = it.next();
+        }
         this.overrides = new ItemOverrideList(Collections.emptyList()) {
 
             @Override
             public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity) {
 
                 NBTTagCompound tag = stack.getTagCompound();
-                if (tag == null) return originalModel;
+                if (tag == null) {
+                    return originalModel;
+                }
                 IFrameMaterial[] materials = new IFrameMaterial[3];
-                if (tag.hasKey("border")) materials[0] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
-                if (tag.hasKey("cross")) materials[1] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("cross")));
-                if (tag.hasKey("binding"))
+                if (tag.hasKey("border")) {
+                    materials[0] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
+                }
+                if (tag.hasKey("cross")) {
+                    materials[1] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("cross")));
+                }
+                if (tag.hasKey("binding")) {
                     materials[2] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("binding")));
+                }
                 try {
                     return cache.get(materials, () -> new ModelFramePanel(ModelFramePanel.this, materials, stack));
                 } catch (ExecutionException e) {
@@ -93,10 +101,12 @@ public class ModelFramePanel implements IBakedModel, IPerspectiveAwareModel {
                 ClientProxy.MODEL_ITEM_BINDING.getOverrides().handleItemState(ClientProxy.MODEL_ITEM_BINDING, stack,
                         Minecraft.getMinecraft().theWorld, Minecraft.getMinecraft().thePlayer),
                 getTexture(materials[2], EnumFrameTexture.BINDING)).getQuads(state, side, rand));
-        if (materials[0] != null) quads.addAll(AdvancedModelRextexturer.retexture(null, 0,
-                ClientProxy.MODEL_ITEM_BORDER.getOverrides().handleItemState(ClientProxy.MODEL_ITEM_BORDER, stack,
-                        Minecraft.getMinecraft().theWorld, Minecraft.getMinecraft().thePlayer),
-                getTexture(materials[0], EnumFrameTexture.BORDER)).getQuads(state, side, rand));
+        if (materials[0] != null) {
+            quads.addAll(AdvancedModelRextexturer.retexture(null, 0,
+                    ClientProxy.MODEL_ITEM_BORDER.getOverrides().handleItemState(ClientProxy.MODEL_ITEM_BORDER, stack,
+                            Minecraft.getMinecraft().theWorld, Minecraft.getMinecraft().thePlayer),
+                    getTexture(materials[0], EnumFrameTexture.BORDER)).getQuads(state, side, rand));
+        }
         return quads;
     }
 
@@ -147,7 +157,9 @@ public class ModelFramePanel implements IBakedModel, IPerspectiveAwareModel {
 
         Pair<? extends IBakedModel, Matrix4f> p = ClientProxy.MODEL_ITEM_BORDER instanceof IPerspectiveAwareModel
                 ? ((IPerspectiveAwareModel) ClientProxy.MODEL_ITEM_BORDER).handlePerspective(cameraTransformType) : null;
-        if (p == null) return Pair.of(this, null);
+        if (p == null) {
+            return Pair.of(this, null);
+        }
         return Pair.of(this, p.getRight());
     }
 

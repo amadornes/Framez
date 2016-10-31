@@ -108,8 +108,11 @@ public class GuiMotorSettingsTabUpgrades extends GuiMotorSettingsTab {
         Entry<IMotorUpgrade, ItemStack> upgrade = motor.get().getUpgrade(button.id);
         if (upgrade != null) {
             GuiScreen gui = upgrade.getKey().getConfigGUI(mc.thePlayer, this);
-            if (gui instanceof GuiContainer) NetworkHandler.instance.sendToServer(new PacketShowGUI(button.id + 9, motor.get().getPos()));
-            else mc.displayGuiScreen(gui);
+            if (gui instanceof GuiContainer) {
+                NetworkHandler.instance.sendToServer(new PacketShowGUI(button.id + 9, motor.get().getPos()));
+            } else {
+                mc.displayGuiScreen(gui);
+            }
         }
     }
 

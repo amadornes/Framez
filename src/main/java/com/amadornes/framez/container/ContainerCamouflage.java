@@ -20,14 +20,18 @@ public class ContainerCamouflage extends ContainerBase {
         int i = 8;
         int j = 156;
 
-        for (int k = 0; k < 6; k++)
+        for (int k = 0; k < 6; k++) {
             this.addSlotToContainer(new SlotItemHandler(upgrade, k, 8, 12 + k * 24));
+        }
 
-        for (int y = 0; y < 3; y++)
-            for (int x = 0; x < 9; x++)
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 9; x++) {
                 this.addSlotToContainer(new Slot(playerInventory, x + y * 9 + 9, i + x * 18, j + y * 18));
-        for (int x = 0; x < 9; x++)
+            }
+        }
+        for (int x = 0; x < 9; x++) {
             this.addSlotToContainer(new Slot(playerInventory, x, i + x * 18, 58 + j));
+        }
     }
 
     @Override

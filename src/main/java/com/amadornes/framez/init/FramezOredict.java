@@ -12,8 +12,9 @@ public class FramezOredict {
     public static void register() {
 
         int i = 0;
-        for (String type : ItemNugget.NUGGET_TYPES)
+        for (String type : ItemNugget.NUGGET_TYPES) {
             OreDictionary.registerOre("nugget" + StringUtils.capitalize(type), new ItemStack(FramezItems.nugget, 1, i++));
+        }
     }
 
 }

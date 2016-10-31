@@ -3,7 +3,6 @@ package com.amadornes.framez.client.render;
 import com.amadornes.framez.api.motor.EnumMotorAction;
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.client.ModelTransformer;
-import com.amadornes.framez.client.ModelTransformer.IVertexTransformer;
 import com.amadornes.framez.motor.logic.MotorLogicLinearActuator;
 import com.amadornes.framez.tile.TileMotor;
 
@@ -11,9 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
 import net.minecraft.util.math.BlockPos;
 
@@ -47,21 +44,17 @@ public class RenderLinearActuator extends RenderMotor<MotorLogicLinearActuator> 
         wr.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
         state = state.withProperty(BlockMotor.PROPERTY_PART_TYPE, 2);
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),
-                ModelTransformer.transform(brd.getBlockModelShapes().getModelForState(state), new IVertexTransformer() {
+                ModelTransformer.transform(brd.getBlockModelShapes().getModelForState(state), (quad, type, usage, data) -> {
 
-                    @Override
-                    public float[] transform(BakedQuad quad, EnumType type, EnumUsage usage, float... data) {
-
-                        if (usage == EnumUsage.POSITION) {
-                            if (data[1] <= 0.0) {
-                                data[1] = 0.25F;
-                            } else if (data[1] >= 1.0) {
-                                data[1] = (float) (0.25F - extension);
-                            }
+                    if (usage == EnumUsage.POSITION) {
+                        if (data[1] <= 0.0) {
+                            data[1] = 0.25F;
+                        } else if (data[1] >= 1.0) {
+                            data[1] = (float) (0.25F - extension);
                         }
-
-                        return data;
                     }
+
+                    return data;
                 }, state, 0L), state, pos, wr, false);
 
         wr.setTranslation(0, 0, 0);

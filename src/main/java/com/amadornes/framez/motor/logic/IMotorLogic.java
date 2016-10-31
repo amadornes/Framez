@@ -47,9 +47,11 @@ public interface IMotorLogic<P> extends INBTSerializable<NBTTagCompound> {
 
     public default int getID() {
 
-        for (int i = 0; i < MotorLogicType.VALUES.length; i++)
-            if (MotorLogicType.VALUES[i].logicClass == getClass())
+        for (int i = 0; i < MotorLogicType.VALUES.length; i++) {
+            if (MotorLogicType.VALUES[i].logicClass == getClass()) {
                 return i;
+            }
+        }
         return -1;
     }
 
@@ -75,8 +77,9 @@ public interface IMotorLogic<P> extends INBTSerializable<NBTTagCompound> {
 
     public default void performAction(IMotorAction action) {
 
-        if (action.isMoving())
+        if (action.isMoving()) {
             getMotor().move(action);
+        }
     }
 
     public boolean canMove(MovingStructure structure, IMotorAction action);

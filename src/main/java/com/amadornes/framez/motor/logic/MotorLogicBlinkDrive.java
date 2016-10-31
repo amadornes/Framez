@@ -75,8 +75,9 @@ public class MotorLogicBlinkDrive implements IMotorLogic<EnumFacing> {
     public boolean rotate(EnumFacing axis) {
 
         EnumFacing oldFace = face;
-        for (int i = 0; i < (axis.getAxisDirection() == AxisDirection.POSITIVE ? 1 : 3); i++)
+        for (int i = 0; i < (axis.getAxisDirection() == AxisDirection.POSITIVE ? 1 : 3); i++) {
             face = face.rotateAround(axis.getAxis());
+        }
         if (face != oldFace) {
             updateLinked();
             return true;
@@ -138,8 +139,9 @@ public class MotorLogicBlinkDrive implements IMotorLogic<EnumFacing> {
     public void updateLinked() {
 
         World world = getMotor().getMotorWorld();
-        if (!world.isRemote)
+        if (!world.isRemote) {
             return;
+        }
 
         BlockPos pos = getMotor().getMotorPos();
         EnumFacing otherFacing = face.getOpposite();

@@ -57,7 +57,9 @@ public class UpgradeCamouflage extends UpgradeBase implements IItemHandlerModifi
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 
-        if (slots[slot] != null) return stack;
+        if (slots[slot] != null) {
+            return stack;
+        }
         if (stack != null && stack.getItem() instanceof ItemBlock) {
             try {
                 IBlockState faceState = ((ItemBlock) stack.getItem()).block

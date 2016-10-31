@@ -35,8 +35,9 @@ public class ModelTransformer {
         List<BakedQuad>[] quads = new List[7];
         for (int i = 0; i < quads.length; i++) {
             quads[i] = new ArrayList<BakedQuad>();
-            for (BakedQuad quad : model.getQuads(state, (i == 6 ? null : EnumFacing.getFront(i)), rand))
+            for (BakedQuad quad : model.getQuads(state, (i == 6 ? null : EnumFacing.getFront(i)), rand)) {
                 quads[i].add(transform(quad, transformer, formatRemapper));
+            }
         }
         return new TransformedModel(model, quads);
     }
@@ -50,8 +51,9 @@ public class ModelTransformer {
             Function<VertexFormat, VertexFormat> formatRemapper) {
 
         List<BakedQuad> transformedQuads = new ArrayList<BakedQuad>();
-        for (BakedQuad quad : quads)
+        for (BakedQuad quad : quads) {
             transformedQuads.add(transform(quad, transformer, formatRemapper));
+        }
         return transformedQuads;
     }
 
@@ -67,8 +69,9 @@ public class ModelTransformer {
         Field f = ReflectionHelper.findField(UnpackedBakedQuad.class, "unpackedData");
         f.setAccessible(true);
         UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(newFormat);
-        if (quad.hasTintIndex())
+        if (quad.hasTintIndex()) {
             builder.setQuadTint(quad.getTintIndex());
+        }
         builder.setQuadOrientation(quad.getFace());
         LightUtil.putBakedQuad(builder, quad);
         UnpackedBakedQuad unpackedQuad = builder.build();

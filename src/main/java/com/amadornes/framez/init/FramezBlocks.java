@@ -46,7 +46,9 @@ public class FramezBlocks {
     private static void registerBlock(Block block, Class<? extends ItemBlock> itemblock, String name, int variants) {
 
         int[] vars = new int[variants];
-        for (int i = 0; i < variants; vars[i] = i++);
+        for (int i = 0; i < variants; vars[i] = i++) {
+            ;
+        }
         registerBlock(block, itemblock, name, i -> i + "", vars);
     }
 
@@ -59,8 +61,9 @@ public class FramezBlocks {
         if (variants.length <= 1) {
             Framez.proxy.registerItemRenderer(item, name, i2s, -1);
         } else {
-            for (int v : variants)
+            for (int v : variants) {
                 Framez.proxy.registerItemRenderer(item, name, i2s, v);
+            }
         }
         block.setCreativeTab(FramezCreativeTab.tab);
     }

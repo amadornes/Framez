@@ -16,11 +16,17 @@ public abstract class Packet<REQ extends Packet<REQ>> implements IMessage, IMess
     public REQ onMessage(REQ message, MessageContext ctx) {
 
         if (synchronize()) {
-            if (ctx.side == Side.SERVER) syncServer(message, ctx.getServerHandler().playerEntity);
-            else syncClient(message, getPlayerClient());
+            if (ctx.side == Side.SERVER) {
+                syncServer(message, ctx.getServerHandler().playerEntity);
+            } else {
+                syncClient(message, getPlayerClient());
+            }
         } else {
-            if (ctx.side == Side.SERVER) message.handleServerSide(ctx.getServerHandler().playerEntity);
-            else message.handleClientSide(getPlayerClient());
+            if (ctx.side == Side.SERVER) {
+                message.handleServerSide(ctx.getServerHandler().playerEntity);
+            } else {
+                message.handleClientSide(getPlayerClient());
+            }
         }
         return null;
     }
@@ -28,26 +34,12 @@ public abstract class Packet<REQ extends Packet<REQ>> implements IMessage, IMess
     @SideOnly(Side.CLIENT)
     private final void syncClient(final REQ packet, final EntityPlayer player) {
 
-        Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-
-            @Override
-            public void run() {
-
-                packet.handleClientSide(player);
-            }
-        });
+        Minecraft.getMinecraft().addScheduledTask(() -> packet.handleClientSide(player));
     }
 
     private final void syncServer(final REQ packet, final EntityPlayer player) {
 
-        player.getServer().addScheduledTask(new Runnable() {
-
-            @Override
-            public void run() {
-
-                packet.handleServerSide(player);
-            }
-        });
+        player.getServer().addScheduledTask(() -> packet.handleServerSide(player));
     }
 
     @SideOnly(Side.CLIENT)

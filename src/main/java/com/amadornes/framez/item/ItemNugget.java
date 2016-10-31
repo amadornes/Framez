@@ -34,8 +34,9 @@ public class ItemNugget extends ItemFramez {
     public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 
         int i = 0;
-        for (String type : NUGGET_TYPES)
+        for (String type : NUGGET_TYPES) {
             subItems.add(new ItemStack(itemIn, 1, i++));
+        }
     }
 
 }

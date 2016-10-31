@@ -95,7 +95,9 @@ public class LinkedHashBiMap<K, V> extends ForwardingBiMap<K, V> {
     @Override
     public void putAll(@Nullable Map<? extends K, ? extends V> map) {
 
-        if (map == null) { return; }
+        if (map == null) {
+            return;
+        }
         for (final Entry<? extends K, ? extends V> entry : map.entrySet()) {
             put(entry.getKey(), entry.getValue());
         }
@@ -192,7 +194,9 @@ public class LinkedHashBiMap<K, V> extends ForwardingBiMap<K, V> {
         @Override
         public void putAll(@Nullable Map<? extends V, ? extends K> map) {
 
-            if (map == null) { return; }
+            if (map == null) {
+                return;
+            }
             for (final Entry<? extends V, ? extends K> entry : map.entrySet()) {
                 put(entry.getKey(), entry.getValue());
             }
@@ -224,7 +228,9 @@ public class LinkedHashBiMap<K, V> extends ForwardingBiMap<K, V> {
                 @Override
                 protected V computeNext() {
 
-                    if (it.hasNext()) { return delegateMap.get(it.next()); }
+                    if (it.hasNext()) {
+                        return delegateMap.get(it.next());
+                    }
                     return super.endOfData();
                 }
             };

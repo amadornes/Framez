@@ -18,8 +18,12 @@ public abstract class ContainerBase extends Container {
             itemstack = itemstack1.copy();
 
             if (index < 9) {
-                if (!this.mergeItemStack(itemstack1, 9, inventorySlots.size(), true)) { return null; }
-            } else if (!this.mergeItemStack(itemstack1, 0, 9, false)) { return null; }
+                if (!this.mergeItemStack(itemstack1, 9, inventorySlots.size(), true)) {
+                    return null;
+                }
+            } else if (!this.mergeItemStack(itemstack1, 0, 9, false)) {
+                return null;
+            }
 
             if (itemstack1.stackSize == 0) {
                 slot.putStack(null);
@@ -27,7 +31,9 @@ public abstract class ContainerBase extends Container {
                 slot.onSlotChanged();
             }
 
-            if (itemstack1.stackSize == itemstack.stackSize) { return null; }
+            if (itemstack1.stackSize == itemstack.stackSize) {
+                return null;
+            }
 
             slot.onPickupFromSlot(player, itemstack1);
         }

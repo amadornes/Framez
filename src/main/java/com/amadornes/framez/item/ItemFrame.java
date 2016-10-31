@@ -45,7 +45,9 @@ public class ItemFrame extends ItemMultiPart implements IFramezItem {
     public String getItemStackDisplayName(ItemStack stack) {
 
         NBTTagCompound tag = stack.getTagCompound();
-        if (tag == null) return TextFormatting.RED + "ERROR";
+        if (tag == null) {
+            return TextFormatting.RED + "ERROR";
+        }
         IFrameMaterial material = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
         return I18n.format(getUnlocalizedName(stack) + ".name", I18n.format("framemat." + material.getType() + ".adj"));
     }
@@ -86,9 +88,15 @@ public class ItemFrame extends ItemMultiPart implements IFramezItem {
         }
 
         IFrameMaterial[] materials = new IFrameMaterial[3];
-        if (tag.hasKey("border")) materials[0] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
-        if (tag.hasKey("cross")) materials[1] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("cross")));
-        if (tag.hasKey("binding")) materials[2] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("binding")));
+        if (tag.hasKey("border")) {
+            materials[0] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
+        }
+        if (tag.hasKey("cross")) {
+            materials[1] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("cross")));
+        }
+        if (tag.hasKey("binding")) {
+            materials[2] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("binding")));
+        }
 
         tooltip.add(TextFormatting.GRAY + I18n.format("tooltip.framez:frame.border") + ": " + TextFormatting.YELLOW
                 + I18n.format("framemat." + materials[0].getType() + ".name"));
@@ -108,7 +116,9 @@ public class ItemFrame extends ItemMultiPart implements IFramezItem {
 
     private String formatTime(int time) {
 
-        if (time <= 0) return I18n.format("tooltip.framez:frame.mintime.warp", TextFormatting.DARK_PURPLE);
+        if (time <= 0) {
+            return I18n.format("tooltip.framez:frame.mintime.warp", TextFormatting.DARK_PURPLE);
+        }
         return (time / 20D) + "s";
     }
 
@@ -122,11 +132,19 @@ public class ItemFrame extends ItemMultiPart implements IFramezItem {
     public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3d hit, ItemStack stack, EntityPlayer player) {
 
         NBTTagCompound tag = stack.getTagCompound();
-        if (tag == null) return new PartFrame();
+        if (tag == null) {
+            return new PartFrame();
+        }
         IFrameMaterial[] materials = new IFrameMaterial[3];
-        if (tag.hasKey("border")) materials[0] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
-        if (tag.hasKey("cross")) materials[1] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("cross")));
-        if (tag.hasKey("binding")) materials[2] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("binding")));
+        if (tag.hasKey("border")) {
+            materials[0] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
+        }
+        if (tag.hasKey("cross")) {
+            materials[1] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("cross")));
+        }
+        if (tag.hasKey("binding")) {
+            materials[2] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("binding")));
+        }
         return new PartFrame(materials);
     }
 

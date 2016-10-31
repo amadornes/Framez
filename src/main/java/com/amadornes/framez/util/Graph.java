@@ -51,14 +51,22 @@ public class Graph<T extends INode> {
 
         // Add vertex2 to the list of vertex1's relations
         edges = getRelations(vertex1);
-        if (edges == null) edges = new ArrayList<T>();
-        if (!edges.contains(vertex2)) edges.add(vertex2);
+        if (edges == null) {
+            edges = new ArrayList<T>();
+        }
+        if (!edges.contains(vertex2)) {
+            edges.add(vertex2);
+        }
         graph.put(vertex1, edges);
 
         // Add vertex1 to the list of vertex2's relations
         edges = getRelations(vertex2);
-        if (edges == null) edges = new ArrayList<T>();
-        if (!edges.contains(vertex1)) edges.add(vertex1);
+        if (edges == null) {
+            edges = new ArrayList<T>();
+        }
+        if (!edges.contains(vertex1)) {
+            edges.add(vertex1);
+        }
         graph.put(vertex2, edges);
     }
 
@@ -67,13 +75,17 @@ public class Graph<T extends INode> {
         if (graph.containsKey(vertex1) && graph.containsKey(vertex2)) {
             // Remove v2 from v1's list
             List<T> edges = graph.get(vertex1);
-            if (edges == null) edges = new ArrayList<T>();
+            if (edges == null) {
+                edges = new ArrayList<T>();
+            }
             edges.remove(vertex2);
             graph.put(vertex1, edges);
 
             // Remove v1 from v2's list
             edges = graph.get(vertex2);
-            if (edges == null) edges = new ArrayList<T>();
+            if (edges == null) {
+                edges = new ArrayList<T>();
+            }
             edges.remove(vertex1);
             graph.put(vertex2, edges);
         }
@@ -93,7 +105,9 @@ public class Graph<T extends INode> {
 
     public boolean edgeExsists(T vertex1, T vertex2) {
 
-        if (!graph.containsKey(vertex1) || !graph.containsKey(vertex2)) return false;
+        if (!graph.containsKey(vertex1) || !graph.containsKey(vertex2)) {
+            return false;
+        }
         return graph.get(vertex1).contains(vertex2);
     }
 
@@ -107,7 +121,9 @@ public class Graph<T extends INode> {
 
     private Graph<T> deepSearch(T start, Graph<T> result, List<T> visited) {
 
-        if (!visited.contains(start)) visited.add(start);
+        if (!visited.contains(start)) {
+            visited.add(start);
+        }
         result.addVertex(start);
 
         int neighbours = 0;
@@ -119,9 +135,13 @@ public class Graph<T extends INode> {
         Collections.sort(l, new NeighbourSorter<T>(this, visited));
 
         for (T vertex : l) {
-            if (neighbours >= maxNeighbours) break;
+            if (neighbours >= maxNeighbours) {
+                break;
+            }
 
-            if (visited.contains(vertex)) continue;
+            if (visited.contains(vertex)) {
+                continue;
+            }
 
             visited.add(vertex);
             result.addEdge(start, vertex);

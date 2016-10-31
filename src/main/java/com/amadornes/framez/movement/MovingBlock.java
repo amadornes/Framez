@@ -71,28 +71,33 @@ public class MovingBlock implements INode, IMovingBlock {
 
     public boolean isSticky(EnumFacing face) {
 
-        if (directions != null)
+        if (directions != null) {
             return directions.contains(face);
+        }
 
         if (stickySides == null) {
             stickySides = new ISticky[6];
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 6; i++) {
                 stickySides[i] = FrameRegistry.INSTANCE.getSticky(world.get(), pos, face, tile);
+            }
         }
         return stickySides[face.ordinal()] != null && stickySides[face.ordinal()].isSticky();
     }
 
     public boolean canStickTo(EnumFacing face) {
 
-        if (!canStickTo)
+        if (!canStickTo) {
             return false;
-        if (directions != null)
+        }
+        if (directions != null) {
             return directions.contains(face);
+        }
 
         if (stickableSides == null) {
             stickableSides = new IStickable[6];
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 6; i++) {
                 stickableSides[i] = FrameRegistry.INSTANCE.getStickable(world.get(), pos, face, tile);
+            }
         }
         if (stickableSides[face.ordinal()] != null) {
             return stickableSides[face.ordinal()].canStickTo();
@@ -110,12 +115,15 @@ public class MovingBlock implements INode, IMovingBlock {
     @Override
     public boolean equals(Object obj) {
 
-        if (obj == this)
+        if (obj == this) {
             return true;
-        if (obj instanceof MovingBlock)
+        }
+        if (obj instanceof MovingBlock) {
             return ((MovingBlock) obj).pos.equals(pos);
-        if (obj instanceof BlockPos)
+        }
+        if (obj instanceof BlockPos) {
             return pos.equals(obj);
+        }
         return true;
     }
 
@@ -145,8 +153,9 @@ public class MovingBlock implements INode, IMovingBlock {
 
     public BlockData toBlockData() {
 
-        if (data == null)
+        if (data == null) {
             return data = new BlockData(getState(), getTile());
+        }
         return data;
     }
 
@@ -156,8 +165,9 @@ public class MovingBlock implements INode, IMovingBlock {
         tag.setLong("pos", pos.toLong());
         tag.setTag("data", toBlockData().serializeNBT());
         BitSet directionBits = new BitSet();
-        for (EnumFacing f : directions)
+        for (EnumFacing f : directions) {
             directionBits.set(f.ordinal());
+        }
         tag.setByteArray("directions", directionBits.toByteArray());
         return tag;
     }
@@ -168,9 +178,11 @@ public class MovingBlock implements INode, IMovingBlock {
         BlockData data = BlockData.fromNBT(tag.getCompoundTag("data"));
         EnumSet<EnumFacing> directions = EnumSet.noneOf(EnumFacing.class);
         BitSet directionBits = BitSet.valueOf(tag.getByteArray("directions"));
-        for (int i = 0; i < 6; i++)
-            if (directionBits.get(i))
+        for (int i = 0; i < 6; i++) {
+            if (directionBits.get(i)) {
                 directions.add(EnumFacing.getFront(i));
+            }
+        }
         return new MovingBlock(world, pos, data, directions);
     }
 

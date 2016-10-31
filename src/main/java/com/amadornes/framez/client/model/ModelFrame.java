@@ -51,20 +51,28 @@ public class ModelFrame implements IBakedModel, IPerspectiveAwareModel {
         this.states = new EnumFrameSideState[PartFrame.PROPERTIES_SIDE_STATE.length];
         this.materials = new IFrameMaterial[PartFrame.PROPERTIES_MATERIAL.length];
         Iterator<IFrameMaterial> it = FrameRegistry.INSTANCE.getMaterials().values().iterator();
-        for (int i = 0; i < materials.length; i++)
+        for (int i = 0; i < materials.length; i++) {
             materials[i] = it.next();
+        }
         this.overrides = new ItemOverrideList(Collections.emptyList()) {
 
             @Override
             public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity) {
 
                 NBTTagCompound tag = stack.getTagCompound();
-                if (tag == null) return originalModel;
+                if (tag == null) {
+                    return originalModel;
+                }
                 IFrameMaterial[] materials = new IFrameMaterial[3];
-                if (tag.hasKey("border")) materials[0] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
-                if (tag.hasKey("cross")) materials[1] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("cross")));
-                if (tag.hasKey("binding"))
+                if (tag.hasKey("border")) {
+                    materials[0] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("border")));
+                }
+                if (tag.hasKey("cross")) {
+                    materials[1] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("cross")));
+                }
+                if (tag.hasKey("binding")) {
                     materials[2] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(tag.getString("binding")));
+                }
                 try {
                     EnumFrameSideState[] states = new EnumFrameSideState[PartFrame.PROPERTIES_SIDE_STATE.length];
                     Arrays.fill(states, EnumFrameSideState.NORMAL);
@@ -94,10 +102,12 @@ public class ModelFrame implements IBakedModel, IPerspectiveAwareModel {
             states = new EnumFrameSideState[PartFrame.PROPERTIES_SIDE_STATE.length];
             materials = new IFrameMaterial[PartFrame.PROPERTIES_MATERIAL.length];
             IExtendedBlockState s = (IExtendedBlockState) state;
-            for (int i = 0; i < states.length; i++)
+            for (int i = 0; i < states.length; i++) {
                 states[i] = s.getValue(PartFrame.PROPERTIES_SIDE_STATE[i]);
-            for (int i = 0; i < materials.length; i++)
+            }
+            for (int i = 0; i < materials.length; i++) {
                 materials[i] = s.getValue(PartFrame.PROPERTIES_MATERIAL[i]);
+            }
         }
 
         List<BakedQuad> quads = new ArrayList<BakedQuad>();
@@ -105,15 +115,20 @@ public class ModelFrame implements IBakedModel, IPerspectiveAwareModel {
 
         for (int i = 0; i < 6; i++) {
             EnumFrameTexture tex = EnumFrameTexture.BORDER;
-            if (states[i] == EnumFrameSideState.PANEL) tex = EnumFrameTexture.BORDER_PANEL;
+            if (states[i] == EnumFrameSideState.PANEL) {
+                tex = EnumFrameTexture.BORDER_PANEL;
+            }
             textures[i] = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(materials[0].getTexture(tex).toString());
         }
         quads.addAll(AdvancedModelRextexturer.retexture(state, 0L, ClientProxy.MODEL_FRAME_BORDER, textures).getQuads(state, side, rand));
 
         for (int i = 0; i < 6; i++) {
             EnumFrameTexture tex = null;
-            if (states[i] == EnumFrameSideState.NORMAL) tex = EnumFrameTexture.CROSS;
-            else if (states[i] == EnumFrameSideState.PIPE) tex = EnumFrameTexture.CROSS_OUTER;
+            if (states[i] == EnumFrameSideState.NORMAL) {
+                tex = EnumFrameTexture.CROSS;
+            } else if (states[i] == EnumFrameSideState.PIPE) {
+                tex = EnumFrameTexture.CROSS_OUTER;
+            }
             if (tex != null) {
                 textures[i] = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(materials[1].getTexture(tex).toString());
             } else {
@@ -131,8 +146,11 @@ public class ModelFrame implements IBakedModel, IPerspectiveAwareModel {
 
         for (int i = 0; i < 6; i++) {
             EnumFrameTexture tex = null;
-            if (states[i] == EnumFrameSideState.NORMAL) tex = EnumFrameTexture.BINDING;
-            else if (states[i] == EnumFrameSideState.PIPE) tex = EnumFrameTexture.BINDING_OUTER;
+            if (states[i] == EnumFrameSideState.NORMAL) {
+                tex = EnumFrameTexture.BINDING;
+            } else if (states[i] == EnumFrameSideState.PIPE) {
+                tex = EnumFrameTexture.BINDING_OUTER;
+            }
             if (tex != null) {
                 textures[i] = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(materials[2].getTexture(tex).toString());
             } else {
@@ -192,7 +210,9 @@ public class ModelFrame implements IBakedModel, IPerspectiveAwareModel {
 
         Pair<? extends IBakedModel, Matrix4f> p = ClientProxy.MODEL_FRAME_ORIGINAL instanceof IPerspectiveAwareModel
                 ? ((IPerspectiveAwareModel) ClientProxy.MODEL_FRAME_ORIGINAL).handlePerspective(cameraTransformType) : null;
-        if (p == null) return Pair.of(this, null);
+        if (p == null) {
+            return Pair.of(this, null);
+        }
         return Pair.of(this, p.getRight());
     }
 

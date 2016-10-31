@@ -45,7 +45,9 @@ public class GuiMotorSettings extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 
-        if (Minecraft.getMinecraft().currentScreen == this) this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+        if (Minecraft.getMinecraft().currentScreen == this) {
+            this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+        }
 
         int left = (width - xSize) / 2;
         int top = (height - ySize) / 2;
@@ -71,7 +73,9 @@ public class GuiMotorSettings extends GuiScreen {
     public void keyTyped(char typedChar, int keyCode) throws IOException {
 
         super.keyTyped(typedChar, keyCode);
-        if (this.mc.currentScreen != null) tabs[tab].keyTyped(typedChar, keyCode);
+        if (this.mc.currentScreen != null) {
+            tabs[tab].keyTyped(typedChar, keyCode);
+        }
     }
 
     @Override
@@ -81,7 +85,9 @@ public class GuiMotorSettings extends GuiScreen {
         int top = (height - ySize) / 2;
 
         for (int i = 0; i < tabs.length; i++) {
-            if (tab == i) continue;
+            if (tab == i) {
+                continue;
+            }
             int x = left + xSize, y = top + 7 + 29 * i;
             int w = 26, h = 26;
             if (mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h) {
@@ -110,8 +116,9 @@ public class GuiMotorSettings extends GuiScreen {
     public void setWorldAndResolution(Minecraft mc, int width, int height) {
 
         super.setWorldAndResolution(mc, width, height);
-        for (int i = 0; i < tabs.length; i++)
+        for (int i = 0; i < tabs.length; i++) {
             tabs[i].setWorldAndResolution(mc, width, height);
+        }
     }
 
 }

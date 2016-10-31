@@ -48,8 +48,12 @@ public class MotorPlacementDirectional implements IMotorPlacement<Pair<EnumFacin
             break;
         }
 
-        if (x < 0) x = 1 + x;
-        if (z < 0) z = 1 + z;
+        if (x < 0) {
+            x = 1 + x;
+        }
+        if (z < 0) {
+            z = 1 + z;
+        }
 
         x -= 0.5;
         z -= 0.5;
@@ -58,7 +62,9 @@ public class MotorPlacementDirectional implements IMotorPlacement<Pair<EnumFacin
             return 0;
         } else if (x > 0 && x > Math.abs(z)) {
             return 3;
-        } else if (z < 0 && Math.abs(z) > Math.abs(x)) { return 2; }
+        } else if (z < 0 && Math.abs(z) > Math.abs(x)) {
+            return 2;
+        }
         return 1;
     }
 
@@ -78,16 +84,21 @@ public class MotorPlacementDirectional implements IMotorPlacement<Pair<EnumFacin
         case NORTH:
         case SOUTH:
             d = EnumFacing.UP;
-            if (r == 1 || r == 3) r = (r + 2) % 4;
+            if (r == 1 || r == 3) {
+                r = (r + 2) % 4;
+            }
             break;
         default:
             break;
         }
         EnumFacing faceAbs = faceHit;
-        if (faceAbs.getAxisDirection() == AxisDirection.NEGATIVE) faceAbs = faceAbs.getOpposite();
+        if (faceAbs.getAxisDirection() == AxisDirection.NEGATIVE) {
+            faceAbs = faceAbs.getOpposite();
+        }
 
-        for (int i = 0; i < r; i++)
+        for (int i = 0; i < r; i++) {
             d = FramezUtils.rotate(d, faceAbs);
+        }
 
         return d;
     }

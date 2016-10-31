@@ -40,7 +40,9 @@ public class GuiMotorSettingsTabTriggers extends GuiMotorSettingsTab implements 
         super(motor, xSize, ySize);
         for (IMotorTrigger t : motor.get().availableTriggers.values()) {
             Map<MotorTriggerType, IMotorTrigger> map = allTriggers.get(t.getTriggerType().getCategory());
-            if (map == null) allTriggers.put(t.getTriggerType().getCategory(), map = new HashMap<MotorTriggerType, IMotorTrigger>());
+            if (map == null) {
+                allTriggers.put(t.getTriggerType().getCategory(), map = new HashMap<MotorTriggerType, IMotorTrigger>());
+            }
             map.put(t.getTriggerType(), t);
         }
     }
@@ -189,7 +191,9 @@ public class GuiMotorSettingsTabTriggers extends GuiMotorSettingsTab implements 
                 GlStateManager.popMatrix();
 
                 i++;
-                if (i > 6) break;
+                if (i > 6) {
+                    break;
+                }
             }
         }
 
@@ -207,8 +211,11 @@ public class GuiMotorSettingsTabTriggers extends GuiMotorSettingsTab implements 
                             break;
                         }
                     }
-                    if (trig) this.drawGradientRect(x, y, x + 18, y + 18, 0x70C0C0FF, 0x80C0C0FF);
-                    else this.drawGradientRect(x, y, x + 18, y + 18, 0x70FFC0C0, 0x80FFC0C0);
+                    if (trig) {
+                        this.drawGradientRect(x, y, x + 18, y + 18, 0x70C0C0FF, 0x80C0C0FF);
+                    } else {
+                        this.drawGradientRect(x, y, x + 18, y + 18, 0x70FFC0C0, 0x80FFC0C0);
+                    }
                 }
 
                 GlStateManager.pushMatrix();
@@ -228,7 +235,9 @@ public class GuiMotorSettingsTabTriggers extends GuiMotorSettingsTab implements 
                 GlStateManager.popMatrix();
 
                 i++;
-                if (i >= 10) break;
+                if (i >= 10) {
+                    break;
+                }
             }
         }
     }
@@ -320,7 +329,9 @@ public class GuiMotorSettingsTabTriggers extends GuiMotorSettingsTab implements 
                     }
 
                     i++;
-                    if (i > 6) break;
+                    if (i > 6) {
+                        break;
+                    }
                 }
             }
 
@@ -344,7 +355,9 @@ public class GuiMotorSettingsTabTriggers extends GuiMotorSettingsTab implements 
                         return;
                     }
                     i++;
-                    if (i >= 10) break;
+                    if (i >= 10) {
+                        break;
+                    }
                 }
             }
         }

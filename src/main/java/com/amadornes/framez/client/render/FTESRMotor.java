@@ -31,7 +31,9 @@ public class FTESRMotor extends FastTESR<TileMotor> {
 
         IMotorLogic<?> logic = te.getLogic();
         RenderMotor<?> renderer = FTESRS[logic.getID()];
-        if (renderer != null) render(renderer, logic, x, y, z, partialTicks, destroyStage, buffer);
+        if (renderer != null) {
+            render(renderer, logic, x, y, z, partialTicks, destroyStage, buffer);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -52,7 +54,9 @@ public class FTESRMotor extends FastTESR<TileMotor> {
 
         T logic = (T) te.getLogic();
         RenderMotor<T> renderer = (RenderMotor<T>) FTESRS[logic.getID()];
-        if (renderer != null) return renderer.alwaysRender(logic);
+        if (renderer != null) {
+            return renderer.alwaysRender(logic);
+        }
         return false;
     }
 

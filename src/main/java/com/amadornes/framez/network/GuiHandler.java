@@ -19,12 +19,14 @@ public class GuiHandler implements IGuiHandler {
 
         if (id >= 0 && id < 9) {
             TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-            if (te != null && te instanceof TileMotor)
+            if (te != null && te instanceof TileMotor) {
                 return new ContainerUpgrade(((TileMotor) te).getSafeReference(), id, player.inventory);
+            }
         } else if (id >= 9 && id < 18) {
             TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-            if (te != null && te instanceof TileMotor)
+            if (te != null && te instanceof TileMotor) {
                 return ((TileMotor) te).getUpgrade(id - 9).getKey().getGuiContainer(player);
+            }
         } else if (id == 19) {
             // NO-OP
         }
@@ -37,12 +39,14 @@ public class GuiHandler implements IGuiHandler {
 
         if (id >= 0 && id < 9) {
             TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-            if (te != null && te instanceof TileMotor)
+            if (te != null && te instanceof TileMotor) {
                 return new GuiUpgradeSelect(((TileMotor) te).getSafeReference(), id, player.inventory);
+            }
         } else if (id >= 9 && id < 18) {
             TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-            if (te != null && te instanceof TileMotor)
+            if (te != null && te instanceof TileMotor) {
                 return ((TileMotor) te).getUpgrade(id - 9).getKey().getConfigGUI(player, Minecraft.getMinecraft().currentScreen);
+            }
         } else if (id == 19) {
             TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
             if (te != null && te instanceof TileMotor) {

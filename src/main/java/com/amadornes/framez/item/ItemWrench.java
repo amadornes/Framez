@@ -48,8 +48,9 @@ public class ItemWrench extends ItemFramez implements IFramezWrench {
     public void onLeftClick(PlayerInteractEvent.LeftClickBlock event) {
 
         ItemStack stack = event.getItemStack();
-        if (stack == null || stack.getItem() != this)
+        if (stack == null || stack.getItem() != this) {
             return;
+        }
         event.setCanceled(true);
         event.setUseItem(Result.DENY);
         event.setUseBlock(Result.DENY);
@@ -65,8 +66,9 @@ public class ItemWrench extends ItemFramez implements IFramezWrench {
     @Override
     public boolean canSeeIssues(EntityPlayer player, ItemStack stack, EnumHand hand, boolean equipped) {
 
-        if (equipped)
+        if (equipped) {
             return true;
+        }
         NBTTagCompound tag = stack.getTagCompound();
         return tag != null && tag.getBoolean("alwaysSeeIssues");
     }

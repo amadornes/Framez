@@ -58,9 +58,10 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
             + PROPERTIES_MATERIAL.length];
 
     static {
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++) {
             PROPERTIES[i] = PROPERTIES_SIDE_STATE[i] = new PropertyAdapter<EnumFrameSideState>(
                     PropertyEnum.create("side_" + i, EnumFrameSideState.class));
+        }
         PROPERTIES[6] = PROPERTIES_MATERIAL[0] = new PropertyMaterial("material_border");
         PROPERTIES[7] = PROPERTIES_MATERIAL[1] = new PropertyMaterial("material_cross");
         PROPERTIES[8] = PROPERTIES_MATERIAL[2] = new PropertyMaterial("material_binding");
@@ -73,8 +74,9 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     public PartFrame() {
 
         Iterator<IFrameMaterial> it = FrameRegistry.INSTANCE.getMaterials().values().iterator();
-        for (int i = 0; i < materials.length; i++)
+        for (int i = 0; i < materials.length; i++) {
             materials[i] = it.next();
+        }
         initStickiness();
     }
 
@@ -97,8 +99,9 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
 
         if (getContainer() != null) {
             IMultipart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(facing));
-            if (part != null && part instanceof IMicroblock)
+            if (part != null && part instanceof IMicroblock) {
                 return ((IMicroblock) part).getSize() != 1;
+            }
             return true;
         }
         return false;
@@ -131,15 +134,17 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
 
         AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-        if (bb.intersectsWith(mask))
+        if (bb.intersectsWith(mask)) {
             list.add(bb);
+        }
     }
 
     @Override
     public boolean occlusionTest(IMultipart part) {
 
-        if (part instanceof PartFrame)
+        if (part instanceof PartFrame) {
             return false;
+        }
         return super.occlusionTest(part);
     }
 
@@ -194,10 +199,12 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     public IBlockState getExtendedState(IBlockState state) {
 
         IExtendedBlockState s = (IExtendedBlockState) state;
-        for (int i = 0; i < PROPERTIES_SIDE_STATE.length; i++)
+        for (int i = 0; i < PROPERTIES_SIDE_STATE.length; i++) {
             s = s.withProperty(PROPERTIES_SIDE_STATE[i], getSideState(EnumFacing.getFront(i)));
-        for (int i = 0; i < PROPERTIES_MATERIAL.length; i++)
+        }
+        for (int i = 0; i < PROPERTIES_MATERIAL.length; i++) {
             s = s.withProperty(PROPERTIES_MATERIAL[i], materials[i]);
+        }
         return s;
     }
 
@@ -226,16 +233,18 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     public void writeUpdatePacket(PacketBuffer buf) {
 
         super.writeUpdatePacket(buf);
-        for (int i = 0; i < materials.length; i++)
+        for (int i = 0; i < materials.length; i++) {
             buf.writeString(materials[i].getType().toString());
+        }
     }
 
     @Override
     public void readUpdatePacket(PacketBuffer buf) {
 
         super.readUpdatePacket(buf);
-        for (int i = 0; i < materials.length; i++)
+        for (int i = 0; i < materials.length; i++) {
             materials[i] = FrameRegistry.INSTANCE.getMaterial(new ResourceLocation(buf.readStringFromBuffer(128)));
+        }
     }
 
     @Override
@@ -270,23 +279,26 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
             if (part != null && part instanceof ICenterConnectablePart) {
                 int radius = ((ICenterConnectablePart) part).getHoleRadius(face);
                 if (radius > 0) {
-                    if (radius <= 8)
+                    if (radius <= 8) {
                         return EnumFrameSideState.PIPE;
-                    else
+                    } else {
                         return EnumFrameSideState.HOLLOW;
+                    }
                 }
             }
             if (FramezConfig.Client.connectContiguousFrames) {
                 IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(face));
                 if (container != null) {
                     for (IMultipart p : container.getParts()) {
-                        if (p instanceof PartFrame)
+                        if (p instanceof PartFrame) {
                             return EnumFrameSideState.HOLLOW;
+                        }
                     }
                 }
             }
-            if (FramezConfig.Client.clickThroughFrames)
+            if (FramezConfig.Client.clickThroughFrames) {
                 return EnumFrameSideState.PIPE;
+            }
             return EnumFrameSideState.NORMAL;
         }
     }
@@ -294,24 +306,30 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
 
-        if (capability == IFrame.CAPABILITY_FRAME && facing == null)
+        if (capability == IFrame.CAPABILITY_FRAME && facing == null) {
             return true;
-        if (capability == ISticky.CAPABILITY_STICKY && facing != null)
+        }
+        if (capability == ISticky.CAPABILITY_STICKY && facing != null) {
             return true;
-        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null)
+        }
+        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null) {
             return true;
+        }
         return false;
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 
-        if (capability == IFrame.CAPABILITY_FRAME && facing == null)
+        if (capability == IFrame.CAPABILITY_FRAME && facing == null) {
             return (T) this;
-        if (capability == ISticky.CAPABILITY_STICKY && facing != null)
+        }
+        if (capability == ISticky.CAPABILITY_STICKY && facing != null) {
             return (T) stickySides[facing.ordinal()];
-        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null)
+        }
+        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null) {
             return (T) stickableSides[facing.ordinal()];
+        }
         return null;
     }
 

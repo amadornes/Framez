@@ -70,7 +70,9 @@ public class BlockMetamorphicStone extends Block {
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 
         int metadata = getMetaFromState(state);
-        if (metadata == 0) return Arrays.asList(new ItemStack(this, 1, 1));
+        if (metadata == 0) {
+            return Arrays.asList(new ItemStack(this, 1, 1));
+        }
         return Arrays.asList(new ItemStack(this, 1, metadata));
     }
 
@@ -78,23 +80,29 @@ public class BlockMetamorphicStone extends Block {
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock) {
 
         Type type = state.getValue(TYPE);
-        for (EnumFacing side : EnumFacing.VALUES)
+        for (EnumFacing side : EnumFacing.VALUES) {
             convertIfNeeded(world, pos, side, type);
+        }
     }
 
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
 
         Type type = state.getValue(TYPE);
-        if (type.hasLogic) world.scheduleBlockUpdate(pos, this, 1, 0);
+        if (type.hasLogic) {
+            world.scheduleBlockUpdate(pos, this, 1, 0);
+        }
 
-        for (EnumFacing side : EnumFacing.VALUES)
+        for (EnumFacing side : EnumFacing.VALUES) {
             convertIfNeeded(world, pos, side, type);
+        }
     }
 
     public static void convertIfNeeded(World world, BlockPos pos, EnumFacing side, Type type) {
 
-        if (world.isRemote) return;
+        if (world.isRemote) {
+            return;
+        }
 
         pos = pos.offset(side);
 
@@ -102,20 +110,29 @@ public class BlockMetamorphicStone extends Block {
         if (type == Type.WATER) {
             if (fluidState.getMaterial() == Material.LAVA) {
                 int lavaMeta = fluidState.getValue(BlockLiquid.LEVEL);
-                if (lavaMeta == 0) world.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState());
-                else if (lavaMeta <= 4) world.setBlockState(pos, Blocks.STONE.getDefaultState());
+                if (lavaMeta == 0) {
+                    world.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState());
+                } else if (lavaMeta <= 4) {
+                    world.setBlockState(pos, Blocks.STONE.getDefaultState());
+                }
             }
         } else if (type == Type.FIRE) {
             if (fluidState.getMaterial() == Material.WATER) {
                 int waterMeta = fluidState.getValue(BlockLiquid.LEVEL);
-                if (waterMeta == 0) world.setBlockState(pos, Blocks.STONE.getDefaultState());
-                else world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
+                if (waterMeta == 0) {
+                    world.setBlockState(pos, Blocks.STONE.getDefaultState());
+                } else {
+                    world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
+                }
             }
         } else if (type == Type.ICE) {
             if (fluidState.getMaterial() == Material.WATER) {
                 int waterMeta = fluidState.getValue(BlockLiquid.LEVEL);
-                if (waterMeta == 0) world.setBlockState(pos, Blocks.PACKED_ICE.getDefaultState());
-                else world.setBlockState(pos, Blocks.ICE.getDefaultState());
+                if (waterMeta == 0) {
+                    world.setBlockState(pos, Blocks.PACKED_ICE.getDefaultState());
+                } else {
+                    world.setBlockState(pos, Blocks.ICE.getDefaultState());
+                }
             }
         }
     }
@@ -124,8 +141,9 @@ public class BlockMetamorphicStone extends Block {
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
 
-        for (EnumFacing side : EnumFacing.VALUES)
+        for (EnumFacing side : EnumFacing.VALUES) {
             spawnFancyParticles(world, pos, side, state, new AxisAlignedBB(0, 0, 0, 1, 1, 1), rand);
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -172,8 +190,10 @@ public class BlockMetamorphicStone extends Block {
             } else if (type == Type.FIRE) {
                 entity.setFire(5);
             } else if (type == Type.ICE) {
-                if (entity instanceof EntityLivingBase) ((EntityLivingBase) entity)
-                        .addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("slowness"), 1, 0, true, false));
+                if (entity instanceof EntityLivingBase) {
+                    ((EntityLivingBase) entity)
+                            .addPotionEffect(new PotionEffect(Potion.getPotionFromResourceLocation("slowness"), 1, 0, true, false));
+                }
             }
         }
 

@@ -26,18 +26,19 @@ public class MovementRotation implements IMovement {
 
         BlockPos origin = motor.get().getPos();
         BlockPos finalPos = pos.subtract(origin);
-        if (axis == Axis.Y && action == EnumMotorAction.ROTATE_CLOCKWISE)
+        if (axis == Axis.Y && action == EnumMotorAction.ROTATE_CLOCKWISE) {
             finalPos = new BlockPos(-finalPos.getZ(), finalPos.getY(), finalPos.getX());
-        else if (axis == Axis.Y && action == EnumMotorAction.ROTATE_CCLOCKWISE)
+        } else if (axis == Axis.Y && action == EnumMotorAction.ROTATE_CCLOCKWISE) {
             finalPos = new BlockPos(finalPos.getZ(), finalPos.getY(), -finalPos.getX());
-        else if (axis == Axis.Z && action == EnumMotorAction.ROTATE_CLOCKWISE)
+        } else if (axis == Axis.Z && action == EnumMotorAction.ROTATE_CLOCKWISE) {
             finalPos = new BlockPos(finalPos.getY(), -finalPos.getX(), finalPos.getZ());
-        else if (axis == Axis.Z && action == EnumMotorAction.ROTATE_CCLOCKWISE)
+        } else if (axis == Axis.Z && action == EnumMotorAction.ROTATE_CCLOCKWISE) {
             finalPos = new BlockPos(-finalPos.getY(), finalPos.getX(), finalPos.getZ());
-        else if (axis == Axis.X && action == EnumMotorAction.ROTATE_CLOCKWISE)
+        } else if (axis == Axis.X && action == EnumMotorAction.ROTATE_CLOCKWISE) {
             finalPos = new BlockPos(finalPos.getX(), finalPos.getZ(), -finalPos.getY());
-        else if (axis == Axis.X && action == EnumMotorAction.ROTATE_CCLOCKWISE)
+        } else if (axis == Axis.X && action == EnumMotorAction.ROTATE_CCLOCKWISE) {
             finalPos = new BlockPos(finalPos.getX(), -finalPos.getZ(), finalPos.getY());
+        }
         return finalPos.add(origin);
     }
 

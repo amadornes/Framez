@@ -15,8 +15,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
 import net.minecraft.util.math.BlockPos;
 
@@ -44,23 +42,19 @@ public class RenderRotator extends RenderMotor<MotorLogicRotator> {
         wr.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
         state = motor.getMotorWorld().getBlockState(pos);
         state = state.getActualState(motor.getMotorWorld(), pos).withProperty(BlockMotor.PROPERTY_PART_TYPE, 1);
-        IVertexTransformer transformer = new IVertexTransformer() {
+        IVertexTransformer transformer = (quad, type, usage, data) -> {
 
-            @Override
-            public float[] transform(BakedQuad quad, EnumType type, EnumUsage usage, float... data) {
-
-                if (usage == EnumUsage.POSITION) {
-                    Vector3f pos = new Vector3f(data);
-                    pos.sub(new Vector3f(0.5F, 0.5F, 0.5F));
-                    Matrix4f mat = new Matrix4f();
-                    mat.rotY((float) Math.toRadians(angle));
-                    mat.transform(pos);
-                    pos.add(new Vector3f(0.5F, 0.5F, 0.5F));
-                    pos.get(data);
-                }
-
-                return data;
+            if (usage == EnumUsage.POSITION) {
+                Vector3f pos1 = new Vector3f(data);
+                pos1.sub(new Vector3f(0.5F, 0.5F, 0.5F));
+                Matrix4f mat = new Matrix4f();
+                mat.rotY((float) Math.toRadians(angle));
+                mat.transform(pos1);
+                pos1.add(new Vector3f(0.5F, 0.5F, 0.5F));
+                pos1.get(data);
             }
+
+            return data;
         };
         brd.getBlockModelRenderer().renderModel(motor.getMotorWorld(),
                 ModelTransformer.transform(brd.getBlockModelShapes().getModelForState(state), transformer, state, 0L), state, pos, wr,

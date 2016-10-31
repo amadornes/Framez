@@ -92,8 +92,9 @@ public class GuiCamouflage extends SubGuiContainer {
 
         drawCenteredString(fontRendererObj, "Camouflage", (left + 79 + left + 79 + 90) / 2, top + 22, 0xFFFFFFFF);
 
-        for (EnumFacing face : EnumFacing.VALUES)
+        for (EnumFacing face : EnumFacing.VALUES) {
             drawString(fontRendererObj, StringUtils.capitalize(face.getName()), left + 28, top + 16 + face.ordinal() * 24, 0xFFFFFFFF);
+        }
 
         double angleX = this.angleX, angleY = this.angleY;
         if (autoRotate) {
@@ -227,7 +228,9 @@ public class GuiCamouflage extends SubGuiContainer {
     protected void mouseReleased(int mouseX, int mouseY, int state) {
 
         super.mouseReleased(mouseX, mouseY, state);
-        if (state == 0) tracking = false;
+        if (state == 0) {
+            tracking = false;
+        }
     }
 
     @SubscribeEvent

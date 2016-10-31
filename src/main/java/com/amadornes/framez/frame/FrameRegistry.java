@@ -57,7 +57,9 @@ public enum FrameRegistry implements IFrameRegistry {
 
         for (IStickinessProvider provider : stickinessProviders.values()) {
             ISticky sticky = provider.getSticky(world, pos, face);
-            if (sticky != null) return sticky;
+            if (sticky != null) {
+                return sticky;
+            }
         }
 
         TileEntity te = world.getTileEntity(pos);
@@ -68,7 +70,9 @@ public enum FrameRegistry implements IFrameRegistry {
 
         for (IStickinessProvider provider : stickinessProviders.values()) {
             ISticky sticky = provider.getSticky(world, pos, face);
-            if (sticky != null) return sticky;
+            if (sticky != null) {
+                return sticky;
+            }
         }
 
         return te == null || !te.hasCapability(ISticky.CAPABILITY_STICKY, face) ? null : te.getCapability(ISticky.CAPABILITY_STICKY, face);
@@ -79,7 +83,9 @@ public enum FrameRegistry implements IFrameRegistry {
 
         for (IStickinessProvider provider : stickinessProviders.values()) {
             IStickable stickable = provider.getStickable(world, pos, face);
-            if (stickable != null) return stickable;
+            if (stickable != null) {
+                return stickable;
+            }
         }
 
         TileEntity te = world.getTileEntity(pos);
@@ -91,7 +97,9 @@ public enum FrameRegistry implements IFrameRegistry {
 
         for (IStickinessProvider provider : stickinessProviders.values()) {
             IStickable stickable = provider.getStickable(world, pos, face);
-            if (stickable != null) return stickable;
+            if (stickable != null) {
+                return stickable;
+            }
         }
 
         return te == null || !te.hasCapability(IStickable.CAPABILITY_STICKABLE, face) ? null
@@ -111,7 +119,9 @@ public enum FrameRegistry implements IFrameRegistry {
 
     public IFrameMaterial getMaterial(ResourceLocation name) {
 
-        if (name.getResourceDomain().equals("minecraft")) name = new ResourceLocation(ModInfo.MODID, name.getResourcePath());
+        if (name.getResourceDomain().equals("minecraft")) {
+            name = new ResourceLocation(ModInfo.MODID, name.getResourcePath());
+        }
         return materials.get(name);
     }
 

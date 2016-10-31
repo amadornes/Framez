@@ -58,7 +58,9 @@ public class UpgradeFactoryBase implements IMotorUpgradeFactory {
 
         for (int i = 0; i < motor.get().getUpgradeSlots(); i++) {
             Entry<IMotorUpgrade, ItemStack> upgrade = motor.get().getUpgrade(i);
-            if (upgrade != null && upgrade.getKey().getType().equals(type)) return false;
+            if (upgrade != null && upgrade.getKey().getType().equals(type)) {
+                return false;
+            }
         }
         return true;
     }

@@ -37,20 +37,25 @@ public class ItemMotorUpgrade extends ItemFramez {
     public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 
         int i = 0;
-        for (String type : MotorRegistry.INSTANCE.internalUpgrades.keySet())
+        for (String type : MotorRegistry.INSTANCE.internalUpgrades.keySet()) {
             subItems.add(new ItemStack(itemIn, 1, i++));
+        }
     }
 
     @Override
     public ICapabilityLambda initCapabilities(ItemStack stack, NBTTagCompound nbt) {
 
         return (c, f) -> {
-            if (f != null || c != IMotorUpgradeFactory.CAPABILITY_ITEM_UPGRADE) return null;
+            if (f != null || c != IMotorUpgradeFactory.CAPABILITY_ITEM_UPGRADE) {
+                return null;
+            }
             String t = null;
             int i = 0;
             for (String type : MotorRegistry.INSTANCE.internalUpgrades.keySet()) {
                 t = type;
-                if (i++ == stack.getItemDamage()) break;
+                if (i++ == stack.getItemDamage()) {
+                    break;
+                }
             }
             return MotorRegistry.INSTANCE.internalUpgrades.get(t);
         };

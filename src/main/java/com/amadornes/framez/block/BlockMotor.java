@@ -87,8 +87,9 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
 
         ItemStack stack = player.getHeldItemMainhand();
-        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null) && world.isRemote)
+        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null) && world.isRemote) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiMotorSettings(((TileMotor) world.getTileEntity(pos)).getSafeReference()));
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -96,8 +97,9 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World worldIn, BlockPos pos) {
 
         ItemStack stack = player.getHeldItemMainhand();
-        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null))
+        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null)) {
             return 0;
+        }
         return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
     }
 
@@ -106,8 +108,9 @@ public class BlockMotor extends Block implements ITileEntityProvider {
 
         ItemStack stack = player.getHeldItemMainhand();
         if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null)) {
-            if (world.isRemote)
+            if (world.isRemote) {
                 Minecraft.getMinecraft().displayGuiScreen(new GuiMotorSettings(((TileMotor) world.getTileEntity(pos)).getSafeReference()));
+            }
             return false;
         }
         return super.removedByPlayer(state, world, pos, player, willHarvest);
@@ -130,8 +133,9 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
 
         TileEntity te = world.getTileEntity(pos);
-        if (te != null && te instanceof TileMotor)
+        if (te != null && te instanceof TileMotor) {
             return ((TileMotor) te).getActualState(state.withProperty(PROPERTY_PART_TYPE, 0));
+        }
         return state;
     }
 
@@ -139,8 +143,9 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 
         TileEntity te = world.getTileEntity(pos);
-        if (te != null && te instanceof TileMotor)
+        if (te != null && te instanceof TileMotor) {
             return ((TileMotor) te).getExtendedState((IExtendedBlockState) state);
+        }
         return state;
     }
 

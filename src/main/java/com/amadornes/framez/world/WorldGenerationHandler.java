@@ -18,9 +18,15 @@ public class WorldGenerationHandler implements IWorldGenerator {
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 
-        if (!FramezConfig.MetamorphicStone.generate) return;
-        if (!world.provider.isSurfaceWorld()) return;
-        if (random.nextDouble() > FramezConfig.MetamorphicStone.rarity) return;
+        if (!FramezConfig.MetamorphicStone.generate) {
+            return;
+        }
+        if (!world.provider.isSurfaceWorld()) {
+            return;
+        }
+        if (random.nextDouble() > FramezConfig.MetamorphicStone.rarity) {
+            return;
+        }
 
         for (int i = 0; i < (FramezConfig.MetamorphicStone.minVeinsPerChunk
                 + random.nextInt(FramezConfig.MetamorphicStone.maxVeinsPerChunk - FramezConfig.MetamorphicStone.minVeinsPerChunk)); i++) {
