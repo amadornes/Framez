@@ -127,13 +127,15 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
             this.moving = motor.moving;
             this.currentMovementTicks = motor.currentMovementTicks;
         }
-        if (logic != null) initLogic(logic);
+        if (logic != null)
+            initLogic(logic);
     }
 
     private void initLogic(IMotorLogic<?> logic) {
 
         this.logic = logic;
-        if (logic == null) return;
+        if (logic == null)
+            return;
 
         logic.setMotor(reference);
 
@@ -152,13 +154,15 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
     @Override
     public void update() {
 
-        if (logic == null) getBlockMetadata();
+        if (logic == null)
+            getBlockMetadata();
         if (firstTick) {
             firstTick = false;
             getLogic().onFirstTick();
         }
         if (moving != null) {
-            if (moving.get()) currentMovementTicks++;
+            if (moving.get())
+                currentMovementTicks++;
             if (currentMovementTicks >= getVariable(MOVEMENT_TIME)) {
                 getLogic().onMovementComplete();
                 currentMovementTicks = -1;
@@ -181,15 +185,18 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
             }
             boolean clash = false;
             for (IMotorAction a : newActions) {
-                if (a == null) continue;
+                if (a == null)
+                    continue;
                 for (IMotorAction b : newActions) {
-                    if (b == null) continue;
+                    if (b == null)
+                        continue;
                     if (a != b && (a.clashesWith(b) || b.clashesWith(a))) {
                         clash = true;
                         break;
                     }
                 }
-                if (clash) break;
+                if (clash)
+                    break;
             }
             if (!clash) {
                 for (int i = 0; i < newActions.length; i++) {
@@ -247,11 +254,17 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
     @Override
     public boolean canMove(IMotorAction action) {
 
-        if (action == EnumMotorAction.STOP) return false;
-        if (checkStatus(EnumMotorStatus.MOVING)) return false;
+        if (action == EnumMotorAction.STOP)
+            return false;
+        if (checkStatus(EnumMotorStatus.MOVING))
+            return false;
         IMotorLogic<?> logic = getLogic();
-        if (logic == null) return false;
-        if (lastMoveCheck == getWorld().getTotalWorldTime()) return couldMove;
+        if (logic == null)
+            return false;
+        if (lastMoveCheck == getWorld().getTotalWorldTime())
+            return couldMove;
+        if (!logic.canMove())
+            return false;
 
         lastMoveCheck = getWorld().getTotalWorldTime();
         movedStructure = MovingStructure.discover(logic.getStructureSearchLocation(action),
@@ -265,7 +278,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
     @Override
     public DynamicReference<Boolean> move(IMotorAction action) {
 
-        if (!action.isMoving()) return null;
+        if (!action.isMoving())
+            return null;
         if (canMove(action)) {
             getLogic().move(movedStructure, action, getVariable(TileMotor.MOVEMENT_TIME).intValue());
             currentMovementTicks = 0;
@@ -291,9 +305,12 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
     @Override
     public boolean checkStatus(EnumMotorStatus status) {
 
-        if (moving != null && moving.get()) return status == EnumMotorStatus.MOVING;
-        if (!couldMove && status == EnumMotorStatus.BLOCKED) return true;
-        if (status == EnumMotorStatus.STOPPED) return true;
+        if (moving != null && moving.get())
+            return status == EnumMotorStatus.MOVING;
+        if (!couldMove && status == EnumMotorStatus.BLOCKED)
+            return true;
+        if (status == EnumMotorStatus.STOPPED)
+            return true;
         return false;
     }
 
@@ -312,15 +329,16 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
                     foundValue = true;
                 }
             }
-            if (!foundValue) for (Pair<IMotorUpgrade, ItemStack> pair : upgrades) {
-                if (pair != null) {
-                    sortedUpgrades.add(pair.getKey());
-                    if (!foundValue && pair.getKey().getProvidedVariables().containsKey(variable)) {
-                        value = (T) pair.getKey().getProvidedVariables().get(variable);
-                        foundValue = true;
+            if (!foundValue)
+                for (Pair<IMotorUpgrade, ItemStack> pair : upgrades) {
+                    if (pair != null) {
+                        sortedUpgrades.add(pair.getKey());
+                        if (!foundValue && pair.getKey().getProvidedVariables().containsKey(variable)) {
+                            value = (T) pair.getKey().getProvidedVariables().get(variable);
+                            foundValue = true;
+                        }
                     }
                 }
-            }
         }
         sortedExtensions.sort((a, b) -> Integer.compare(b.getAlterationPriority(variable), a.getAlterationPriority(variable)));
         sortedUpgrades.sort((a, b) -> Integer.compare(b.getAlterationPriority(variable), a.getAlterationPriority(variable)));
@@ -336,8 +354,9 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
         for (IMotorVariable<?> var : nativeVariables.keySet())
             variables.put(var, getVariable(var));
         for (Pair<IMotorUpgrade, ItemStack> p : this.upgrades)
-            if (p != null) for (IMotorVariable<?> var : p.getKey().getProvidedVariables().keySet())
-                variables.put(var, getVariable(var));
+            if (p != null)
+                for (IMotorVariable<?> var : p.getKey().getProvidedVariables().keySet())
+                    variables.put(var, getVariable(var));
         for (IMotorExtension extension : extensions.values())
             for (IMotorVariable<?> var : extension.getProvidedVariables().keySet())
                 variables.put(var, getVariable(var));
@@ -348,7 +367,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
     public boolean hasCapability(Capability<?> capability, EnumFacing side) {
 
         for (IMotorExtension extension : extensions.values())
-            if (extension.hasCapability(capability, side)) return true;
+            if (extension.hasCapability(capability, side))
+                return true;
         return super.hasCapability(capability, side);
     }
 
@@ -356,7 +376,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
     public <T> T getCapability(Capability<T> capability, EnumFacing side) {
 
         for (IMotorExtension extension : extensions.values())
-            if (extension.hasCapability(capability, side)) return extension.getCapability(capability, side);
+            if (extension.hasCapability(capability, side))
+                return extension.getCapability(capability, side);
         return super.getCapability(capability, side);
     }
 
@@ -388,39 +409,48 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
 
         // if (getStackInSlot(slot) != null) return stack;
 
-        if (!stack.hasCapability(IMotorUpgradeFactory.CAPABILITY_ITEM_UPGRADE, null)) return stack;
+        if (!stack.hasCapability(IMotorUpgradeFactory.CAPABILITY_ITEM_UPGRADE, null))
+            return stack;
         IMotorUpgradeFactory upgradeFactory = stack.getCapability(IMotorUpgradeFactory.CAPABILITY_ITEM_UPGRADE, null);
-        if (MotorHelper.addUpgrade(this, upgradeFactory, slot, stack, simulate)) return stack.copy().splitStack(stack.stackSize - 1);
+        if (MotorHelper.addUpgrade(this, upgradeFactory, slot, stack, simulate))
+            return stack.copy().splitStack(stack.stackSize - 1);
         return stack;
     }
 
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
 
-        if (getStackInSlot(slot) == null) return null;
+        if (getStackInSlot(slot) == null)
+            return null;
 
         ItemStack stack = upgrades[slot].getRight();
-        if (!simulate) MotorHelper.removeUpgrade(this, slot);
+        if (!simulate)
+            MotorHelper.removeUpgrade(this, slot);
         return stack;
     }
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
 
-        if (stack == null) extractItem(slot, 1, false);
-        else insertItem(slot, stack, false);
+        if (stack == null)
+            extractItem(slot, 1, false);
+        else
+            insertItem(slot, stack, false);
     }
 
     public IMotorLogic<?> getLogic() {
 
-        if (logic == null) getBlockMetadata();
+        if (logic == null)
+            getBlockMetadata();
         return logic;
     }
 
     public void setUpgrade(int slot, IMotorUpgrade upgrade, ItemStack stack) {
 
-        if (upgrade == null || stack == null) upgrades[slot] = null;
-        else upgrades[slot] = new ImmutablePair<IMotorUpgrade, ItemStack>(upgrade, stack);
+        if (upgrade == null || stack == null)
+            upgrades[slot] = null;
+        else
+            upgrades[slot] = new ImmutablePair<IMotorUpgrade, ItemStack>(upgrade, stack);
     }
 
     public IBlockState getActualState(IBlockState state) {
@@ -440,7 +470,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
                         if (stack != null && stack.getItem() instanceof ItemBlock) {
                             IBlockState faceState = ((ItemBlock) stack.getItem()).block
                                     .getStateFromMeta(((ItemBlock) stack.getItem()).getMetadata(stack.getMetadata()));
-                            if (Framez.proxy.isFullBlock(faceState)) state = state.withProperty(BlockMotor.PROPERTIES_CAMO[i], faceState);
+                            if (Framez.proxy.isFullBlock(faceState))
+                                state = state.withProperty(BlockMotor.PROPERTIES_CAMO[i], faceState);
                         }
                     }
                 }
@@ -495,7 +526,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
 
     public void readFromPacketNBT(NBTTagCompound tag) {
 
-        if (logic == null) initLogic(IMotorLogic.create(tag.getInteger("logicID")));
+        if (logic == null)
+            initLogic(IMotorLogic.create(tag.getInteger("logicID")));
 
         moving = new DynamicReference<Boolean>(tag.getBoolean("moving"));
         currentMovementTicks = tag.getInteger("currentMovementTicks");
@@ -508,7 +540,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
 
         NBTTagCompound upgrades = tag.getCompoundTag("upgrades");
         for (int i = 0; i < this.upgrades.length; i++) {
-            if (!upgrades.hasKey("upgrade" + i)) continue;
+            if (!upgrades.hasKey("upgrade" + i))
+                continue;
             Pair<IMotorUpgrade, ItemStack> p = this.upgrades[i];
             NBTTagCompound upgrade = upgrades.getCompoundTag("upgrade" + i);
             if (p != null && p.getKey().getType().toString().equals(upgrade.getString("upgradeType"))) {
@@ -542,7 +575,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
         trigger.getTriggers().clear();
         NBTTagCompound trig = tag.getCompoundTag("triggers");
         for (String k : trig.getKeySet()) {
-            if (k.endsWith("_data")) continue;
+            if (k.endsWith("_data"))
+                continue;
             trigger.addTrigger(availableTriggers.get(new ResourceLocation(k)), trig.getBoolean(k));
         }
     }
@@ -582,7 +616,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
     public int getBlockMetadata() {
 
         int meta = super.getBlockMetadata();
-        if (getWorld() != null && logic == null) initLogic(IMotorLogic.create(meta));
+        if (getWorld() != null && logic == null)
+            initLogic(IMotorLogic.create(meta));
         return meta;
     }
 
@@ -597,7 +632,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
 
         super.validate();
         onValidate();
-        if (getLogic() != null) getLogic().validate();
+        if (getLogic() != null)
+            getLogic().validate();
     }
 
     @Override
@@ -605,7 +641,8 @@ public class TileMotor extends TileEntity implements IMotor, IMotorInteractions,
 
         super.invalidate();
         onInvalidate();
-        if (getLogic() != null) getLogic().invalidate();
+        if (getLogic() != null)
+            getLogic().invalidate();
         firstTick = true;
     }
 

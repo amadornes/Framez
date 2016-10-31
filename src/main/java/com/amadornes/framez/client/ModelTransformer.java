@@ -41,16 +41,34 @@ public class ModelTransformer {
         return new TransformedModel(model, quads);
     }
 
-    private static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer,
+    public static List<BakedQuad> transform(List<BakedQuad> quads, IVertexTransformer transformer) {
+
+        return transform(quads, transformer, f -> f);
+    }
+
+    public static List<BakedQuad> transform(List<BakedQuad> quads, IVertexTransformer transformer,
             Function<VertexFormat, VertexFormat> formatRemapper) {
 
-        // TODO: Optimize
+        List<BakedQuad> transformedQuads = new ArrayList<BakedQuad>();
+        for (BakedQuad quad : quads)
+            transformedQuads.add(transform(quad, transformer, formatRemapper));
+        return transformedQuads;
+    }
+
+    public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer) {
+
+        return transform(quad, transformer, f -> f);
+    }
+
+    public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer, Function<VertexFormat, VertexFormat> formatRemapper) {
+
         VertexFormat format = quad.getFormat();
         VertexFormat newFormat = formatRemapper.apply(format);
         Field f = ReflectionHelper.findField(UnpackedBakedQuad.class, "unpackedData");
         f.setAccessible(true);
         UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(newFormat);
-        if (quad.hasTintIndex()) builder.setQuadTint(quad.getTintIndex());
+        if (quad.hasTintIndex())
+            builder.setQuadTint(quad.getTintIndex());
         builder.setQuadOrientation(quad.getFace());
         LightUtil.putBakedQuad(builder, quad);
         UnpackedBakedQuad unpackedQuad = builder.build();

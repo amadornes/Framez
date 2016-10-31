@@ -65,16 +65,20 @@ public class MovingStructure implements IMovingStructure {
         for (MovingBlock b : blocks) {
             BlockPos pos = b.getPos();
             if (axis == Axis.X) {
-                if (pos.getY() != reference.getY() && pos.getZ() != reference.getZ()) continue;
+                if (pos.getY() != reference.getY() && pos.getZ() != reference.getZ())
+                    continue;
                 val = pos.getX();
             } else if (axis == Axis.Y) {
-                if (pos.getX() != reference.getX() && pos.getZ() != reference.getZ()) continue;
+                if (pos.getX() != reference.getX() && pos.getZ() != reference.getZ())
+                    continue;
                 val = pos.getY();
             } else {
-                if (pos.getX() != reference.getX() && pos.getY() != reference.getY()) continue;
+                if (pos.getX() != reference.getX() && pos.getY() != reference.getY())
+                    continue;
                 val = pos.getZ();
             }
-            if (val < minVal || val > maxVal) continue;
+            if (val < minVal || val > maxVal)
+                continue;
             min = Math.min(min, val);
             max = Math.max(max, val);
         }
@@ -122,7 +126,8 @@ public class MovingStructure implements IMovingStructure {
         IMovement movement = movementSupplier.apply(blocks);
         Map<MovingBlock, BlockPos> blockMap = new HashMap<MovingBlock, BlockPos>();
         for (MovingBlock b : blocks)
-            if (b != start) blockMap.put(b, movement != null ? movement.transform(b.getPos()) : b.getPos());
+            if (b != start)
+                blockMap.put(b, movement != null ? movement.transform(b.getPos()) : b.getPos());
 
         // This is not needed. Motors may want to move even if there are no blocks (linear actuator)
         // if (blockMap.isEmpty()) return null;

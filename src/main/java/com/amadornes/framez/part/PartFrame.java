@@ -17,9 +17,9 @@ import com.amadornes.framez.util.PropertyMaterial;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.AdvancedParticleManager;
 import mcmultipart.client.multipart.ICustomHighlightPart;
+import mcmultipart.microblock.ICenterConnectablePart;
 import mcmultipart.microblock.IMicroblock;
 import mcmultipart.microblock.IMicroblock.IFaceMicroblock;
-import mcmultipart.multipart.ICenterConnectablePart;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.ISlottedPart;
@@ -97,7 +97,8 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
 
         if (getContainer() != null) {
             IMultipart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(facing));
-            if (part != null && part instanceof IMicroblock) return ((IMicroblock) part).getSize() != 1;
+            if (part != null && part instanceof IMicroblock)
+                return ((IMicroblock) part).getSize() != 1;
             return true;
         }
         return false;
@@ -130,13 +131,15 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
 
         AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-        if (bb.intersectsWith(mask)) list.add(bb);
+        if (bb.intersectsWith(mask))
+            list.add(bb);
     }
 
     @Override
     public boolean occlusionTest(IMultipart part) {
 
-        if (part instanceof PartFrame) return false;
+        if (part instanceof PartFrame)
+            return false;
         return super.occlusionTest(part);
     }
 
@@ -267,19 +270,23 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
             if (part != null && part instanceof ICenterConnectablePart) {
                 int radius = ((ICenterConnectablePart) part).getHoleRadius(face);
                 if (radius > 0) {
-                    if (radius <= 8) return EnumFrameSideState.PIPE;
-                    else return EnumFrameSideState.HOLLOW;
+                    if (radius <= 8)
+                        return EnumFrameSideState.PIPE;
+                    else
+                        return EnumFrameSideState.HOLLOW;
                 }
             }
             if (FramezConfig.Client.connectContiguousFrames) {
                 IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(face));
                 if (container != null) {
                     for (IMultipart p : container.getParts()) {
-                        if (p instanceof PartFrame) return EnumFrameSideState.HOLLOW;
+                        if (p instanceof PartFrame)
+                            return EnumFrameSideState.HOLLOW;
                     }
                 }
             }
-            if (FramezConfig.Client.clickThroughFrames) return EnumFrameSideState.PIPE;
+            if (FramezConfig.Client.clickThroughFrames)
+                return EnumFrameSideState.PIPE;
             return EnumFrameSideState.NORMAL;
         }
     }
@@ -287,18 +294,24 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
 
-        if (capability == IFrame.CAPABILITY_FRAME && facing == null) return true;
-        if (capability == ISticky.CAPABILITY_STICKY && facing != null) return true;
-        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null) return true;
+        if (capability == IFrame.CAPABILITY_FRAME && facing == null)
+            return true;
+        if (capability == ISticky.CAPABILITY_STICKY && facing != null)
+            return true;
+        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null)
+            return true;
         return false;
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 
-        if (capability == IFrame.CAPABILITY_FRAME && facing == null) return (T) this;
-        if (capability == ISticky.CAPABILITY_STICKY && facing != null) return (T) stickySides[facing.ordinal()];
-        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null) return (T) stickableSides[facing.ordinal()];
+        if (capability == IFrame.CAPABILITY_FRAME && facing == null)
+            return (T) this;
+        if (capability == ISticky.CAPABILITY_STICKY && facing != null)
+            return (T) stickySides[facing.ordinal()];
+        if (capability == IStickable.CAPABILITY_STICKABLE && facing != null)
+            return (T) stickableSides[facing.ordinal()];
         return null;
     }
 
@@ -330,10 +343,10 @@ public class PartFrame extends Multipart implements IFrame, ICustomHighlightPart
         GlStateManager.depthMask(false);
 
         double d = 0.002D;
-        RenderGlobal.drawSelectionBoundingBox(new AxisAlignedBB(0, 0, 0, 1, 1, 1).expandXyz(d));
-        RenderGlobal.drawSelectionBoundingBox(new AxisAlignedBB(0, 2 / 16D, 2 / 16D, 1, 14 / 16D, 14 / 16D).expand(d, -d, -d));
-        RenderGlobal.drawSelectionBoundingBox(new AxisAlignedBB(2 / 16D, 0, 2 / 16D, 14 / 16D, 1, 14 / 16D).expand(-d, d, -d));
-        RenderGlobal.drawSelectionBoundingBox(new AxisAlignedBB(2 / 16D, 2 / 16D, 0, 14 / 16D, 14 / 16D, 1).expand(-d, -d, d));
+        RenderGlobal.func_189697_a(new AxisAlignedBB(0, 0, 0, 1, 1, 1).expandXyz(d), 0, 0, 0, 0.4F);
+        RenderGlobal.func_189697_a(new AxisAlignedBB(0, 2 / 16D, 2 / 16D, 1, 14 / 16D, 14 / 16D).expand(d, -d, -d), 0, 0, 0, 0.4F);
+        RenderGlobal.func_189697_a(new AxisAlignedBB(2 / 16D, 0, 2 / 16D, 14 / 16D, 1, 14 / 16D).expand(-d, d, -d), 0, 0, 0, 0.4F);
+        RenderGlobal.func_189697_a(new AxisAlignedBB(2 / 16D, 2 / 16D, 0, 14 / 16D, 14 / 16D, 1).expand(-d, -d, d), 0, 0, 0, 0.4F);
 
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture2D();

@@ -24,6 +24,7 @@ public class PacketShowGUI extends Packet<PacketShowGUI> {
     @Override
     public void handleClientSide(EntityPlayer player) {
 
+        player.openGui(Framez.instance, gui, player.worldObj, pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override

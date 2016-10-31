@@ -4,6 +4,7 @@ import java.util.function.IntFunction;
 
 import com.amadornes.framez.Framez;
 import com.amadornes.framez.ModInfo;
+import com.amadornes.framez.block.BlockBreaker;
 import com.amadornes.framez.block.BlockMetamorphicStone;
 import com.amadornes.framez.block.BlockMotor;
 import com.amadornes.framez.item.ItemBlockMetamorphicStone;
@@ -20,11 +21,13 @@ public class FramezBlocks {
 
     public static Block motor;
     public static Block metamorphic_stone;
+    public static Block block_breaker;
 
     public static void initialize() {
 
         motor = new BlockMotor();
         metamorphic_stone = new BlockMetamorphicStone();
+        block_breaker = new BlockBreaker();
     }
 
     public static void register() {
@@ -32,9 +35,9 @@ public class FramezBlocks {
         registerBlock(motor, ItemBlockMotor.class, "motor", MotorLogicType.VALUES.length);
         GameRegistry.registerTileEntity(TileMotor.class, ModInfo.MODID + ":motor");
         registerBlock(metamorphic_stone, ItemBlockMetamorphicStone.class, "metamorphic_stone", 6);
+        registerBlock(block_breaker, "block_breaker", 1);
     }
 
-    @SuppressWarnings("unused")
     private static void registerBlock(Block block, String name, int variants) {
 
         registerBlock(block, ItemBlock.class, name, variants);
@@ -47,7 +50,7 @@ public class FramezBlocks {
         registerBlock(block, itemblock, name, i -> i + "", vars);
     }
 
-    @SuppressWarnings("deprecation") // TODO: Upgrade to the new registr
+    @SuppressWarnings("deprecation") // TODO: Upgrade to the new registries
     private static void registerBlock(Block block, Class<? extends ItemBlock> itemblock, String name, IntFunction<String> i2s,
             int... variants) {
 

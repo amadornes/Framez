@@ -46,6 +46,8 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public BlockMotor() {
 
         super(Material.IRON);
+        setHardness(3);
+        setResistance(10);
     }
 
     @Override
@@ -70,6 +72,14 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack stack,
             EnumFacing side, float hitX, float hitY, float hitZ) {
 
+        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null)) {
+            TileMotor te = ((TileMotor) world.getTileEntity(pos));
+            boolean result = te.getLogic().rotate(side);
+            if (result) {
+                te.sendUpdatePacket();
+            }
+            return result;
+        }
         return false;
     }
 
@@ -86,7 +96,8 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World worldIn, BlockPos pos) {
 
         ItemStack stack = player.getHeldItemMainhand();
-        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null)) return 0;
+        if (stack != null && stack.hasCapability(IFramezWrench.CAPABILITY_WRENCH, null))
+            return 0;
         return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
     }
 
@@ -119,7 +130,8 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
 
         TileEntity te = world.getTileEntity(pos);
-        if (te != null && te instanceof TileMotor) return ((TileMotor) te).getActualState(state.withProperty(PROPERTY_PART_TYPE, 0));
+        if (te != null && te instanceof TileMotor)
+            return ((TileMotor) te).getActualState(state.withProperty(PROPERTY_PART_TYPE, 0));
         return state;
     }
 
@@ -127,7 +139,8 @@ public class BlockMotor extends Block implements ITileEntityProvider {
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 
         TileEntity te = world.getTileEntity(pos);
-        if (te != null && te instanceof TileMotor) return ((TileMotor) te).getExtendedState((IExtendedBlockState) state);
+        if (te != null && te instanceof TileMotor)
+            return ((TileMotor) te).getExtendedState((IExtendedBlockState) state);
         return state;
     }
 

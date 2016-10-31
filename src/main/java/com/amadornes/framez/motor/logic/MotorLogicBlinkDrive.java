@@ -91,6 +91,12 @@ public class MotorLogicBlinkDrive implements IMotorLogic<EnumFacing> {
     }
 
     @Override
+    public boolean canMove() {
+
+        return linked != null;
+    }
+
+    @Override
     public void move(MovingStructure structure, IMotorAction action, int duration) {
 
         this.action = (EnumMotorAction) action;
@@ -132,7 +138,8 @@ public class MotorLogicBlinkDrive implements IMotorLogic<EnumFacing> {
     public void updateLinked() {
 
         World world = getMotor().getMotorWorld();
-        if (!world.isRemote) return;
+        if (!world.isRemote)
+            return;
 
         BlockPos pos = getMotor().getMotorPos();
         EnumFacing otherFacing = face.getOpposite();

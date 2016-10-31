@@ -38,7 +38,7 @@ public class BlockMetamorphicStone extends Block {
 
     public BlockMetamorphicStone() {
 
-        super(Material.IRON);
+        super(Material.ROCK);
         setHardness(3F);
         setResistance(30);
         setUnlocalizedName(ModInfo.MODID + ":metamorphic_stone");

@@ -3,8 +3,10 @@
 	"defaults": {
 		"textures": {
 	        "border": "framez:blocks/motor/border",
+	        "border_front": "framez:blocks/motor/border",
 	        "rod": "framez:blocks/motor/rod",
 	        "center": "framez:blocks/motor/center",
+	        "center_front": "framez:blocks/motor/center",
 	        "particle": "framez:blocks/motor/center",
 	        "border_b": "framez:blocks/motor/border_b",
 	        "center_b": "framez:blocks/motor/center_b",

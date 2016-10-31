@@ -2,6 +2,8 @@ package com.amadornes.framez.client.model;
 
 import java.util.List;
 
+import com.amadornes.framez.client.ModelTransformer;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -22,9 +24,10 @@ public class ModelMotorRotationHandler implements IBakedModel {
 
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-        // TRSRTransformation.getMatrix(facing);
 
-        return model.getQuads(state, side, rand);
+        return ModelTransformer.transform(model.getQuads(state, side, rand), (quad, type, usage, data) -> {
+            return data;
+        });
     }
 
     @Override

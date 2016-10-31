@@ -29,7 +29,8 @@ public class IsolatedWorld implements IBlockAccess {
     @Override
     public TileEntity getTileEntity(BlockPos pos) {
 
-        if (this.position.equals(pos)) return world.getTileEntity(pos);
+        if (this.position.equals(pos))
+            return world.getTileEntity(pos);
         return null;
     }
 
@@ -42,14 +43,16 @@ public class IsolatedWorld implements IBlockAccess {
     @Override
     public IBlockState getBlockState(BlockPos pos) {
 
-        if (this.position.equals(pos)) return world.getBlockState(pos);
+        if (this.position.equals(pos))
+            return world.getBlockState(pos);
         return Blocks.AIR.getDefaultState();
     }
 
     @Override
     public boolean isAirBlock(BlockPos pos) {
 
-        if (this.position.equals(pos)) return world.isAirBlock(pos);
+        if (this.position.equals(pos))
+            return world.isAirBlock(pos);
         return true;
     }
 
@@ -60,15 +63,10 @@ public class IsolatedWorld implements IBlockAccess {
     }
 
     @Override
-    public boolean extendedLevelsInChunkCache() {
-
-        return world.extendedLevelsInChunkCache();
-    }
-
-    @Override
     public int getStrongPower(BlockPos pos, EnumFacing direction) {
 
-        if (this.position.equals(pos)) return world.getStrongPower(pos, direction);
+        if (this.position.equals(pos))
+            return world.getStrongPower(pos, direction);
         return 0;
     }
 
@@ -81,7 +79,8 @@ public class IsolatedWorld implements IBlockAccess {
     @Override
     public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
 
-        if (this.position.equals(pos)) return world.isSideSolid(pos, side, _default);
+        if (this.position.equals(pos))
+            return world.isSideSolid(pos, side, _default);
         return false;
     }
 

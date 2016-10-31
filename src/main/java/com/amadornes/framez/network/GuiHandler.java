@@ -1,5 +1,6 @@
 package com.amadornes.framez.network;
 
+import com.amadornes.framez.client.gui.GuiMotorSettings;
 import com.amadornes.framez.client.gui.GuiUpgradeSelect;
 import com.amadornes.framez.container.ContainerUpgrade;
 import com.amadornes.framez.tile.TileMotor;
@@ -22,7 +23,10 @@ public class GuiHandler implements IGuiHandler {
                 return new ContainerUpgrade(((TileMotor) te).getSafeReference(), id, player.inventory);
         } else if (id >= 9 && id < 18) {
             TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-            if (te != null && te instanceof TileMotor) return ((TileMotor) te).getUpgrade(id - 9).getKey().getGuiContainer(player);
+            if (te != null && te instanceof TileMotor)
+                return ((TileMotor) te).getUpgrade(id - 9).getKey().getGuiContainer(player);
+        } else if (id == 19) {
+            // NO-OP
         }
 
         return null;
@@ -39,6 +43,11 @@ public class GuiHandler implements IGuiHandler {
             TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
             if (te != null && te instanceof TileMotor)
                 return ((TileMotor) te).getUpgrade(id - 9).getKey().getConfigGUI(player, Minecraft.getMinecraft().currentScreen);
+        } else if (id == 19) {
+            TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
+            if (te != null && te instanceof TileMotor) {
+                return new GuiMotorSettings(((TileMotor) te).getSafeReference());
+            }
         }
 
         return null;
